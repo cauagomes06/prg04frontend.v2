@@ -1,0 +1,210 @@
+/* src/styles/global.css */
+
+/* 1. Importar Fontes */
+@import url("https://fonts.googleapis.com/css2?family=Alan+Sans:wght@300..900&family=Anton&family=Bebas+Neue&display=swap");
+
+/* 2. Definir as Cores da Identidade Visual */
+:root {
+  --primary-color: #0ad354; /* O seu Verde Fit-Hub */
+  --primary-hover: #08a441;
+  --bg-light: #f8f9fa;
+  --border-color: #e9ecef;
+  --text-dark: #333;
+  --text-muted: #555;
+}
+
+body {
+  margin: 0;
+  font-family: "Alan Sans", sans-serif;
+  color: var(--text-dark);
+  background-color: #fff;
+  box-sizing: border-box;
+}
+
+/* 3. Sobrescrever o Bootstrap para usar o SEU VERDE */
+.btn-success {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.btn-success:hover {
+  background-color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+}
+
+.text-success {
+  color: var(--primary-color) !important;
+}
+
+.btn-outline-success {
+  color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+.btn-outline-success:hover {
+  background-color: var(--primary-color) !important;
+  color: #fff !important;
+}
+
+/* 4. Estilos da Sidebar (Menu Lateral) */
+.portal-container {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+}
+
+.portal-sidebar {
+  background-color: var(--bg-light);
+  border-right: 1px solid var(--border-color);
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.portal-sidebar.active {
+    /* Garante que aparece */
+    display: flex; 
+}
+
+.perfil-usuario {
+  text-align: center;
+}
+
+.perfil-usuario img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border: 3px solid var(--primary-color);
+}
+
+.portal-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.portal-menu li a {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text-dark);
+  font-weight: 500;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+.portal-menu li a:hover {
+  background-color: #e2e6ea;
+  color: var(--primary-color);
+}
+
+/* Link Ativo (você pode adicionar lógica no React para isso depois) */
+.portal-menu li a.active {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+.portal-menu li.menu-divider {
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 15px 0;
+}
+
+/* 5. Estilos dos Cards (Treinos, etc.) */
+.portal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+  justify-content: start;
+}
+
+.personal-card {
+  background-color: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: #fff;
+}
+
+.personal-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.personal-card.no-image {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  height: 100%;
+}
+
+.personal-info h3 {
+  margin: 0 0 5px 0;
+  font-size: 1.4rem;
+  color: var(--text-dark);
+  font-weight: bold;
+}
+
+.workout-tags {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 15px 0;
+  flex-wrap: wrap;
+}
+
+/* Estilização das Badges do Bootstrap para combinar */
+.badge.bg-primary {
+    background-color: var(--primary-color) !important;
+    color: #ffffff !important; /* ADICIONE ESTA LINHA */
+}
+
+.badge.bg-secondary {
+    background-color: #6c757d; 
+    color: #ffffff !important; /* Garante branco aqui também */
+}
+/* Área superior do card */
+.card-top-bg {
+  height: 110px;
+  background-color: #f0fdf4;
+  border-bottom: 3px solid #0ad35420;
+}
+
+/* Ícone do dumbbell */
+.icon-dumbbell {
+  color: #0ad354;
+  opacity: 0.6;
+}
+
+/* Animação de hover */
+.card-hover {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08) !important;
+}
+  
+/* Responsividade Mobile */
+@media (max-width: 992px) {
+  .portal-container {
+    grid-template-columns: 1fr;
+  }
+  .portal-sidebar {
+    display: none; /* Esconde em mobile por enquanto, até fazermos o toggle */
+  }
+}

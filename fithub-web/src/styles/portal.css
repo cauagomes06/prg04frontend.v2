@@ -1,0 +1,719 @@
+/* --- ESTILOS GERAIS --- */
+@import url("https://fonts.googleapis.com/css2?family=Alan+Sans:wght@300..900&family=Anton&family=Bebas+Neue&display=swap");
+
+:root {
+  --primary-color: #0ad354;
+  --primary-hover: #08a441;
+  --bg-light: #f8f9fa;
+  --border-color: #e9ecef;
+  --text-dark: #333;
+  --text-muted: #555;
+}
+
+body {
+  margin: 0;
+  font-family: "Alan Sans", sans-serif;
+  color: var(--text-dark);
+  background-color: #fff;
+  box-sizing: border-box;
+}
+
+/* --- LAYOUT PRINCIPAL --- */
+.portal-container {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: calc(100vh - 100px);
+}
+
+.navbar {
+  align-items: center;
+  background-color: var(--primary-color);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* --- SIDEBAR --- */
+.portal-sidebar {
+  background-color: var(--bg-light);
+  border-right: 1px solid var(--border-color);
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.perfil-usuario {
+  text-align: center;
+}
+
+.perfil-usuario img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border: 3px solid var(--primary-color);
+}
+
+.perfil-usuario h3 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.perfil-usuario p {
+  margin: 5px 0 0 0;
+  color: var(--text-muted);
+}
+
+.portal-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.portal-menu li a {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text-dark);
+  font-weight: 500;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+.portal-menu li a:hover {
+  background-color: var(--border-color);
+}
+
+.portal-menu li.active a {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+.portal-menu li a i {
+  width: 20px;
+  text-align: center;
+}
+
+.portal-menu li.menu-divider {
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 15px 0;
+}
+
+/* --- ÁREA DE CONTEÚDO --- */
+.portal-conteudo {
+  padding: 40px;
+  background-color: #fff;
+}
+
+.portal-conteudo h1 {
+  font-size: 2.5rem;
+  margin-top: 0;
+}
+
+.portal-tab-content {
+  display: none;
+  animation: tabFadeIn 0.5s ease;
+}
+
+.portal-tab-content.active {
+  display: block;
+}
+
+@keyframes tabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- CARDS GERAIS --- */
+.anuncio-card,
+.portal-evento-card,
+.portal-contato-card,
+.personal-card,
+.workout-card,
+.perfil-card,
+.aula-item {
+  background-color: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: 8px; /* Padronizado para 8px, ajuste se necessário */
+  padding: 20px;
+  margin-bottom: 20px; /* Margem inferior padrão */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.portal-evento-card:hover,
+.portal-contato-card:hover,
+.personal-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* --- ANÚNCIOS --- */
+.anuncio-card {
+  border-left: 5px solid var(--primary-color);
+}
+
+.anuncio-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.anuncio-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+.anuncio-header time {
+  font-size: 0.9rem;
+  color: #777;
+}
+.anuncio-card p {
+  margin: 0;
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+/* --- GRIDS --- */
+.portal-grid,
+.perfil-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+/* Opcional: Limitar a largura máxima do card para ele não ficar gigante em telas ultra-wide */
+.portal-grid .personal-card {
+  max-width: 400px; /* O card nunca passará desta largura */
+  width: 100%;
+} 
+/* Ajuste específico para cards quadrados de treino se necessário */
+/* .portal-grid-treino { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); } */
+
+/* --- EVENTOS --- */
+.portal-evento-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.portal-evento-card .evento-data {
+  padding: 10px;
+  font-size: 0.8rem;
+  background-color: #e6fff1;
+  color: var(--primary-color);
+  border-radius: 8px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.portal-evento-card .evento-data strong {
+  font-size: 1.5rem;
+}
+.portal-evento-card .evento-info h3 {
+  font-size: 1.2rem;
+  margin: 0 0 5px 0;
+}
+.portal-evento-card .evento-info p {
+  font-size: 0.9rem;
+  margin: 0;
+  color: #777;
+}
+
+/* --- CONTATO --- */
+.portal-contato-card {
+  text-align: center;
+  text-decoration: none;
+  color: var(--text-dark);
+}
+.portal-contato-card i {
+  font-size: 2rem;
+  color: var(--primary-color);
+  margin-bottom: 15px;
+}
+.portal-contato-card h3 {
+  font-size: 1.3rem;
+  margin: 0 0 8px 0;
+}
+.portal-contato-card p {
+  font-size: 1rem;
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.contato-lista {
+  list-style: none;
+  padding: 0;
+  margin-top: 40px;
+  max-width: 600px;
+  border-top: 1px solid var(--border-color);
+}
+
+.contato-lista li {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  padding: 25px 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.contato-lista i {
+  font-size: 2rem;
+  color: var(--primary-color);
+  width: 40px;
+  text-align: center;
+}
+.contato-lista .info {
+  flex-grow: 1;
+}
+.contato-lista .info h3 {
+  margin: 0 0 5px 0;
+  font-size: 1.3rem;
+  color: var(--text-dark);
+}
+.contato-lista .info p,
+.contato-lista .info a {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  word-break: break-all;
+}
+.contato-lista .info a:hover {
+  text-decoration: underline;
+  color: var(--primary-color);
+}
+
+/* --- PERSONAIS E TREINOS --- */
+.personal-card {
+  background-color: #fff;
+  border-radius: 12px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.personal-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.personal-card .personal-info,
+.workout-info {
+  padding: 20px;
+}
+.personal-card h3,
+.workout-info h3 {
+  margin: 0 0 5px 0;
+  font-size: 1.5rem;
+  color: var(--text-dark);
+}
+.personal-card span {
+  display: block;
+  color: var(--primary-color);
+  font-weight: 500;
+  margin-bottom: 15px;
+}
+
+.personal-social {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.personal-social a {
+  color: #aaa;
+  font-size: 1.5rem;
+  transition: color 0.3s ease;
+}
+.personal-social a:hover {
+  color: var(--primary-color);
+}
+
+/* Cards Quadrados de Treino (No Image) */
+.personal-card.no-image {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.personal-card.no-image .personal-info {
+  padding-top: 0;
+}
+.workout-tags {
+  display: flex;
+  justify-content: center;
+  gap: 15px; /* ou 8px dependendo do contexto */
+  margin-bottom: 20px; /* ou 10px */
+  color: #777; /* ou #555 */
+  font-weight: 500;
+  font-size: 0.9rem; /* ou 0.8rem */
+}
+/* Unificando estilos de tags se possível */
+.workout-tags span {
+  background-color: var(--border-color); /* Se usado com fundo */
+  /* color: var(--text-muted); */
+  padding: 4px 8px;
+  border-radius: 4px;
+  /* display: flex; align-items: center; gap: 5px; */
+}
+
+/* --- BOTÕES --- */
+.btn-agendar,
+.btn-ver-treino,
+.btn-editar-perfil,
+.btn-agendar-aula {
+  background-color: var(
+    --primary-color
+  ); /* btn-editar-perfil usa #e9ecef originalmente, ajustar se quiser unificar */
+  color: #fff; /* btn-editar-perfil usa #333 */
+  border: none;
+  padding: 12px; /* btn-agendar-aula usa 8px 15px */
+  border-radius: 8px; /* btn-agendar-aula usa 50px */
+  font-size: 1rem;
+  font-weight: bold; /* btn-editar-perfil usa 500 */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%; /* btn-agendar-aula e btn-editar-perfil não tinham width 100% explícito ou tinham especificidades */
+}
+
+.btn-agendar:hover,
+.btn-ver-treino:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Exceções de botões */
+.btn-editar-perfil {
+  background-color: var(--border-color);
+  color: var(--text-dark);
+  font-weight: 500;
+  padding: 10px 20px;
+  width: auto;
+}
+.btn-agendar-aula {
+  padding: 8px 15px;
+  border-radius: 50px;
+  white-space: nowrap;
+  width: auto;
+}
+.personal-card.no-image .btn-agendar {
+  width: 90%;
+}
+
+/* --- FILTROS DE TREINO --- */
+.filtro-treinos {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.filtro-treinos a {
+  background-color: #f0f0f0;
+  color: var(--text-muted);
+  padding: 8px 15px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.filtro-treinos a:hover {
+  background-color: #ddd;
+}
+.filtro-treinos a.active {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+/* --- AGENDA --- */
+.agenda-container {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 40px;
+  margin-top: 40px;
+}
+
+.calendario {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.calendario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.calendario-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text-dark);
+}
+.calendario-header button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  padding: 5px 10px;
+}
+
+.calendario-weekdays,
+.calendario-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+}
+
+.calendario-weekdays {
+  font-weight: bold;
+  color: #777;
+  padding-bottom: 10px;
+}
+
+.calendario-days div {
+  padding: 15px 5px;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.3s ease;
+  border-radius: 50%;
+}
+
+.calendario-days div.prev-month,
+.calendario-days div.next-month {
+  color: #ccc;
+}
+.calendario-days div:not(.prev-month, .next-month):hover {
+  background-color: var(--border-color);
+}
+.calendario-days div.today {
+  font-weight: bold;
+  color: var(--primary-color);
+}
+.calendario-days div.selected {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+.calendario-days div.has-events::after {
+  content: "";
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+}
+
+.calendario-days div.selected.has-events::after {
+  background-color: #fff;
+}
+
+.aulas-do-dia h3 {
+  font-size: 1.5rem;
+  margin: 0 0 20px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+#aulas-list .sem-aulas {
+  color: #777;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.aula-item {
+  background-color: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.aula-info h4 {
+  margin: 0 0 5px 0;
+  font-size: 1.2rem;
+}
+.aula-info p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* --- PERFIL --- */
+.perfil-header {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  background-color: var(--bg-light);
+  padding: 30px;
+  border-radius: 12px;
+  margin-bottom: 40px;
+}
+
+.perfil-avatar img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #fff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.perfil-info-principal {
+  flex-grow: 1;
+}
+.perfil-info-principal h1 {
+  margin: 0;
+  font-size: 2.2rem;
+}
+.perfil-info-principal .email-privado {
+  margin: 5px 0 10px 0;
+  color: #777;
+  font-size: 1.1rem;
+}
+.plano-tag {
+  background-color: #e6fff1;
+  color: var(--primary-color);
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-weight: bold;
+}
+
+.perfil-card h3 {
+  margin-top: 0;
+  font-size: 1.4rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.stats-lista .stat-item,
+.pr-lista .pr-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.1rem;
+  padding: 10px 0;
+}
+
+.stats-lista .stat-item strong,
+.pr-lista .pr-item strong {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.conquistas-grid {
+  display: flex;
+  gap: 15px;
+}
+.badge {
+  font-size: 2rem;
+  color: #ccc;
+}
+.badge.earned {
+  color: var(--primary-color);
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 992px) {
+  .portal-container {
+    grid-template-columns: 1fr;
+  }
+  .agenda-container {
+    grid-template-columns: 1fr;
+  }
+
+  .portal-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    width: 280px;
+    background-color: #fff;
+  }
+
+  .sidebar-visible .portal-sidebar {
+    transform: translateX(0);
+  }
+  .sidebar-visible .sidebar-overlay {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .btn-fechar-sidebar {
+    display: block;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 2.5rem;
+    color: #aaa;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .sidebar-visible .btn-fechar-sidebar:hover {
+    color: var(--text-dark);
+    transform: rotate(90deg);
+  }
+
+  .btn-toggle-sidebar {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+}
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+.btn-toggle-sidebar,
+.btn-fechar-sidebar {
+  display: none;
+}

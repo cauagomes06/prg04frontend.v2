@@ -1,0 +1,69 @@
+/* Importa a fonte (se ainda não estiver no custom.css) */
+@import url("https://fonts.googleapis.com/css2?family=Alan+Sans:wght@300..900&display=swap");
+
+body {
+  font-family: "Alan Sans", sans-serif ;
+}
+
+/* Define a cor verde personalizada do Fit-Hub */
+:root {
+  --bs-success: #0ad354;
+  --bs-success-rgb: 10, 211, 84;
+  --bs-success-hover: #08a441; 
+}
+
+/* --- BOTÕES --- */
+.btn-success {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--bs-success);
+  --bs-btn-border-color: var(--bs-success);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--bs-success-hover);
+  --bs-btn-hover-border-color: var(--bs-success-hover);
+}
+
+.text-success {
+  color: var(--bs-success) ;
+}
+.alert-success {
+  background-color: #e6fff1;
+  color: #056a2a;
+  border-color: #b3e6c9;
+}
+
+/* --- COLUNA DA IMAGEM --- */
+.login-imagem {
+  background-image: linear-gradient(rgba(10, 211, 84, 0.8), rgba(8, 164, 65, 0.8)),
+      url("../assets/images/danielle-cerullo-CQfNt66ttZM-unsplash.jpg"); 
+  background-size: cover;
+  background-position: center;
+}
+
+/* --- FORMULÁRIO --- */
+.login-formulario {
+  background-color: #fff;
+}
+/* Ajusta o foco dos inputs para usar a cor verde */
+.form-control:focus {
+  border-color: #0ad354;
+  box-shadow: 0 0 0 0.25rem rgba(10, 211, 84, 0.25);
+}
+
+/* --- divisor "OU" --- */
+.divisor {
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+.divisor::before,
+.divisor::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #dee2e6;
+}
+.divisor:not(:empty)::before {
+  margin-right: 0.5em;
+}
+.divisor:not(:empty)::after {
+  margin-left: 0.5em;
+}
