@@ -4,7 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import { Button, Row, Col, Modal, Form, Spinner, Container } from "react-bootstrap";
 import { SuccessModal } from "../components/common/SuccessModal";
 import { ConfirmModal } from "../components/common/ConfirmModal";
-import { ErrorModal } from "../components/common/ErrorModal"; // 1. Importar
+import { ErrorModal } from "../components/common/ErrorModal"; 
 import CreateCompeticaoModal from "../components/competicoes/CreateCompeticaoModal";
 import { RankingCard } from "../components/competicoes/RankingCard";
 import { CompetitionsListCard } from "../components/competicoes/CompetitionsListCard";
@@ -199,7 +199,6 @@ export function Competicoes() {
       <ConfirmModal show={showConfirmModal} handleClose={() => setShowConfirmModal(false)} handleConfirm={() => pendingAction && pendingAction()} title={confirmTitle} message={confirmMessage} />
       <SuccessModal show={showSuccessModal} handleClose={() => setShowSuccessModal(false)} message={successMessage} />
       
-      {/* 4. Inserir ErrorModal */}
       <ErrorModal show={showErrorModal} handleClose={() => setShowErrorModal(false)} message={errorMessage} />
 
       <CompeticaoDetailsModal show={showDetalhesModal} onHide={() => setShowDetalhesModal(false)} competicao={competicaoSelecionada} ranking={rankingCompeticao} canManage={canManage} isAdmin={isAdmin} onUpdateStatus={handleUpdateStatus} onDelete={solicitarExclusao} />

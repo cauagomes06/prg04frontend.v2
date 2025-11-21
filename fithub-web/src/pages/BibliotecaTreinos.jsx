@@ -206,7 +206,6 @@ export function Biblioteca() {
           message={successMessage}
         />
 
-        {/* 4. Inserir ErrorModal */}
         <ErrorModal
           show={showError}
           handleClose={() => setShowError(false)}
