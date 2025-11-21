@@ -1,11 +1,13 @@
-// src/services/api.js
 const API_URL = "http://localhost:8080";
 
 export const apiFetch = async (endpoint, options = {}) => {
   const token = localStorage.getItem("fithub_token");
 
+  // 1. Se o body for FormData (upload), NÃO definimos Content-Type manualmente
+  const isFormData = options.body instanceof FormData;
+
   const defaultHeaders = {
-    "Content-Type": "application/json",
+    ...( !isFormData && { "Content-Type": "application/json" }), // Só adiciona se não for upload
     ...(token && { Authorization: `Bearer ${token}` }),
   };
 
@@ -23,13 +25,13 @@ export const apiFetch = async (endpoint, options = {}) => {
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
         localStorage.removeItem("fithub_token");
-        window.location.href = "/login"; // Força o logout
+        window.location.href = "/login";
       }
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.message || `Erro: ${response.statusText}`);
     }
 
-    // Verifica se há conteúdo para retornar (evita erro em respostas vazias)
+    // Verifica se há conteúdo para retornar
     const contentType = response.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
       return response.json();

@@ -13,6 +13,7 @@ import { Competicoes } from "./pages/Competicoes.jsx";
 import { Aulas } from "./pages/Aulas";
 import { Dashboard } from "./pages/Dashboard";
 import { Register } from "./pages/Register";
+import  AdminUsers  from "./pages/AdminUsers.jsx";
 
 // Componente para proteger rotas (se não estiver logado, manda para login)
 const PrivateRoute = ({ children }) => {
@@ -58,6 +59,7 @@ function App() {
             <Route path="exercicios" element={<Exercicios />} />
             <Route path="competicoes" element={<Competicoes />} />
             <Route path="aulas" element={<Aulas />} />
+            <Route path="admin" element={<AdminUsers/>} />
           </Route>
           {/* Qualquer rota desconhecida vai para login */}
           <Route path="*" element={<Navigate to="/login" />} />

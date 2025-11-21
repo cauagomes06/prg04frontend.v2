@@ -67,3 +67,27 @@ body {
 .divisor:not(:empty)::after {
   margin-left: 0.5em;
 }
+.senha-container {
+  position: relative;
+}
+
+.senha-input {
+  padding-right: 3rem !important;
+}
+
+/* ícone dentro do input */
+.senha-icone {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: #6c757d;
+  z-index: 5; /* garante que fique acima do fundo */
+}
+
+/* hover opcional */
+.senha-icone:hover {
+  color: #343a40;
+}

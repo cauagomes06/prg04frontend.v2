@@ -1,10 +1,31 @@
 import { Button } from "react-bootstrap";
+import { useState, useEffect } from "react"; // Importa useState e useEffect
 
 export function ProfileHeader({ perfil, onEditData, onOpenConfig }) {
+  // Estado para controlar erro na imagem
+  const [imgError, setImgError] = useState(false);
+
+  // Reseta o estado de erro sempre que o perfil mudar (para tentar carregar nova foto)
+  useEffect(() => {
+    setImgError(false);
+  }, [perfil?.fotoUrl]);
+
   return (
     <div className="perfil-header d-flex align-items-center gap-4 mb-4 flex-wrap">
-      <div className="perfil-avatar">
-        <i className="fas fa-user fa-4x"></i>
+      <div className="perfil-avatar overflow-hidden d-flex align-items-center justify-content-center">
+        {/* Lógica: Mostra a imagem SE existir URL E não houver erro.
+           Caso contrário, mostra o ícone.
+        */}
+        {perfil?.fotoUrl && !imgError ? (
+          <img 
+            src={`http://localhost:8080${perfil.fotoUrl}`} 
+            alt="Avatar" 
+            style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+            onError={() => setImgError(true)} // Se falhar, ativa o modo de erro
+          />
+        ) : (
+          <i className="fas fa-user fa-4x"></i>
+        )}
       </div>
 
       <div className="flex-grow-1">
