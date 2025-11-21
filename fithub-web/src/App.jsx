@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, AuthContext } from "./context/AuthContext";
 import { useContext } from "react";
+
 import { Login } from "./pages/Login.jsx";
 import { Layout } from "./components/common/Layout.jsx";
 import { MeusTreinos } from "./pages/MeusTreinos";
@@ -9,7 +10,9 @@ import { Exercicios } from "./pages/Exercicios";
 import { Perfil } from "./pages/Perfil";
 import { Notificacoes } from "./pages/Notificacoes";
 import { Competicoes } from "./pages/Competicoes.jsx";
-import { Aulas } from "./pages/Aulas"; 
+import { Aulas } from "./pages/Aulas";
+import { Dashboard } from "./pages/Dashboard";
+import { Register } from "./pages/Register";
 
 // Componente para proteger rotas (se não estiver logado, manda para login)
 const PrivateRoute = ({ children }) => {
@@ -31,8 +34,8 @@ function App() {
         <Routes>
           {/* Rota Pública */}
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
-          {/* Rotas Protegidas (Portal) */}
           <Route
             path="/portal"
             element={
@@ -43,7 +46,11 @@ function App() {
           >
             {/* Redireciona /portal para /portal/dashboard */}
             <Route index element={<Navigate to="/portal/dashboard" />} />
+            {/* --- ROTAS SEPARADAS --- */}
+            <Route path="dashboard" element={<Dashboard />} />{" "}
 
+            <Route path="notificacoes" element={<Notificacoes />} />{" "}
+           
             <Route path="dashboard" element={<Notificacoes />} />
             <Route path="perfil" element={<Perfil />} />
             <Route path="treinos" element={<MeusTreinos />} />

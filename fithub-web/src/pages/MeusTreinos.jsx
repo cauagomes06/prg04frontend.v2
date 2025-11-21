@@ -5,7 +5,7 @@ import { WorkoutModal } from "../components/treinos/WorkoutModal";
 import { CreateWorkoutModal } from "../components/treinos/CreateWorkoutModal";
 import { SuccessModal } from "../components/common/SuccessModal";
 import { ConfirmModal } from "../components/common/ConfirmModal";
-// Importamos o componente granular
+import { ErrorModal } from "../components/common/ErrorModal"; // Importante
 import { MyWorkoutCard } from "../components/treinos/MyWorkoutCard";
 
 export function MeusTreinos() {
@@ -13,18 +13,20 @@ export function MeusTreinos() {
   const [treinos, setTreinos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ... (Manter estados dos modais e lógica de isPersonalOrAdmin igual)
+  // Estados dos Modais
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [treinoSelecionado, setTreinoSelecionado] = useState(null);
 
+  // Estados de Feedback
+  const [errorData, setErrorData] = useState({ show: false, message: "" });
+  const [successData, setSuccessData] = useState({ show: false, message: "" });
   const [confirmData, setConfirmData] = useState({
     show: false,
     title: "",
     message: "",
     onConfirm: null,
   });
-  const [successData, setSuccessData] = useState({ show: false, message: "" });
 
   const isPersonalOrAdmin =
     user?.nomePerfil &&
@@ -49,62 +51,96 @@ export function MeusTreinos() {
     carregarTreinos();
   }, [user]);
 
-  // ... (Manter as funções handleVerDetalhes, executarExclusao, executarPublicacao iguais)
-  // Apenas wrappers simples para passar ao card:
+  // --- HANDLERS ---
 
   const onVerDetalhes = async (id) => {
     try {
       const detalhes = await apiFetch(`/api/treinos/${id}`);
       setTreinoSelecionado(detalhes);
       setShowDetailModal(true);
-    } catch (e) {
-      /* ... */
+    } catch (error) {
+      setErrorData({
+        show: true,
+        message: "Erro ao carregar detalhes: " + error.message,
+      });
     }
   };
 
+  // Inicia o fluxo de exclusão (Abre ConfirmModal)
   const onExcluir = (id) => {
     setConfirmData({
       show: true,
-      title: "Excluir",
-      message: "Tem a certeza?",
-      onConfirm: () => {
-        /* Lógica de exclusão aqui */
-      },
+      title: "Excluir Treino",
+      message:
+        "Tem a certeza que deseja apagar este treino? Esta ação é irreversível.",
+      onConfirm: () => executarExclusao(id),
     });
   };
 
+  // Executa a exclusão após confirmação
+  const executarExclusao = async (id) => {
+    setConfirmData({ ...confirmData, show: false }); // Fecha confirmação
+    try {
+      await apiFetch(`/api/treinos/delete/${id}`, { method: "DELETE" });
+      setSuccessData({ show: true, message: "Treino excluído com sucesso!" });
+      carregarTreinos();
+    } catch (error) {
+      setErrorData({
+        show: true,
+        message: "Erro ao excluir: " + error.message,
+      });
+    }
+  };
+
+  // Inicia o fluxo de publicação (Abre ConfirmModal)
   const onPublicar = (id) => {
     setConfirmData({
       show: true,
-      title: "Publicar",
-      message: "Publicar na biblioteca global?",
-      onConfirm: () => {
-        /* Lógica de publicação aqui */
-      },
+      title: "Publicar Treino",
+      message: "Deseja tornar este treino público para toda a comunidade?",
+      onConfirm: () => executarPublicacao(id),
     });
   };
 
-  if (loading) return <div className="p-4">Carregando...</div>;
+  // Executa a publicação após confirmação
+  const executarPublicacao = async (id) => {
+    setConfirmData({ ...confirmData, show: false });
+    try {
+      await apiFetch(`/api/treinos/${id}/publicar`, { method: "PATCH" }); // Ajuste conforme sua rota real
+      setSuccessData({ show: true, message: "Treino publicado com sucesso!" });
+      carregarTreinos();
+    } catch (error) {
+      setErrorData({
+        show: true,
+        message: "Erro ao publicar: " + error.message,
+      });
+    }
+  };
+
+  if (loading)
+    return <div className="p-4 text-center">Carregando treinos...</div>;
 
   return (
     <div className="p-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Meus Treinos</h2>
+        <h2 className="fw-bold text-dark">Meus Treinos</h2>
         <button
-          className="btn btn-success"
+          className="btn btn-success rounded-pill px-4 fw-bold shadow-sm"
           onClick={() => setShowCreateModal(true)}
         >
-          <i className="fas fa-plus"></i> Criar Novo Treino
+          <i className="fas fa-plus me-2"></i> Criar Novo Treino
         </button>
       </div>
 
       {treinos.length === 0 ? (
-        <p>Você ainda não tem treinos atribuídos.</p>
+        <div className="text-center py-5 bg-white rounded-4 shadow-sm border">
+          <i className="fas fa-dumbbell fa-3x text-muted mb-3 opacity-25"></i>
+          <p className="text-muted">Você ainda não tem treinos criados.</p>
+        </div>
       ) : (
-        <div className="row g-3">
+        <div className="row g-4">
           {treinos.map((treino) => (
             <div className="col-12 col-md-6 col-lg-4" key={treino.id}>
-              {/* AQUI ESTÁ A MUDANÇA: Usamos o componente granular */}
               <MyWorkoutCard
                 treino={treino}
                 isPersonalOrAdmin={isPersonalOrAdmin}
@@ -117,18 +153,42 @@ export function MeusTreinos() {
         </div>
       )}
 
-      {/* Modais permanecem aqui ... */}
+      {/* --- MODAIS --- */}
+
       <WorkoutModal
         show={showDetailModal}
         handleClose={() => setShowDetailModal(false)}
         treino={treinoSelecionado}
       />
+
       <CreateWorkoutModal
         show={showCreateModal}
         handleClose={() => setShowCreateModal(false)}
         onSuccess={carregarTreinos}
       />
-      {/* ... Confirm e Success Modals */}
+
+      {/* Modal de Confirmação (Genérico) */}
+      <ConfirmModal
+        show={confirmData.show}
+        handleClose={() => setConfirmData({ ...confirmData, show: false })}
+        handleConfirm={confirmData.onConfirm}
+        title={confirmData.title}
+        message={confirmData.message}
+      />
+
+      {/* Modal de Sucesso */}
+      <SuccessModal
+        show={successData.show}
+        handleClose={() => setSuccessData({ ...successData, show: false })}
+        message={successData.message}
+      />
+
+      {/* Modal de Erro (Adicionado Corretamente) */}
+      <ErrorModal
+        show={errorData.show}
+        handleClose={() => setErrorData({ ...errorData, show: false })}
+        message={errorData.message}
+      />
     </div>
   );
 }
