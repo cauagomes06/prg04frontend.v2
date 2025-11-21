@@ -1,13 +1,13 @@
 import { useState, useEffect, useContext } from "react";
 import { apiFetch } from "../services/api";
-import { Container, Spinner, Button } from "react-bootstrap"; // Container adicionado aqui
+import { Container, Spinner, Button } from "react-bootstrap";
 import { AuthContext } from "../context/AuthContext";
 import { WorkoutModal } from "../components/treinos/WorkoutModal";
 import { LibraryCard } from "../components/treinos/LibraryCard";
 import { ConfirmModal } from "../components/common/ConfirmModal";
 import { SuccessModal } from "../components/common/SuccessModal";
+import { ErrorModal } from "../components/common/ErrorModal"; // 1. Importar
 
-// Componentes Granulares (Certifique-se que criou estes arquivos)
 import { SearchBar } from "../components/common/SearchBar";
 import { FilterGroup } from "../components/common/FilterGroup";
 
@@ -16,20 +16,22 @@ import "../styles/treinos.css";
 export function Biblioteca() {
   const { user } = useContext(AuthContext);
 
-  // --- ESTADOS ---
   const [treinos, setTreinos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Estados de Modais
   const [selectedTreino, setSelectedTreino] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  // 2. Estados de Erro
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [treinoParaCopiar, setTreinoParaCopiar] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Filtros e Busca (Estes eram os que estavam faltando)
   const [filtroMusculo, setFiltroMusculo] = useState("TODOS");
   const [termoBusca, setTermoBusca] = useState("");
 
@@ -44,13 +46,11 @@ export function Biblioteca() {
     "FULL BODY",
   ];
 
-  // --- CARREGAMENTO DE DADOS ---
   useEffect(() => {
     setLoading(true);
     apiFetch("/api/treinos")
       .then((data) => {
         const lista = Array.isArray(data) ? data : [];
-        // Filtra apenas treinos com status PUBLICO
         const publicos = lista.filter(
           (t) => t.status === "PUBLICO" || t.publico === true
         );
@@ -63,7 +63,6 @@ export function Biblioteca() {
       });
   }, []);
 
-  // --- LÓGICA DE FILTRAGEM ---
   const treinosFiltrados = treinos.filter((treino) => {
     const termoMusculo = filtroMusculo.toUpperCase();
     const nome = treino.nome ? treino.nome.toUpperCase() : "";
@@ -73,7 +72,6 @@ export function Biblioteca() {
       filtroMusculo === "TODOS" ||
       nome.includes(termoMusculo) ||
       objetivo.includes(termoMusculo);
-
     const matchBusca =
       nome.toLowerCase().includes(termoBusca.toLowerCase()) ||
       objetivo.toLowerCase().includes(termoBusca.toLowerCase());
@@ -81,14 +79,15 @@ export function Biblioteca() {
     return matchMusculo && matchBusca;
   });
 
-  // --- HANDLERS ---
   const handleShowDetalhes = async (id) => {
     try {
       const treinoDetalhado = await apiFetch(`/api/treinos/${id}`);
       setSelectedTreino(treinoDetalhado);
       setShowDetailModal(true);
     } catch (error) {
-      alert("Erro ao carregar detalhes.");
+      // 3. Substituir alert
+      setErrorMessage("Não foi possível carregar os detalhes do treino.");
+      setShowError(true);
     }
   };
 
@@ -112,7 +111,9 @@ export function Biblioteca() {
       );
       setShowSuccess(true);
     } catch (error) {
-      alert("Erro ao copiar treino: " + error.message);
+      // 3. Substituir alert
+      setErrorMessage("Erro ao copiar treino: " + error.message);
+      setShowError(true);
     } finally {
       setIsProcessing(false);
       setTreinoParaCopiar(null);
@@ -130,20 +131,17 @@ export function Biblioteca() {
   return (
     <div className="treinos-container py-5">
       <Container>
-        {/* Cabeçalho com Componentes Granulares */}
         <div className="mb-5">
           <h1 className="mb-1 fw-bold text-dark">Biblioteca de Treinos</h1>
           <p className="text-muted small mb-4">
             Fichas de treino públicas da comunidade.
           </p>
-
           <SearchBar
             placeholder="Pesquisar treino por nome ou objetivo..."
             value={termoBusca}
             onChange={(e) => setTermoBusca(e.target.value)}
             onClear={() => setTermoBusca("")}
           />
-
           <FilterGroup
             options={gruposMusculares}
             selected={filtroMusculo}
@@ -151,7 +149,6 @@ export function Biblioteca() {
           />
         </div>
 
-        {/* Grid de Resultados */}
         {treinosFiltrados.length === 0 ? (
           <div className="alert alert-light text-center p-5 border shadow-sm rounded-3">
             <h5 className="text-muted fs-6">Nenhum treino encontrado.</h5>
@@ -186,14 +183,12 @@ export function Biblioteca() {
           </div>
         )}
 
-        {/* --- MODAIS --- */}
         <WorkoutModal
           show={showDetailModal}
           handleClose={() => setShowDetailModal(false)}
           treino={selectedTreino}
           readOnly={true}
         />
-
         <ConfirmModal
           show={showConfirm}
           handleClose={() => setShowConfirm(false)}
@@ -205,13 +200,20 @@ export function Biblioteca() {
               : ""
           }
         />
-
         <SuccessModal
           show={showSuccess}
           handleClose={() => setShowSuccess(false)}
           message={successMessage}
         />
+
+        {/* 4. Inserir ErrorModal */}
+        <ErrorModal
+          show={showError}
+          handleClose={() => setShowError(false)}
+          message={errorMessage}
+        />
       </Container>
     </div>
   );
 }
+  

@@ -204,7 +204,5 @@ body {
   .portal-container {
     grid-template-columns: 1fr;
   }
-  .portal-sidebar {
-    display: none; /* Esconde em mobile por enquanto, até fazermos o toggle */
-  }
+
 }

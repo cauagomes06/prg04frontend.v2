@@ -1,8 +1,8 @@
 import { useState, useEffect, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { apiFetch } from "../services/api";
-import { SuccessModal } from "../components/SuccessModal";
-import { ErrorModal } from "../components/ErrorModal"; // Assuming ErrorModal is in the same directory
+import { SuccessModal } from "../components/common/SuccessModal";
+import { ErrorModal } from "../components/common/ErrorModal"; 
 import { AuthContext } from "../context/AuthContext";
 import "../styles/login.css";
 
