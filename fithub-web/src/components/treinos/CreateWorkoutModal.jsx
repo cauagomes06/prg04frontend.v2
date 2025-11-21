@@ -1,9 +1,9 @@
 import { useState, useEffect, useContext } from "react";
 import { Modal, Button, Form, Row, Col, Table } from "react-bootstrap";
-import { apiFetch } from "../services/api";
-import { AuthContext } from "../context/AuthContext";
-import { ConfirmModal } from "./ConfirmModal";
-import { SuccessModal } from "./SuccessModal";
+import { apiFetch } from "../../services/api";
+import { AuthContext } from "../../context/AuthContext";
+import { ConfirmModal } from "../common/ConfirmModal";
+import { SuccessModal } from "../common/SuccessModal";
 
 export function CreateWorkoutModal({ show, handleClose, onSuccess }) {
   const { user } = useContext(AuthContext);

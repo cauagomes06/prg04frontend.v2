@@ -1,7 +1,7 @@
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";import { useState, useEffect } from "react";
-import { apiFetch } from "../services/api.js";
-import { ConfirmModal } from "./ConfirmModal";
-import { SuccessModal } from "./SuccessModal";
+import { apiFetch } from "../../services/api";
+import { ConfirmModal } from "../common/ConfirmModal";
+import { SuccessModal } from "../common/SuccessModal";
 
 export default function CreateCompeticaoModal({ show, handleClose, onSuccess }) {
   // Estados do Formulário

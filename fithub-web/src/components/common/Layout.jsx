@@ -1,8 +1,8 @@
 import { Outlet, Link } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../context/AuthContext";
-import { apiFetch } from "../services/api";
-import "../styles/portal.css";
+import { AuthContext } from "../../context/AuthContext";
+import { apiFetch } from "../../services/api";
+import "../../styles/portal.css";
 
 export function Layout() {
   const { user, logout } = useContext(AuthContext);
@@ -94,6 +94,10 @@ export function Layout() {
             <li><Link to="/portal/perfil"><i className="fas fa-user-circle"></i> Meu Perfil</Link></li>
             <li><Link to="/portal/treinos"><i className="fas fa-dumbbell"></i> Meus Treinos</Link></li>
             <li><Link to="/portal/biblioteca"><i className="fas fa-book-open"></i> Biblioteca</Link></li>
+            
+            {/* --- LINK DE AULAS ADICIONADO AQUI --- */}
+            <li><Link to="/portal/aulas"><i className="fas fa-calendar-alt"></i> Aulas de Grupo</Link></li>
+            
             <li><Link to="/portal/competicoes"><i className="fas fa-trophy"></i> Competições</Link></li>
             
             {/* Link condicional para Exercícios (Staff) */}
@@ -117,4 +121,4 @@ export function Layout() {
       </main>
     </div>
   );
-}
+} 

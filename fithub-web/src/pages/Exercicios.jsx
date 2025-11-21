@@ -1,30 +1,48 @@
 import { useState, useEffect, useContext } from "react";
 import { apiFetch } from "../services/api";
-import { Table, Button, Badge, Card, Modal, Spinner, Form, InputGroup } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap"; // Removemos Table, Badge, Card, etc.
 import { AuthContext } from "../context/AuthContext";
-import { CreateExerciseModal } from "../components/CreateExerciseModal";
+
+// Componentes
+import { CreateExerciseModal } from "../components/exercicios/CreateExerciseModal";
+import { ConfirmModal } from "../components/common/ConfirmModal";
+import { SuccessModal } from "../components/common/SuccessModal";
+import { SearchBar } from "../components/common/SearchBar";
+import { FilterGroup } from "../components/common/FilterGroup";
+import { ExerciseTable } from "../components/exercicios/ExerciseTable";
 
 export function Exercicios() {
   const { user } = useContext(AuthContext);
+
+  // --- ESTADOS ---
   const [exercicios, setExercicios] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // --- Modais ---
+  // Modais
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showErrorModal, setShowErrorModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
 
-  // --- Estados auxiliares ---
+  // Auxiliares
   const [exerciseToDelete, setExerciseToDelete] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // --- FILTROS ---
+  // Filtros
   const [filtroMusculo, setFiltroMusculo] = useState("TODOS");
   const [termoBusca, setTermoBusca] = useState("");
 
   const gruposMusculares = [
-    "TODOS", "PEITO", "COSTAS", "PERNAS", "OMBROS", "BRAÇOS", "ABDÔMEN", "GLÚTEOS", "PANTURRILHA", "FULL BODY"
+    "TODOS",
+    "PEITO",
+    "COSTAS",
+    "PERNAS",
+    "OMBROS",
+    "BRAÇOS",
+    "ABDÔMEN",
+    "GLÚTEOS",
+    "PANTURRILHA",
+    "FULL BODY",
   ];
 
   const isPersonalOrAdmin =
@@ -32,6 +50,7 @@ export function Exercicios() {
     (user.nomePerfil.toUpperCase().includes("ROLE_ADMIN") ||
       user.nomePerfil.toUpperCase().includes("ROLE_PERSONAL"));
 
+  // --- CARREGAMENTO ---
   const carregarExercicios = () => {
     setLoading(true);
     apiFetch("/api/exercicios/buscar")
@@ -49,40 +68,7 @@ export function Exercicios() {
     carregarExercicios();
   }, []);
 
-  // --- ABRIR MODAL DE CONFIRMAÇÃO ---
-  const initiateDelete = (id) => {
-    setExerciseToDelete(id);
-    setShowDeleteConfirm(true);
-  };
-
-  // --- DELETAR ---
-  const confirmDelete = async () => {
-    if (!exerciseToDelete) return;
-
-    try {
-      await apiFetch(`/api/exercicios/delete/${exerciseToDelete}`, { method: "DELETE" });
-
-      setShowDeleteConfirm(false);
-      setExercicios(exercicios.filter((ex) => ex.id !== exerciseToDelete));
-      setExerciseToDelete(null);
-    } catch (error) {
-      setShowDeleteConfirm(false);
-
-      if (error.message && error.message.includes("integridade")) {
-        setErrorMessage(
-          "Não é possível excluir este exercício pois ele faz parte de uma ou mais fichas de treino ativas."
-        );
-      } else {
-        setErrorMessage(error.message || "Ocorreu um erro ao tentar excluir.");
-      }
-
-      setShowErrorModal(true);
-    }
-  };
-
-  // ---------------------------
-  // 🔎 LÓGICA DE FILTRAGEM
-  // ---------------------------
+  // --- LÓGICA DE FILTRAGEM ---
   const exerciciosFiltrados = exercicios.filter((ex) => {
     const termoMusculo = filtroMusculo.toUpperCase();
     const matchMusculo =
@@ -97,6 +83,37 @@ export function Exercicios() {
     return matchMusculo && matchBusca;
   });
 
+  // --- AÇÕES ---
+  const initiateDelete = (id) => {
+    setExerciseToDelete(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!exerciseToDelete) return;
+
+    try {
+      await apiFetch(`/api/exercicios/delete/${exerciseToDelete}`, {
+        method: "DELETE",
+      });
+
+      setShowDeleteConfirm(false);
+      setExercicios(exercicios.filter((ex) => ex.id !== exerciseToDelete));
+      setExerciseToDelete(null);
+    } catch (error) {
+      setShowDeleteConfirm(false);
+
+      if (error.message && error.message.includes("integridade")) {
+        setErrorMessage(
+          "Não é possível excluir este exercício pois ele faz parte de uma ou mais fichas de treino ativas."
+        );
+      } else {
+        setErrorMessage(error.message || "Ocorreu um erro ao tentar excluir.");
+      }
+      setShowErrorModal(true);
+    }
+  };
+
   if (!isPersonalOrAdmin) {
     return (
       <div className="p-5 text-center text-muted">
@@ -107,12 +124,13 @@ export function Exercicios() {
 
   return (
     <div className="p-4">
-
       {/* Cabeçalho */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h2 className="fw-bold text-dark mb-0">Banco de Exercícios</h2>
-          <p className="text-muted mb-0">Gerencie o catálogo de exercícios da academia.</p>
+          <p className="text-muted mb-0">
+            Gerencie o catálogo de exercícios da academia.
+          </p>
         </div>
         <Button
           variant="success"
@@ -123,121 +141,32 @@ export function Exercicios() {
         </Button>
       </div>
 
-      {/* 🔍 BARRA DE BUSCA */}
+      {/* Busca Granularizada */}
+      <SearchBar
+        placeholder="Pesquisar por nome ou descrição..."
+        value={termoBusca}
+        onChange={(e) => setTermoBusca(e.target.value)}
+        onClear={() => setTermoBusca("")}
+      />
+
+      {/* Filtros Granularizados */}
       <div className="mb-4">
-        <InputGroup className="shadow-sm">
-          <InputGroup.Text className="bg-white border-end-0">
-            <i className="fas fa-search text-muted"></i>
-          </InputGroup.Text>
-          <Form.Control
-            placeholder="Pesquisar por nome ou descrição..."
-            value={termoBusca}
-            onChange={(e) => setTermoBusca(e.target.value)}
-          />
-          {termoBusca && (
-            <Button variant="outline-secondary" onClick={() => setTermoBusca("")}>
-              <i className="fas fa-times"></i>
-            </Button>
-          )}
-        </InputGroup>
+        <FilterGroup
+          options={gruposMusculares}
+          selected={filtroMusculo}
+          onSelect={setFiltroMusculo}
+        />
       </div>
 
-      {/* 🎯 BOTÕES DE FILTRO */}
-      <div className="mb-4 d-flex gap-2 flex-wrap">
-        {gruposMusculares.map((grupo) => (
-          <Button
-            key={grupo}
-            variant={filtroMusculo === grupo ? "success" : "outline-secondary"}
-            onClick={() => setFiltroMusculo(grupo)}
-            className="rounded-pill px-3 py-1 text-capitalize"
-            size="sm"
-          >
-            {grupo.toLowerCase()}
-          </Button>
-        ))}
-      </div>
+      {/* Tabela Granularizada */}
+      <ExerciseTable
+        exercicios={exerciciosFiltrados}
+        loading={loading}
+        onDelete={initiateDelete}
+      />
 
-      {/* TABELA */}
-      <Card className="shadow-sm border-0 rounded-3 overflow-hidden">
-        <Card.Body className="p-0">
-          {loading ? (
-            <div className="text-center p-5">
-              <Spinner animation="border" variant="success" />
-              <p className="mt-2 text-muted">Carregando dados...</p>
-            </div>
-          ) : (
-            <div className="table-responsive">
-              <Table hover className="align-middle mb-0 table-borderless">
-                <thead className="bg-light text-secondary border-bottom">
-                  <tr>
-                    <th className="ps-4 py-3">Exercício</th>
-                    <th className="py-3">Grupo</th>
-                    <th className="py-3">Descrição</th>
-                    <th className="py-3">Mídia</th>
-                    <th className="pe-4 py-3 text-end">Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {exerciciosFiltrados.map((ex) => (
-                    <tr key={ex.id} className="border-bottom">
-                      <td className="ps-4 fw-bold text-dark">{ex.nome}</td>
-                      <td>
-                        <Badge bg="light" text="dark" className="border">
-                          {ex.grupoMuscular}
-                        </Badge>
-                      </td>
-                      <td className="text-muted small" style={{ maxWidth: "350px" }}>
-                        {ex.descricao ? (
-                          <span
-                            className="text-truncate d-inline-block"
-                            style={{ maxWidth: "340px" }}
-                          >
-                            {ex.descricao}
-                          </span>
-                        ) : (
-                          <span className="fst-italic text-black-50">Sem descrição</span>
-                        )}
-                      </td>
-                      <td>
-                        {ex.urlVideo ? (
-                          <a
-                            href={ex.urlVideo}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="btn btn-sm btn-light text-primary border-0"
-                          >
-                            <i className="fas fa-play-circle fa-lg"></i>
-                          </a>
-                        ) : (
-                          <span className="text-muted">-</span>
-                        )}
-                      </td>
-                      <td className="pe-4 text-end">
-                        <Button
-                          variant="link"
-                          className="text-danger p-0"
-                          onClick={() => initiateDelete(ex.id)}
-                        >
-                          <i className="fas fa-trash-alt"></i>
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
+      {/* --- MODAIS --- */}
 
-              {exerciciosFiltrados.length === 0 && (
-                <div className="text-center p-5 text-muted">
-                  <i className="fas fa-dumbbell fa-3x mb-3 opacity-50"></i>
-                  <p>Nenhum exercício encontrado.</p>
-                </div>
-              )}
-            </div>
-          )}
-        </Card.Body>
-      </Card>
-
-      {/* MODAL CRIAR */}
       <CreateExerciseModal
         show={showCreateModal}
         handleClose={() => setShowCreateModal(false)}
@@ -248,30 +177,30 @@ export function Exercicios() {
         }}
       />
 
-      {/* MODAL CONFIRMAR EXCLUSÃO */}
-      <Modal show={showDeleteConfirm} onHide={() => setShowDeleteConfirm(false)} centered>
-        <Modal.Header closeButton className="border-0 pb-0">
-          <Modal.Title className="text-danger">
-            <i className="fas fa-exclamation-triangle me-2"></i> Excluir Exercício
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Tem certeza que deseja remover este exercício?
-          <br />
-          <small className="text-muted">Esta ação não pode ser desfeita.</small>
-        </Modal.Body>
-        <Modal.Footer className="border-0 pt-0">
-          <Button variant="light" onClick={() => setShowDeleteConfirm(false)}>
-            Cancelar
-          </Button>
-          <Button variant="danger" onClick={confirmDelete}>
-            Sim, Excluir
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      {/* Modal de Confirmação Genérico (Substitui o manual) */}
+      <ConfirmModal
+        show={showDeleteConfirm}
+        handleClose={() => setShowDeleteConfirm(false)}
+        handleConfirm={confirmDelete}
+        title="Excluir Exercício"
+        message="Tem certeza que deseja remover este exercício? Esta ação não pode ser desfeita."
+      />
 
-      {/* MODAL DE ERRO */}
-      <Modal show={showErrorModal} onHide={() => setShowErrorModal(false)} centered>
+      {/* Modal de Sucesso Genérico */}
+      <SuccessModal
+        show={showSuccessModal}
+        handleClose={() => setShowSuccessModal(false)}
+        title="Sucesso!"
+        message="Exercício cadastrado/removido com sucesso!"
+      />
+
+      {/* Modal de Erro (Este mantemos "manual" pois tem lógica específica de ícone/cor, 
+          mas poderia ser um 'AlertModal' genérico no futuro) */}
+      <Modal
+        show={showErrorModal}
+        onHide={() => setShowErrorModal(false)}
+        centered
+      >
         <Modal.Header closeButton className="bg-danger text-white">
           <Modal.Title>
             <i className="fas fa-times-circle me-2"></i> Operação Negada
@@ -287,24 +216,6 @@ export function Exercicios() {
         <Modal.Footer className="justify-content-center border-0">
           <Button variant="secondary" onClick={() => setShowErrorModal(false)}>
             Entendido
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      {/* MODAL SUCESSO */}
-      <Modal show={showSuccessModal} onHide={() => setShowSuccessModal(false)} centered>
-        <Modal.Header closeButton className="bg-success text-white">
-          <Modal.Title>
-            <i className="fas fa-check-circle me-2"></i> Exercício Criado
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="text-center p-4">
-          <i className="fas fa-check-circle text-success fa-4x mb-3"></i>
-          <h5 className="fw-bold">Exercício cadastrado com sucesso!</h5>
-        </Modal.Body>
-        <Modal.Footer className="justify-content-center border-0">
-          <Button variant="success" onClick={() => setShowSuccessModal(false)}>
-            Ok
           </Button>
         </Modal.Footer>
       </Modal>

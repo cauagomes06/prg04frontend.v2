@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
-import { apiFetch } from "../services/api";
+import { apiFetch } from "../../services/api";
 
 export function CreateExerciseModal({ show, handleClose, onSuccess }) {
   // LOG DE RENDERIZAÇÃO

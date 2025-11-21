@@ -10,9 +10,9 @@ import {
   Spinner,
   Container,
 } from "react-bootstrap";
-import { SuccessModal } from "../components/SuccessModal";
-import { ConfirmModal } from "../components/ConfirmModal";
-import CreateCompeticaoModal from "../components/CreateCompeticaoModal";
+import { SuccessModal } from "../components/common/SuccessModal";
+import { ConfirmModal } from "../components/common/ConfirmModal";
+import CreateCompeticaoModal from "../components/competicoes/CreateCompeticaoModal";
 
 // Importação dos novos componentes granulares
 import { RankingCard } from "../components/competicoes/RankingCard";

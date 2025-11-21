@@ -2,13 +2,14 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, AuthContext } from "./context/AuthContext";
 import { useContext } from "react";
 import { Login } from "./pages/Login.jsx";
-import { Layout } from "./components/Layout.jsx";
+import { Layout } from "./components/common/Layout.jsx";
 import { MeusTreinos } from "./pages/MeusTreinos";
 import { Biblioteca } from "./pages/BibliotecaTreinos.jsx";
-import { Exercicios } from "./pages/Exercicios"; 
+import { Exercicios } from "./pages/Exercicios";
 import { Perfil } from "./pages/Perfil";
 import { Notificacoes } from "./pages/Notificacoes";
-import  {Competicoes}  from "./pages/Competicoes.jsx";
+import { Competicoes } from "./pages/Competicoes.jsx";
+import { Aulas } from "./pages/Aulas"; 
 
 // Componente para proteger rotas (se não estiver logado, manda para login)
 const PrivateRoute = ({ children }) => {
@@ -22,9 +23,6 @@ const PrivateRoute = ({ children }) => {
 
   return user ? children : <Navigate to="/login" />;
 };
-
-// Páginas de Exemplo (Criaremos os arquivos reais depois)
-const Dashboard = () => <h2>Bem-vindo às Notificações</h2>;
 
 function App() {
   return (
@@ -45,15 +43,15 @@ function App() {
           >
             {/* Redireciona /portal para /portal/dashboard */}
             <Route index element={<Navigate to="/portal/dashboard" />} />
+
             <Route path="dashboard" element={<Notificacoes />} />
             <Route path="perfil" element={<Perfil />} />
-            <Route path="treinos" element={<MeusTreinos />} />{" "}
-            <Route path="biblioteca" element={<Biblioteca />} />{" "}
+            <Route path="treinos" element={<MeusTreinos />} />
+            <Route path="biblioteca" element={<Biblioteca />} />
             <Route path="exercicios" element={<Exercicios />} />
-            <Route path="perfil" element={<Perfil />} />
-            <Route path="competicoes" element={<Competicoes />} />            
+            <Route path="competicoes" element={<Competicoes />} />
+            <Route path="aulas" element={<Aulas />} />
           </Route>
-
           {/* Qualquer rota desconhecida vai para login */}
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
