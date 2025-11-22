@@ -52,7 +52,7 @@ export function Register() {
     const payload = {
       username: formData.email,
       password: formData.password,
-      perfil: 4, // ROLE_CLIENTE
+      perfil: 3, // ROLE_CLIENTE
       plano: parseInt(formData.planoId),
       pessoa: {
         nomeCompleto: formData.nomeCompleto,
