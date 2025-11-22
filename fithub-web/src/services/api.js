@@ -1,4 +1,4 @@
-const API_URL = "https://fithub-api.onrender.com"
+const API_URL = "https://fithub-api-kx7l.onrender.com"
 
 export const apiFetch = async (endpoint, options = {}) => {
   const token = localStorage.getItem("fithub_token");
