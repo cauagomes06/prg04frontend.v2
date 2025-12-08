@@ -98,3 +98,22 @@
 .icon-opacity {
   opacity: 0.5;
 }
+
+/* --- ESTILO PARA ITENS DENTRO DA MODAL/LISTA (Mini-Cards) --- */
+.bg-light { 
+    background-color: var(--card-bg) !important; 
+}
+
+.text-filter-small {
+    font-size: 0.75rem !important; 
+    letter-spacing: 0.5px; 
+}
+
+.list-group-item.hover-effect:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.bg-success {
+    background-color: var(--primary-green) !important;
+}
