@@ -1,59 +1,41 @@
 import { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Spinner, Button } from "react-bootstrap";
-import { apiFetch } from "../services/api";
 import { AuthContext } from "../context/AuthContext";
-import { SuccessModal } from "../components/common/SuccessModal";
+import { paymentService } from "../services/PaymentService";
 
-// Componentes Granulares
-import { NotificationItem } from "../components/notificacoes/NotificacaoItem";
-import { BroadcastModal } from "../components/notificacoes/BroadcastModal";
-import { AdminStatsCards } from "../components/dashboard/AdminStatsCards"; // <--- Importação do Card
+// Importação do CSS Externo
+import "../styles/dashboard.css"; 
 
-import "../styles/notificacoes.css"; // Reutiliza o estilo das notificações
+// Componentes de Analytics
+import { AdminStatsCards } from "../components/dashboard/AdminStatsCards";
+import { RevenueChart } from "../components/dashboard/RevenueChart";
 
 export function Dashboard() {
   const { user } = useContext(AuthContext);
   
-  // Estados
-  const [notificacoes, setNotificacoes] = useState([]);
+  // Estados para dados financeiros
+  const [stats, setStats] = useState({ total_faturado: 0, quantidade_vendas: 0 });
   const [loading, setLoading] = useState(true);
-  
-  // Modais
-  const [showBroadcast, setShowBroadcast] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
 
   // Verificação de permissão
   const isAdmin = user?.nomePerfil && user.nomePerfil.includes("ROLE_ADMIN");
 
-  // --- CARREGAR DADOS ---
-  const carregarNotificacoes = async () => {
+  // --- CARREGAR DADOS FINANCEIROS ---
+  const carregarDadosDashboard = async () => {
     setLoading(true);
     try {
-      const data = await apiFetch("/api/notificacoes/minhas");
-      setNotificacoes(data);
+      const data = await paymentService.obterRelatorioFaturamento();
+      setStats(data);
     } catch (error) {
-      console.error("Erro ao carregar notificações:", error);
+      console.error("Erro ao carregar dados do dashboard:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    carregarNotificacoes();
+    carregarDadosDashboard();
   }, []);
-
-  // --- AÇÕES ---
-  const handleMarcarComoLida = async (id) => {
-    try {
-      await apiFetch(`/api/notificacoes/${id}/ler`, { method: "PATCH" });
-      // Atualização otimista na lista
-      setNotificacoes(prev => prev.map(n => 
-        n.id === id ? { ...n, lida: true } : n
-      ));
-    } catch (error) {
-      console.error("Erro ao marcar como lida", error);
-    }
-  };
 
   if (loading) return (
     <div className="d-flex justify-content-center align-items-center vh-100">
@@ -62,75 +44,58 @@ export function Dashboard() {
   );
 
   return (
-    <div className="py-5" style={{backgroundColor: "#f8f9fa", minHeight: "100vh"}}>
+    <div className="dashboard-admin-container">
       <Container>
         
-        {/* 1. SEÇÃO DE ANALYTICS (Visível apenas para Admin) */}
-        {isAdmin && (
-            <AdminStatsCards />
-        )}
-
-        {/* 2. SEÇÃO DE NOTIFICAÇÕES / MENSAGENS */}
+        {/* CABEÇALHO DO DASHBOARD (Mantendo sua estrutura de layout) */}
         <div className="d-flex justify-content-between align-items-center mb-4 mt-2">
           <div>
-            <h4 className="fw-bold text-dark mb-1">
-                <i className="far fa-bell me-2"></i>
-                {isAdmin ? "Centro de Mensagens" : "Minhas Notificações"}
+            <h4 className="dashboard-admin-title mb-1">
+                <i className="fas fa-chart-line me-2"></i>
+                {isAdmin ? "Painel de Administração" : "Meu Resumo"}
             </h4>
             <p className="text-muted mb-0 small">
-                {isAdmin ? "Gerencie a comunicação com os alunos." : "Fique por dentro das novidades."}
+                {isAdmin 
+                  ? "Acompanhe métricas e faturamento da plataforma." 
+                  : "Visualize suas estatísticas de uso."}
             </p>
           </div>
 
           <div className="d-flex gap-2">
-             {isAdmin && (
-              <Button 
-                className="btn-custom-primary rounded-pill shadow-sm fw-bold" 
-                onClick={() => setShowBroadcast(true)}
-              >
-                <i className="fas fa-paper-plane me-2"></i> Enviar Geral
-              </Button>
-            )}
-            <Button variant="light" onClick={carregarNotificacoes} className="rounded-pill shadow-sm">
-              <i className="fas fa-sync-alt"></i>
+            <Button variant="light" onClick={carregarDadosDashboard} className="rounded-pill shadow-sm">
+              <i className="fas fa-sync-alt"></i> Atualizar
             </Button>
           </div>
         </div>
 
+        {/* 1. SEÇÃO DE CARDS (Usando classes do CSS externo) */}
+        {isAdmin && (
+          <Row className="mb-4">
+            <Col lg={12}>
+                <AdminStatsCards dados={stats} />
+            </Col>
+          </Row>
+        )}
+
+        {/* 2. SEÇÃO DO GRÁFICO (Usando classe dashboard-chart-section do CSS externo) */}
         <Row>
           <Col lg={12}>
-            {notificacoes.length === 0 ? (
-              <div className="text-center py-5 bg-white rounded-4 shadow-sm border">
-                <i className="far fa-bell-slash fa-3x text-muted mb-3 opacity-25"></i>
-                <p className="text-muted mb-0">Não há novas notificações.</p>
-              </div>
-            ) : (
-              <div className="d-flex flex-column gap-3">
-                {notificacoes.map((n) => (
-                  <NotificationItem 
-                    key={n.id} 
-                    notificacao={n} 
-                    onMarcarComoLida={handleMarcarComoLida} 
-                  />
-                ))}
-              </div>
-            )}
+            <div className="dashboard-chart-section">
+               <h5 className="fw-bold mb-4">Desempenho de Vendas e Faturamento</h5>
+               
+               {isAdmin ? (
+                 <RevenueChart dados={stats} />
+               ) : (
+                 <div className="text-center py-5">
+                   <i className="fas fa-user-clock fa-3x text-muted mb-3 opacity-25"></i>
+                   <p className="text-muted">Seu progresso pessoal será exibido aqui em breve.</p>
+                 </div>
+               )}
+            </div>
           </Col>
         </Row>
-      </Container>
-      
-      {/* Modais Auxiliares */}
-      <BroadcastModal 
-        show={showBroadcast} 
-        onHide={() => setShowBroadcast(false)} 
-        onSuccess={() => { setShowSuccess(true); carregarNotificacoes(); }} 
-      />
 
-      <SuccessModal 
-        show={showSuccess} 
-        handleClose={() => setShowSuccess(false)} 
-        message="Mensagem enviada para todos os utilizadores com sucesso!" 
-      />
+      </Container>
     </div>
   );
 }

@@ -45,7 +45,6 @@ export default function AdminUsers() {
     try {
         setLoading(true);
 
-        // ⚠️ PASSO CRÍTICO: Atualizar a URL da API para incluir parâmetros de paginação e busca
         const usersUrl = `/api/usuarios?page=${page}&size=${pageSize}&search=${search}`;
         
         // Busca usuários (com paginação) e perfis (sem paginação, assumindo que são poucos)

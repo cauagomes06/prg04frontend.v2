@@ -1,31 +1,35 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom"; 
 import { apiFetch } from "../services/api";
+import { paymentService } from "../services/PaymentService";
 import { SuccessModal } from "../components/common/SuccessModal";
 import { ConfirmModal } from "../components/common/ConfirmModal";
+import { ErrorModal } from "../components/common/ErrorModal"; 
 import "../styles/perfil.css";
 
-// Componentes Granulares
+// Componentes Granulares (Mantenha os imports)
 import { ProfileHeader } from "../components/perfil/ProfileHeader";
 import { ProfileStats } from "../components/perfil/ProfileStats";
 import { EditDataModal } from "../components/perfil/EditDataModal";
 import { ConfigModal } from "../components/perfil/ConfigModal";
 
 export function Perfil() {
-  // Estados
   const [perfil, setPerfil] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [searchParams, setSearchParams] = useSearchParams(); 
 
   // Modais
   const [showConfig, setShowConfig] = useState(false);
   const [showEditData, setShowEditData] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showError, setShowError] = useState(false); 
 
   // Auxiliares
   const [pendingPlanId, setPendingPlanId] = useState(null);
   const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
-  // --- CARREGAR DADOS ---
   const carregarPerfil = async () => {
     try {
       const data = await apiFetch("/api/usuarios/me");
@@ -37,70 +41,83 @@ export function Perfil() {
     }
   };
 
+  // --- NOVO: Verificar retorno do Mercado Pago ---
   useEffect(() => {
+    const status = searchParams.get("status");
+    if (status === "sucesso") {
+      setSuccessMsg("Pagamento confirmado! O seu plano foi ativado.");
+      setShowSuccess(true);
+      // Remove o parametro da URL para ficar limpo
+      setSearchParams({});
+    } else if (status === "falha") {
+      setErrorMsg("O pagamento falhou ou foi cancelado.");
+      setShowError(true);
+      setSearchParams({});
+    }
     carregarPerfil();
-  }, []);
+  }, [searchParams]);
 
   // --- AÇÕES ---
 
-  // 1. Sucesso na edição de dados pessoais
   const handleEditSuccess = () => {
     setSuccessMsg("Dados pessoais atualizados com sucesso!");
     setShowSuccess(true);
     carregarPerfil();
   };
 
-  // 2. Solicitar mudança de plano (Vem do ConfigModal)
   const handlePlanChangeRequest = (novoId) => {
-    if (novoId == perfil.planoId) {
+    if (String(novoId) === String(perfil.planoId)) {
       alert("Você já possui este plano.");
       return;
     }
     setPendingPlanId(novoId);
-    setShowConfirm(true); // Abre confirmação
+    setShowConfirm(true);
   };
 
-  // 3. Confirmar mudança de plano (Chamada API)
+  // 3. Confirmar mudança de plano -> Gera Pagamento
   const executarMudancaPlano = async () => {
     try {
-      await apiFetch(`/api/planos/mudar/${perfil.id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ novoPlanoId: pendingPlanId }),
-      });
-
+      // Fecha os modais para não ficarem abertos quando o usuário voltar
       setShowConfirm(false);
-      setShowConfig(false); // Fecha modal de configuração
-      setSuccessMsg("Plano alterado com sucesso!");
-      setShowSuccess(true);
-      carregarPerfil();
+      setShowConfig(false);
+      
+      // Chama o backend para gerar o link do novo plano
+      const checkoutResponse = await paymentService.criarCheckout(
+        perfil.id, 
+        pendingPlanId
+      );
+
+      // Redireciona para o Mercado Pago
+      if (checkoutResponse && checkoutResponse.initPoint) {
+        window.location.href = checkoutResponse.initPoint;
+      } else {
+        alert("Erro: O servidor não retornou o link de pagamento.");
+      }
+
     } catch (error) {
-      alert("Erro ao mudar plano: " + error.message);
+      console.error("Erro no checkout:", error);
+      alert("Não foi possível iniciar o pagamento: " + error.message);
     }
   };
 
-  if (loading)
-    return <div className="text-center mt-5">Carregando perfil...</div>;
+  if (loading) return <div className="text-center mt-5">Carregando perfil...</div>;
 
   return (
     <div className="p-4">
       <h1 className="mb-4 fw-bold text-dark">Meu Perfil</h1>
 
-      {/* Header (Avatar, Nome, Ações) */}
       <ProfileHeader
         perfil={perfil}
         onEditData={() => setShowEditData(true)}
         onOpenConfig={() => setShowConfig(true)}
       />
 
-      {/* Estatísticas */}
       <ProfileStats
         scoreTotal={perfil?.scoreTotal}
         dataCriacao={perfil?.dataCriacao}
       />
 
       {/* --- MODAIS --- */}
-
-      {/* 1. Editar Dados Pessoais */}
       <EditDataModal
         show={showEditData}
         handleClose={() => setShowEditData(false)}
@@ -108,7 +125,6 @@ export function Perfil() {
         onSuccess={handleEditSuccess}
       />
 
-      {/* 2. Configurações (Senha/Plano) */}
       <ConfigModal
         show={showConfig}
         handleClose={() => setShowConfig(false)}
@@ -117,20 +133,28 @@ export function Perfil() {
         onPlanChangeRequest={handlePlanChangeRequest}
       />
 
-      {/* 3. Confirmação Genérica (usada para plano) */}
       <ConfirmModal
         show={showConfirm}
         handleClose={() => setShowConfirm(false)}
         handleConfirm={executarMudancaPlano}
-        message="Tem a certeza que deseja mudar para este novo plano?"
+        title="Ir para Pagamento"
+        message="Você será redirecionado para o Mercado Pago para concluir a assinatura. Deseja continuar?"
       />
 
-      {/* 4. Sucesso Genérico */}
       <SuccessModal
         show={showSuccess}
         handleClose={() => setShowSuccess(false)}
         message={successMsg}
       />
+      
+      {/* Se tiver o componente ErrorModal */}
+      {ErrorModal && (
+        <ErrorModal 
+            show={showError} 
+            handleClose={() => setShowError(false)} 
+            message={errorMsg} 
+        />
+      )}
     </div>
   );
 }

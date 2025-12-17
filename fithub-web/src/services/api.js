@@ -1,4 +1,4 @@
-const API_URL = "https://fithub-api-kx7l.onrender.com"
+const API_URL = "https://malisa-defiable-fae.ngrok-free.dev"
 
 export const apiFetch = async (endpoint, options = {}) => {
   const token = localStorage.getItem("fithub_token");
@@ -9,6 +9,7 @@ export const apiFetch = async (endpoint, options = {}) => {
   const defaultHeaders = {
     ...( !isFormData && { "Content-Type": "application/json" }), // Só adiciona se não for upload
     ...(token && { Authorization: `Bearer ${token}` }),
+    "ngrok-skip-browser-warning": "true",
   };
 
   const config = {
@@ -38,6 +39,7 @@ export const apiFetch = async (endpoint, options = {}) => {
     }
     return null;
   } catch (error) {
-    throw error;
+    throw error;  
+
   }
 };
