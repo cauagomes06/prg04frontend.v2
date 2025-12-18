@@ -1,0 +1,72 @@
+/* ============================
+   CORES PADRÃO DO PROJETO
+   ============================ */
+:root {
+  --green-main: #0ad354;
+  --green-light: #f0fdf4;
+  --green-main-20: #0ad35420;
+}
+
+/* ============================
+      HEADER DO PERFIL
+   ============================ */
+.perfil-header {
+  background-color: white;
+  border-left: 6px solid var(--green-main);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 6px #00000015;
+}
+
+.perfil-avatar {
+  width: 120px;
+  height: 120px;
+  background-color: var(--green-light);
+  border: 3px solid var(--green-main);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px #00000010;
+}
+
+.perfil-avatar i {
+  color: var(--green-main);
+}
+
+/* ============================
+      BADGE DO PLANO
+   ============================ */
+.badge-plano {
+  background-color: var(--green-main-20);
+  color: var(--green-main);
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+}
+
+/* ============================
+      BOTÃO PERSONALIZADO
+   ============================ */
+.btn-green {
+  background-color: var(--green-main) !important;
+  border: none !important;
+  color: white !important;
+  font-weight: bold;
+}
+
+.btn-green:hover {
+  opacity: 0.9;
+}
+
+/* ============================
+        CARD ESTATÍSTICAS
+   ============================ */
+.card-estats {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 2px 6px #00000015;
+}
+
+.card-estats-title {
+  color: var(--green-main);
+}

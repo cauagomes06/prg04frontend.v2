@@ -1,16 +1,48 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# FitHub Web - Frontend (React/Vite)
 
-Currently, two official plugins are available:
+Interface de utilizador (Frontend) para o sistema de gestão de ginásios FitHub, desenvolvida utilizando React com Vite e estilizada com React-Bootstrap e CSS personalizado.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Tecnologias
 
-## React Compiler
+* **Framework:** React v19.2.0
+* **Build Tool:** Vite
+* **Estilização:** Bootstrap 5.3.8 + React-Bootstrap + CSS Customizado
+* **Roteamento:** React Router DOM
+* **Gestão de Estado:** React Context API (`AuthContext`)
+* **Linguagem:** JavaScript/JSX
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## ✨ Principais Funcionalidades
 
-## Expanding the ESLint configuration
+O portal web é dividido em áreas protegidas por autenticação, oferecendo uma experiência dinâmica para clientes e instrutores/administradores:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 🌐 Área do Usuário
+* **Login e Registo**.
+* **Meu Perfil:** Visualização e edição de dados pessoais, foto de perfil, e gestão de plano/senha.
+* **Meus Treinos:** Criação de novas fichas e visualização/gestão de treinos pessoais.
+* **Biblioteca de Treinos:** Exploração e cópia de treinos públicos da comunidade.
+* **Aulas de Grupo:** Visualização da agenda e reserva de vagas.
+* **Competições:** Inscrição em desafios, submissão de resultados e acompanhamento do Ranking Geral e por competição.
+* **Notificações:** Centro de mensagens para updates do sistema.
+
+### 👨‍💼 Área de Administração/Instrutor
+* **Dashboard (Admin):** Visão geral de estatísticas (Alunos, Aulas, Receita).
+* **Gerenciar Usuários (Admin):** Listagem, pesquisa e alteração de perfis de usuário.
+* **Banco de Exercícios:** CRUD para gerir o catálogo de exercícios.
+* **Ferramentas de Classe:** Agendamento de novas aulas e cancelamento.
+
+## ⚙️ Configuração e Execução
+
+### 1. Pré-requisitos
+* Node.js (versão 18+ recomendada)
+* npm (incluído no Node.js)
+* **Backend:** A API deve estar em execução no endereço configurado em `src/services/api.js`.
+
+### 2. Endereço da API
+
+O arquivo `src/services/api.js` está configurado para consumir o backend:
+
+```javascript
+const API_URL = "https://fithub-api-kx7l.onrender.com" //
+// ...
+>>>>>>> 555ee68c1da8b5515aaacce3ec48654f9ae66708
