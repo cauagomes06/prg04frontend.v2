@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8080"
+const API_URL = "https://fithub-api-kx7l.onrender.com";
 
 export const apiFetch = async (endpoint, options = {}) => {
   const token = localStorage.getItem("fithub_token");
@@ -6,10 +6,10 @@ export const apiFetch = async (endpoint, options = {}) => {
   // 1. Se o body for FormData (upload), NÃO definimos Content-Type manualmente
   const isFormData = options.body instanceof FormData;
 
-  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
 
   const defaultHeaders = {
-    ...( !isFormData && { "Content-Type": "application/json" }), // Só adiciona se não for upload
+    ...(!isFormData && { "Content-Type": "application/json" }), // Só adiciona se não for upload
     ...(token && { Authorization: `Bearer ${token}` }),
   };
 
@@ -22,7 +22,7 @@ export const apiFetch = async (endpoint, options = {}) => {
   };
 
   try {
-const response = await fetch(`${API_URL}${cleanEndpoint}`, config);
+    const response = await fetch(`${API_URL}${cleanEndpoint}`, config);
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
         localStorage.removeItem("fithub_token");
@@ -39,7 +39,6 @@ const response = await fetch(`${API_URL}${cleanEndpoint}`, config);
     }
     return null;
   } catch (error) {
-    throw error;  
-
+    throw error;
   }
 };

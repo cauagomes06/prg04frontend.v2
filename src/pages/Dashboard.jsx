@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { Container, Row, Col, Spinner, Button, Alert } from "react-bootstrap";
+import { Container, Row, Col, Spinner, Button } from "react-bootstrap";
 import { AuthContext } from "../context/AuthContext";
 import { paymentService } from "../services/PaymentService";
 
@@ -11,75 +11,53 @@ import { AdminStatsCards } from "../components/dashboard/AdminStatsCards";
 import { RevenueChart } from "../components/dashboard/RevenueChart";
 
 export function Dashboard() {
-  const { user, loading: authLoading } = useContext(AuthContext); //
+  const { user } = useContext(AuthContext);
   
   // Estados para dados financeiros
   const [stats, setStats] = useState({ total_faturado: 0, quantidade_vendas: 0 });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); // Estado de erro adicionado
 
   // Verificação de permissão
-  const isAdmin = user?.nomePerfil && user.nomePerfil.includes("ROLE_ADMIN"); //
+  const isAdmin = user?.nomePerfil && user.nomePerfil.includes("ROLE_ADMIN");
 
   // --- CARREGAR DADOS FINANCEIROS ---
   const carregarDadosDashboard = async () => {
-    if (!isAdmin) return; // Segurança extra
-
     setLoading(true);
-    setError(null);
     try {
-      const data = await paymentService.obterRelatorioFaturamento(); //
+      const data = await paymentService.obterRelatorioFaturamento();
       setStats(data);
     } catch (error) {
       console.error("Erro ao carregar dados do dashboard:", error);
-      setError("Não foi possível carregar os dados financeiros. Tente novamente mais tarde.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Sincroniza a busca com o carregamento do usuário
   useEffect(() => {
-    if (!authLoading) {
-      if (isAdmin) {
-        carregarDadosDashboard();
-      } else {
-        setLoading(false);
-      }
-    }
-  }, [isAdmin, authLoading]); // Dependências corrigidas
+    carregarDadosDashboard();
+  }, []);
 
-  // 1. Verificação de Loading do Auth ou Dados
-  if (authLoading || (isAdmin && loading)) return (
+  if (loading) return (
     <div className="d-flex justify-content-center align-items-center vh-100">
       <Spinner animation="border" variant="success"/>
     </div>
   );
 
-  // 2. Cláusula de Guarda: Se não for Admin, mostra acesso negado
-  if (!isAdmin) {
-    return (
-      <div className="p-5 text-center text-muted">
-        <i className="fas fa-lock fa-3x mb-3 opacity-25"></i>
-        <h3>Acesso Restrito</h3>
-        <p>Esta página é acessível apenas para administradores do sistema.</p>
-      </div>
-    );
-  }
-
   return (
     <div className="dashboard-admin-container">
       <Container>
         
-        {/* CABEÇALHO DO DASHBOARD */}
+        {/* CABEÇALHO DO DASHBOARD (Mantendo sua estrutura de layout) */}
         <div className="d-flex justify-content-between align-items-center mb-4 mt-2">
           <div>
             <h4 className="dashboard-admin-title mb-1">
                 <i className="fas fa-chart-line me-2"></i>
-                Painel de Administração
+                {isAdmin ? "Painel de Administração" : "Meu Resumo"}
             </h4>
             <p className="text-muted mb-0 small">
-                Acompanhe métricas e faturamento da plataforma.
+                {isAdmin 
+                  ? "Acompanhe métricas e faturamento da plataforma." 
+                  : "Visualize suas estatísticas de uso."}
             </p>
           </div>
 
@@ -90,22 +68,29 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* ALERTA DE ERRO */}
-        {error && <Alert variant="danger">{error}</Alert>}
+        {/* 1. SEÇÃO DE CARDS (Usando classes do CSS externo) */}
+        {isAdmin && (
+          <Row className="mb-4">
+            <Col lg={12}>
+                <AdminStatsCards dados={stats} />
+            </Col>
+          </Row>
+        )}
 
-        {/* 1. SEÇÃO DE CARDS */}
-        <Row className="mb-4">
-          <Col lg={12}>
-              <AdminStatsCards dados={stats} />
-          </Col>
-        </Row>
-
-        {/* 2. SEÇÃO DO GRÁFICO */}
+        {/* 2. SEÇÃO DO GRÁFICO (Usando classe dashboard-chart-section do CSS externo) */}
         <Row>
           <Col lg={12}>
             <div className="dashboard-chart-section">
-                <h5 className="fw-bold mb-4">Desempenho de Vendas e Faturamento</h5>
-                <RevenueChart dados={stats} />
+               <h5 className="fw-bold mb-4">Desempenho de Vendas e Faturamento</h5>
+               
+               {isAdmin ? (
+                 <RevenueChart dados={stats} />
+               ) : (
+                 <div className="text-center py-5">
+                   <i className="fas fa-user-clock fa-3x text-muted mb-3 opacity-25"></i>
+                   <p className="text-muted">Seu progresso pessoal será exibido aqui em breve.</p>
+                 </div>
+               )}
             </div>
           </Col>
         </Row>

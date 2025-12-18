@@ -43,30 +43,33 @@ export default function AdminUsers() {
 
   const carregarDados = async (page = 0, search = "") => {
     try {
-      setLoading(true);
+        setLoading(true);
 
-      const usersUrl = `/api/usuarios?page=${page}&size=${pageSize}&search=${search}`;
+        const usersUrl = `/api/usuarios?page=${page}&size=${pageSize}&search=${search}`;
+        
+        // Busca usuários (com paginação) e perfis (sem paginação, assumindo que são poucos)
+        const [pageData, perfisData] = await Promise.all([
+            apiFetch(usersUrl),
+            apiFetch('/api/perfil')
+        ]);
+        
+        if (pageData && Array.isArray(pageData.content)) {
+            setUsuarios(pageData.content); 
+            setTotalPages(pageData.totalPages); 
+  
+        } else {
+            setUsuarios([]); 
+            setTotalPages(0);
+        }
+        
+        if (Array.isArray(perfisData)) setPerfis(perfisData);
 
-      // Busca usuários (com paginação) e perfis (sem paginação, assumindo que são poucos)
-      const [pageData, perfisData] = await Promise.all([
-        apiFetch(usersUrl),
-        apiFetch("/api/perfil"),
-      ]);
-
-      if (pageData && Array.isArray(pageData.content)) {
-        setUsuarios(pageData.content);
-        setTotalPages(pageData.totalPages);
-      } else {
-        setUsuarios([]);
-        setTotalPages(0);
-      }
-
-      if (Array.isArray(perfisData)) setPerfis(perfisData);
     } catch (error) {
+    
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
 
   // 2. DELETAR USUÁRIO
   const handleDeleteClick = (id) => {
@@ -171,12 +174,9 @@ export default function AdminUsers() {
 
       {/* Tabela (Componente Separado) */}
       <UserTable
-        users={usuarios} 
+        users={filteredUsers}
         onEdit={setEditingUser}
         onDelete={handleDeleteClick}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={(page) => setCurrentPage(page)}
       />
 
       {/* Modal de Edição (Componente Separado) */}
