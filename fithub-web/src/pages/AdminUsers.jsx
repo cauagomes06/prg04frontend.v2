@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { apiFetch } from "../services/api";
 
-// COMPONENTES VISUAIS (Granularizados)
+// COMPONENTES VISUAIS
 import { SearchBar } from "../components/common/SearchBar";
 import { UserTable } from "../components/admin/UserTable";
 import { EditUserModal } from "../components/admin/EditUserModal";
+import { PaginationComponent } from "../components/common/PaginationComponent"; // IMPORTADO AQUI
 
 // MODAIS DE FEEDBACK
 import { ConfirmModal } from "../components/common/ConfirmModal";
@@ -18,9 +19,9 @@ export default function AdminUsers() {
   const [loading, setLoading] = useState(true);
 
   // --- ESTADOS PARA PAGINAÇÃO ---
-  const [currentPage, setCurrentPage] = useState(0); // Página atual (0-indexado)
-  const [totalPages, setTotalPages] = useState(0); // Total de páginas
-  const [pageSize, setPageSize] = useState(10); // Tamanho da página (se for ajustável)
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [pageSize] = useState(10);
 
   // --- ESTADOS DE INTERFACE ---
   const [searchTerm, setSearchTerm] = useState("");
@@ -29,47 +30,48 @@ export default function AdminUsers() {
   // --- ESTADOS DE MODAIS ---
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
-
   const [showError, setShowError] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
 
-  // 1. CARREGAR DADOS AO INICIAR
+  // 1. CARREGAR DADOS AO INICIAR OU MUDAR PÁGINA/BUSCA
   useEffect(() => {
     carregarDados(currentPage, searchTerm);
   }, [currentPage, searchTerm]);
 
+  // Resetar para a página 0 quando o usuário digitar na busca
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(0);
+  };
+
   const carregarDados = async (page = 0, search = "") => {
     try {
-        setLoading(true);
+      setLoading(true);
+      const usersUrl = `/api/usuarios?page=${page}&size=${pageSize}&search=${search}`;
 
-        const usersUrl = `/api/usuarios?page=${page}&size=${pageSize}&search=${search}`;
-        
-        // Busca usuários (com paginação) e perfis (sem paginação, assumindo que são poucos)
-        const [pageData, perfisData] = await Promise.all([
-            apiFetch(usersUrl),
-            apiFetch('/api/perfil')
-        ]);
-        
-        if (pageData && Array.isArray(pageData.content)) {
-            setUsuarios(pageData.content); 
-            setTotalPages(pageData.totalPages); 
-  
-        } else {
-            setUsuarios([]); 
-            setTotalPages(0);
-        }
-        
-        if (Array.isArray(perfisData)) setPerfis(perfisData);
+      const [pageData, perfisData] = await Promise.all([
+        apiFetch(usersUrl),
+        apiFetch("/api/perfil"),
+      ]);
 
+      if (pageData && Array.isArray(pageData.content)) {
+        setUsuarios(pageData.content);
+        setTotalPages(pageData.totalPages);
+      } else {
+        setUsuarios([]);
+        setTotalPages(0);
+      }
+
+      if (Array.isArray(perfisData)) setPerfis(perfisData);
     } catch (error) {
-    
+      setErrorMsg("Erro ao carregar usuários.");
+      setShowError(true);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
+  };
 
   // 2. DELETAR USUÁRIO
   const handleDeleteClick = (id) => {
@@ -78,15 +80,13 @@ export default function AdminUsers() {
   };
 
   const confirmDeleteAction = async () => {
-    setShowConfirmDelete(false); // Fecha pergunta
+    setShowConfirmDelete(false);
     try {
       await apiFetch(`/api/usuarios/delete/${userToDelete}`, {
         method: "DELETE",
       });
-
-      // Remove da lista visualmente
-      setUsuarios(usuarios.filter((user) => user.id !== userToDelete));
-
+      // Recarregar a página atual para atualizar a lista do banco
+      carregarDados(currentPage, searchTerm);
       setSuccessMsg("Usuário excluído com sucesso!");
       setShowSuccess(true);
     } catch (error) {
@@ -106,52 +106,18 @@ export default function AdminUsers() {
     try {
       await apiFetch(
         `/api/usuarios/${editingUser.id}/alterar-perfil?novoPerfilId=${novoPerfilId}`,
-        {
-          method: "PATCH",
-        }
+        { method: "PATCH" }
       );
 
-      // Descobre o nome do perfil baseado no ID selecionado (para atualizar a tabela)
-      const perfilEncontrado = perfis.find(
-        (p) => p.id === Number(novoPerfilId)
-      );
-      const nomePerfilAtualizado = perfilEncontrado
-        ? perfilEncontrado.nome
-        : "ROLE_USER";
-
-      // Atualiza a lista localmente
-      setUsuarios(
-        usuarios.map((u) =>
-          u.id === editingUser.id
-            ? { ...u, nomePerfil: nomePerfilAtualizado }
-            : u
-        )
-      );
-
-      setEditingUser(null); // Fecha modal
+      carregarDados(currentPage, searchTerm); // Atualiza dados do servidor
+      setEditingUser(null);
       setSuccessMsg("Perfil do usuário atualizado!");
       setShowSuccess(true);
     } catch (error) {
-      console.error(error);
       setErrorMsg("Erro ao atualizar o perfil.");
       setShowError(true);
     }
   };
-
-  // 4. FILTRAGEM DA LISTA (Busca)
-  const filteredUsers = usuarios.filter(
-    (user) =>
-      user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.nomePerfil?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // 5. RENDERIZAÇÃO
-  if (loading)
-    return (
-      <div className="d-flex justify-content-center align-items-center vh-100">
-        <div className="spinner-border text-success" role="status"></div>
-      </div>
-    );
 
   return (
     <div className="container-fluid p-4">
@@ -166,21 +132,38 @@ export default function AdminUsers() {
           <SearchBar
             placeholder="Buscar por nome ou perfil..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onClear={() => setSearchTerm("")}
+            onChange={handleSearchChange}
+            onClear={() => {
+              setSearchTerm("");
+              setCurrentPage(0);
+            }}
           />
         </div>
       </div>
 
-      {/* Tabela (Componente Separado) */}
-      <UserTable
-        users={filteredUsers}
-        onEdit={setEditingUser}
-        onDelete={handleDeleteClick}
-      />
+      {loading ? (
+        <div className="d-flex justify-content-center p-5">
+          <div className="spinner-border text-success" role="status"></div>
+        </div>
+      ) : (
+        <>
+          {/* Tabela */}
+          <UserTable
+            users={usuarios}
+            onEdit={setEditingUser}
+            onDelete={handleDeleteClick}
+          />
 
-      {/* Modal de Edição (Componente Separado) */}
-      {/* Passamos a lista de perfis do banco para ele montar o select */}
+          {/* COMPONENTE DE PAGINAÇÃO */}
+          <PaginationComponent
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
+        </>
+      )}
+
+      {/* Modal de Edição */}
       <EditUserModal
         show={!!editingUser}
         user={editingUser}
@@ -195,7 +178,7 @@ export default function AdminUsers() {
         handleClose={() => setShowConfirmDelete(false)}
         handleConfirm={confirmDeleteAction}
         title="Excluir Usuário"
-        message="Tem certeza que deseja excluir este usuário permanentemente? Esta ação não pode ser desfeita."
+        message="Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita."
       />
 
       <SuccessModal
@@ -203,7 +186,6 @@ export default function AdminUsers() {
         handleClose={() => setShowSuccess(false)}
         message={successMsg}
       />
-
       <ErrorModal
         show={showError}
         handleClose={() => setShowError(false)}

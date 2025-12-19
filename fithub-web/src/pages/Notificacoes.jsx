@@ -66,10 +66,6 @@ export function Notificacoes() {
     <div className="notificacoes-container py-5">
       <Container>
         
-        {/* --- SEÇÃO DE ANALYTICS (SÓ PARA ADMIN) --- */}
-        {isAdmin && (
-            <AdminStatsCards />
-        )}
 
         {/* Cabeçalho Notificações */}
         <div className="d-flex justify-content-between align-items-center mb-4 mt-2">

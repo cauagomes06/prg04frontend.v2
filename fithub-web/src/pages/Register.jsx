@@ -1,10 +1,10 @@
 import { useState, useEffect, useContext } from "react";
 import { paymentService } from "../services/PaymentService.js";
 import { useNavigate, Link } from "react-router-dom";
-import { apiFetch } from "../services/api";
-import { SuccessModal } from "../components/common/SuccessModal";
-import { ErrorModal } from "../components/common/ErrorModal";
-import { AuthContext } from "../context/AuthContext";
+import { apiFetch } from "../services/api.js";
+import { SuccessModal } from "../components/common/SuccessModal.jsx";
+import { ErrorModal } from "../components/common/ErrorModal.jsx";
+import { AuthContext } from "../context/AuthContext.jsx";
 import "../styles/login.css";
 
 export function Register() {
@@ -29,7 +29,7 @@ export function Register() {
     planoId: "",
   });
 
-// carregamento de planos
+  // carregamento de planos
   useEffect(() => {
     apiFetch("/api/planos/buscar")
       .then((data) => {
@@ -51,7 +51,7 @@ export function Register() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
- const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
@@ -99,7 +99,7 @@ export function Register() {
       // 3. INICIA O PAGAMENTO DO PLANO ESCOLHIDO
       // Usa o ID do usuário recém-criado (userProfile.id) e o plano do form
       const checkoutResponse = await paymentService.criarCheckout(
-        userProfile.id, 
+        userProfile.id,
         parseInt(formData.planoId)
       );
 
@@ -109,7 +109,6 @@ export function Register() {
       } else {
         throw new Error("Link de pagamento não gerado.");
       }
-
     } catch (err) {
       console.error(err);
       setErrorMessage(err.message || "Erro ao criar conta.");
@@ -230,7 +229,9 @@ export function Register() {
                     ))
                   ) : (
                     <div className="col-12 text-center text-muted p-3 border rounded">
-                      {loading ? "A carregar planos..." : "Nenhum plano disponível."}
+                      {loading
+                        ? "A carregar planos..."
+                        : "Nenhum plano disponível."}
                     </div>
                   )}
                 </div>

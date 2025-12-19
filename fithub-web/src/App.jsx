@@ -1,26 +1,27 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider, AuthContext } from "./context/AuthContext";
+import { AuthProvider, AuthContext } from "./context/AuthContext.jsx";
 import { useContext } from "react";
 
 // Imports das Páginas
+import AdminPlans from "./pages/AdminPlans.jsx";
 import { Login } from "./pages/Login.jsx";
-import { Register } from "./pages/Register";
+import { Register } from "./pages/Register.jsx";
 import { Layout } from "./components/common/Layout.jsx";
-import { Dashboard } from "./pages/Dashboard";
-import { MeusTreinos } from "./pages/MeusTreinos";
+import { Dashboard } from "./pages/Dashboard.jsx";
+import { MeusTreinos } from "./pages/MeusTreinos.jsx";
 import { Biblioteca } from "./pages/BibliotecaTreinos.jsx";
-import { Exercicios } from "./pages/Exercicios";
-import { Perfil } from "./pages/Perfil";
-import { Notificacoes } from "./pages/Notificacoes";
+import { Exercicios } from "./pages/Exercicios.jsx";
+import { Perfil } from "./pages/Perfil.jsx";
+import { Notificacoes } from "./pages/Notificacoes.jsx";
 import { Competicoes } from "./pages/Competicoes.jsx";
-import { Aulas } from "./pages/Aulas";
+import { Aulas } from "./pages/Aulas.jsx";
 import AdminUsers from "./pages/AdminUsers.jsx";
 
 // Imports de Pagamento (Adicionados)
-import { PaymentSuccess } from "./pages/payment/PaymentSuccess";
-import { PaymentFailure } from "./pages/payment/PaymentFailure";
+import { PaymentSuccess } from "./pages/payment/PaymentSuccess.jsx";
+import { PaymentFailure } from "./pages/payment/PaymentFailure.jsx";
 
-// Componente para proteger rotas
+// 1. Protetor de Rotas Geral (Logado)
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
 
@@ -33,6 +34,21 @@ const PrivateRoute = ({ children }) => {
   return user ? children : <Navigate to="/login" />;
 };
 
+// 2. Protetor de Rotas de Admin (Role Check)
+const AdminRoute = ({ children }) => {
+  const { user, loading } = useContext(AuthContext);
+
+  if (loading)
+    return (
+      <div className="d-flex justify-content-center mt-5">Carregando...</div>
+    );
+
+  // Verifica se o perfil contém "ADMIN"
+  const isAdmin = user?.nomePerfil?.toUpperCase().includes("ROLE_ADMIN");
+
+  return isAdmin ? children : <Navigate to="/portal/dashboard" />;
+};
+
 function App() {
   return (
     <AuthProvider>
@@ -42,7 +58,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* --- Rotas de Retorno do Pagamento (Públicas ou Protegidas conforme necessidade) --- */}
+          {/* --- Rotas de Retorno do Pagamento --- */}
           <Route path="/sucesso" element={<PaymentSuccess />} />
           <Route path="/falha" element={<PaymentFailure />} />
           <Route path="/pendente" element={<PaymentSuccess />} />
@@ -57,7 +73,7 @@ function App() {
             }
           >
             {/* Redireciona /portal para /portal/dashboard */}
-            <Route index element={<Navigate to="/portal/dashboard" />} />
+            <Route index element={<Navigate to="/portal/perfil" />} />
 
             {/* Rotas Internas do Portal */}
             <Route path="dashboard" element={<Dashboard />} />
@@ -68,8 +84,16 @@ function App() {
             <Route path="exercicios" element={<Exercicios />} />
             <Route path="competicoes" element={<Competicoes />} />
             <Route path="aulas" element={<Aulas />} />
-            
+
             {/* Rota de Admin */}
+            <Route
+              path="admin/planos"
+              element={
+                <AdminRoute>
+                  <AdminPlans />
+                </AdminRoute>
+              }
+            />
             <Route path="admin" element={<AdminUsers />} />
           </Route>
 

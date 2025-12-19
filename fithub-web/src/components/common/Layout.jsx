@@ -46,23 +46,26 @@ export function Layout() {
           foto: data.fotoUrl,
         });
 
-        return apiFetch("/api/usuarios/ranking").then((ranking) => {
-          const posicao = ranking.findIndex(
-            (r) => r.usuarioId === data.id || r.id === data.id
-          );
-          if (posicao !== -1) setUserRank(posicao + 1);
-        });
+        // 2. Ranking (com catch para não travar o sistema caso o usuário não tenha permissão)
+        return apiFetch("/api/usuarios/ranking")
+          .then((ranking) => {
+            const posicao = ranking.findIndex(
+              (r) => r.usuarioId === data.id || r.id === data.id
+            );
+            if (posicao !== -1) setUserRank(posicao + 1);
+          })
+          .catch(() => console.warn("Usuário sem acesso ao ranking."));
       })
       .catch((err) => console.error("Erro ao carregar dados:", err));
 
-    // 2. Notificações
+    // 3. Notificações (com catch para não travar o sistema caso o usuário não tenha permissão)
     apiFetch("/api/notificacoes/contagem-nao-lidas")
       .then((data) => {
         if (data && typeof data.contagem === "number") {
           setNotifCount(data.contagem);
         }
       })
-      .catch((err) => console.error("Erro ao carregar notificações:", err));
+      .catch(() => console.warn("Usuário sem acesso às notificações."));
   }, []);
 
   return (
@@ -143,6 +146,12 @@ export function Layout() {
                 <li>
                   <Link to="/portal/admin">
                     <i className="fas fa-users-cog"></i> Gerenciar Usuários
+                  </Link>
+                </li>
+                {/* ABA DE PLANOS ADICIONADA NOVAMENTE */}
+                <li>
+                  <Link to="/portal/admin/planos">
+                    <i className="fas fa-tags"></i> Gerenciar Planos
                   </Link>
                 </li>
               </>
