@@ -3,7 +3,7 @@ import { AuthProvider, AuthContext } from "./context/AuthContext";
 import { useContext } from "react";
 
 // Imports das Páginas
-import AdminPlans from "./pages/AdminPlans";
+import AdminPlans from "./pages/AdminPlans.jsx"; 
 import { Login } from "./pages/Login.jsx";
 import { Register } from "./pages/Register";
 import { Layout } from "./components/common/Layout.jsx";
@@ -21,29 +21,26 @@ import AdminUsers from "./pages/AdminUsers.jsx";
 import { PaymentSuccess } from "./pages/payment/PaymentSuccess";
 import { PaymentFailure } from "./pages/payment/PaymentFailure";
 
-// 1. Componente para proteger rotas gerais (qualquer usuário logado)
+// 1. Protetor de Rotas Geral (Logado)
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
 
   if (loading) {
-    return (
-      <div className="d-flex justify-content-center mt-5">Carregando...</div>
-    );
+    return <div className="d-flex justify-content-center mt-5">Carregando...</div>;
   }
 
   return user ? children : <Navigate to="/login" />;
 };
 
-// 2. Componente para proteger rotas de ADMIN
+// 2. Protetor de Rotas de Admin (Role Check)
 const AdminRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
 
   if (loading) return <div className="d-flex justify-content-center mt-5">Carregando...</div>;
 
-  // Verifica se o perfil contém "ADMIN" (baseado no seu sistema de perfis)
+  // Verifica se o perfil contém "ADMIN"
   const isAdmin = user?.nomePerfil?.toUpperCase().includes("ROLE_ADMIN");
 
-  // Se for admin, mostra o conteúdo; se não, manda de volta para o dashboard
   return isAdmin ? children : <Navigate to="/portal/dashboard" />;
 };
 
@@ -70,9 +67,10 @@ function App() {
               </PrivateRoute>
             }
           >
+            {/* Redireciona /portal para /portal/dashboard */}
             <Route index element={<Navigate to="/portal/perfil" />} />
 
-            {/* Rotas de Usuário Comum */}
+            {/* Rotas Internas do Portal */}
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="notificacoes" element={<Notificacoes />} />
             <Route path="perfil" element={<Perfil />} />
@@ -82,20 +80,22 @@ function App() {
             <Route path="competicoes" element={<Competicoes />} />
             <Route path="aulas" element={<Aulas />} />
             
-            {/* 3. Rotas de Admin (Protegidas pelo AdminRoute) */}
+            {/* --- Rotas de Admin (Protegidas) --- */}
+            {/* Usamos caminhos relativos (sem "/") para evitar erros de aninhamento */}
             <Route path="admin" element={
               <AdminRoute>
                 <AdminUsers />
               </AdminRoute>
             } />
-            
+
             <Route path="admin/planos" element={
               <AdminRoute>
                 <AdminPlans />
               </AdminRoute>
             } />
           </Route>
-          
+
+          {/* Qualquer rota desconhecida vai para login */}
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </BrowserRouter>

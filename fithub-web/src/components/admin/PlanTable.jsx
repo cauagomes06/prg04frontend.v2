@@ -9,20 +9,34 @@ export function PlanTable({ planos, onEdit, onDelete }) {
             <tr>
               <th className="ps-4">ID</th>
               <th>Nome do Plano</th>
+              <th>Descrição</th>
               <th>Preço (R$)</th>
               <th className="text-end pe-4">Ações</th>
             </tr>
           </thead>
           <tbody>
             {planos.map((plano) => (
-              <tr key={plano.id}>
-                <td className="ps-4 text-muted">#{plano.idPlano }</td>
-                <td className="fw-bold text-dark">{plano.nomePlano}</td>
-                <td>
-                  <span className="badge bg-success-subtle text-success border border-success-subtle px-3">
-                    R$ {plano.preco?.toFixed(2)}
+              <tr key={plano.idPlano}>
+                {/* Usando idPlano conforme sua estrutura de dados */}
+                <td className="ps-4 text-muted">#{plano.idPlano}</td>
+                
+                {/* CORREÇÃO: Fallback para o nome não aparecer vazio como na imagem */}
+                <td className="fw-bold text-dark">
+                  {plano.nomePlano ||"Sem Nome"}
+                </td>
+
+                <td className="text-muted small" style={{ maxWidth: "300px" }}>
+                  <span className="text-truncate d-inline-block w-100">
+                    {plano.descricaoPlano || "Sem descrição"}
                   </span>
                 </td>
+
+                <td>
+                  <span className="badge bg-success-subtle text-success border border-success-subtle px-3">
+                    R$ {plano.preco?.toFixed(2) || "0.00"}
+                  </span>
+                </td>
+
                 <td className="text-end pe-4">
                   <button 
                     onClick={() => onEdit(plano)}
@@ -31,7 +45,7 @@ export function PlanTable({ planos, onEdit, onDelete }) {
                     <i className="fas fa-pen"></i>
                   </button>
                   <button 
-                    onClick={() => onDelete(plano.id)}
+                    onClick={() => onDelete(plano.idPlano)}
                     className="btn btn-sm btn-outline-danger border-0"
                     title="Excluir Plano">
                     <i className="fas fa-trash"></i>
@@ -40,12 +54,14 @@ export function PlanTable({ planos, onEdit, onDelete }) {
               </tr>
             ))}
             
+            {/* Mensagem caso a lista venha vazia */}
             {planos.length === 0 && (
-                <tr>
-                    <td colSpan="4" className="text-center py-5 text-muted">
-                        Nenhum plano encontrado.
-                    </td>
-                </tr>
+              <tr>
+                <td colSpan="5" className="text-center py-5 text-muted">
+                  <i className="fas fa-info-circle me-2"></i>
+                  Nenhum plano encontrado.
+                </td>
+              </tr>
             )}
           </tbody>
         </table>

@@ -7,7 +7,7 @@ import { SuccessModal } from "../components/common/SuccessModal";
 // Componentes Granulares
 import { NotificationItem } from "../components/notificacoes/NotificacaoItem";
 import { BroadcastModal } from "../components/notificacoes/BroadcastModal";
-
+import { AdminStatsCards } from "../components/dashboard/AdminStatsCards"; // <--- IMPORTAR AQUI
 
 import "../styles/notificacoes.css";
 

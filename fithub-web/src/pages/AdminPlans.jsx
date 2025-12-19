@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { apiFetch } from "../services/api";
-import { Button } from "react-bootstrap"; // Adicionado para o botão
+import { Button } from "react-bootstrap";
 
 // COMPONENTES
 import { SearchBar } from "../components/common/SearchBar";
 import { PlanTable } from "../components/admin/PlanTable";
-import { PaginationComponent } from "../components/common/PaginationComponent";
-import { PlanModal } from "../components/planos/PlanModal"; // Novo Componente
+import { PlanModal } from "../components/planos/PlanModal";
 
 // MODAIS DE FEEDBACK
 import { ConfirmModal } from "../components/common/ConfirmModal";
@@ -15,137 +14,129 @@ import { ErrorModal } from "../components/common/ErrorModal";
 
 export default function AdminPlans() {
   const [planos, setPlanos] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // PAGINAÇÃO E BUSCA
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [searchTerm, setSearchTerm] = useState("");
-
-  // ESTADOS DE MODAIS
+  // ESTADOS DOS MODAIS
   const [showPlanModal, setShowPlanModal] = useState(false);
   const [planToEdit, setPlanToEdit] = useState(null);
-
   const [showSuccess, setShowSuccess] = useState(false);
-  const [successMsg, setSuccessMsg] = useState("");
   const [showError, setShowError] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [planToDelete, setPlanToDelete] = useState(null);
 
+  // Carrega os dados sempre que a página abrir ou o termo de busca mudar
   useEffect(() => {
     carregarPlanos();
-  }, [currentPage, searchTerm]);
+  }, [searchTerm]);
 
   const carregarPlanos = async () => {
     try {
       setLoading(true);
-      const url = `/api/planos/buscar?page=${currentPage}&size=10&search=${searchTerm}`;
+      // Ajustado para o seu endpoint que retorna List<Plano>
+      const url = `/api/planos/buscar?search=${searchTerm}`;
       const data = await apiFetch(url);
-      
-      if (data?.content) {
-        setPlanos(data.content);
-        setTotalPages(data.totalPages);
+
+      console.log("Resposta da API:", data); // Verifique no console se é um Array []
+
+      if (Array.isArray(data)) {
+        setPlanos(data);
       } else {
-        setPlanos(Array.isArray(data) ? data : []);
-        setTotalPages(0);
+        // Fallback caso o backend mude a estrutura inesperadamente
+        setPlanos(data?.content || []);
       }
     } catch (error) {
-      setErrorMsg("Não foi possível carregar os planos.");
+      // CORREÇÃO: Garante que a mensagem de erro apareça (resolvendo a imagem 3d3286)
+      setErrorMsg(error.message || "Não foi possível carregar os planos.");
       setShowError(true);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEditClick = (plano) => {
-    setPlanToEdit(plano);
-    setShowPlanModal(true);
-  };
-
-  const handleCreateClick = () => {
-    setPlanToEdit(null);
-    setShowPlanModal(true);
-  };
-
   const confirmDelete = async () => {
     setShowConfirmDelete(false);
     try {
-      await apiFetch(`/api/planos/delete/${planToDelete}`, { method: "DELETE" });
-      setSuccessMsg("Plano excluído com sucesso!");
+      await apiFetch(`/api/planos/delete/${planToDelete}`, {
+        method: "DELETE",
+      });
+      carregarPlanos(); // Recarrega a lista após apagar
       setShowSuccess(true);
-      carregarPlanos();
     } catch (error) {
-      const msg = error.message?.toLowerCase() || "";
-      if (msg.includes("foreign key") || msg.includes("integridade")) {
-        setErrorMsg("Não é possível excluir este plano pois existem usuários vinculados a ele.");
-      } else {
-        setErrorMsg("Ocorreu um erro ao tentar excluir o plano.");
-      }
+      setErrorMsg(error.message || "Erro ao excluir o plano.");
       setShowError(true);
     }
   };
 
   return (
     <div className="container-fluid p-4">
-      <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
         <div>
-          <h2 className="fw-bold text-dark mb-0">
-            <i className="fas fa-tags me-2 text-success"></i> Gerenciar Planos
+          <h2 className="fw-bold mb-0">
+            <i className="fas fa-tags me-2 text-success"></i> Planos
           </h2>
-          <p className="text-muted mb-0">Adicione, edite ou remova planos da academia.</p>
+          <p className="text-muted mb-0">
+            Gerencie os planos ativos da academia.
+          </p>
         </div>
 
-        <div className="d-flex align-items-center mt-3 mt-md-0">
-          <div className="me-3" style={{ width: "300px" }}>
-            <SearchBar 
-              placeholder="Buscar planos..." 
-              value={searchTerm}
-              onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(0); }}
-              onClear={() => { setSearchTerm(""); setCurrentPage(0); }}
-            />
-          </div>
-          <Button variant="success" className="fw-bold" onClick={handleCreateClick}>
-            <i className="fas fa-plus me-2"></i> Novo Plano
+        <div className="d-flex align-items-center gap-2">
+          <SearchBar
+            placeholder="Buscar planos..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <Button
+            variant="success"
+            className="fw-bold"
+            onClick={() => {
+              setPlanToEdit(null);
+              setShowPlanModal(true);
+            }}
+          >
+            <i className="fas fa-plus me-2"></i> Novo
           </Button>
         </div>
       </div>
 
-      <PlanTable 
-        planos={planos} 
-        onEdit={handleEditClick} 
-        onDelete={(id) => { setPlanToDelete(id); setShowConfirmDelete(true); }} 
-      />
-
-      <PaginationComponent 
-        currentPage={currentPage} 
-        totalPages={totalPages} 
-        onPageChange={setCurrentPage} 
-      />
-
-      {/* MODAL DE CRIAÇÃO/EDIÇÃO */}
-      <PlanModal 
-        show={showPlanModal}
-        planToEdit={planToEdit}
-        handleClose={() => setShowPlanModal(false)}
-        onSuccess={() => {
-          carregarPlanos();
-          setSuccessMsg(planToEdit ? "Plano atualizado!" : "Plano cadastrado!");
-          setShowSuccess(true);
+      {/* TABELA SEM PAGINAÇÃO */}
+      <PlanTable
+        planos={planos}
+        onEdit={(p) => {
+          setPlanToEdit(p);
+          setShowPlanModal(true);
+        }}
+        onDelete={(id) => {
+          setPlanToDelete(id);
+          setShowConfirmDelete(true);
         }}
       />
 
-      <ConfirmModal 
-        show={showConfirmDelete} 
-        handleClose={() => setShowConfirmDelete(false)} 
-        handleConfirm={confirmDelete}
-        title="Excluir Plano"
-        message="Tem certeza que deseja remover este plano permanentemente?"
+      {/* MODAIS */}
+      <PlanModal
+        show={showPlanModal}
+        planToEdit={planToEdit}
+        handleClose={() => setShowPlanModal(false)}
+        onSuccess={carregarPlanos}
       />
 
-      <SuccessModal show={showSuccess} handleClose={() => setShowSuccess(false)} message={successMsg} />
-      <ErrorModal show={showError} handleClose={() => setShowError(false)} message={errorMsg} />
+      <ConfirmModal
+        show={showConfirmDelete}
+        handleClose={() => setShowConfirmDelete(false)}
+        handleConfirm={confirmDelete}
+      />
+
+      <SuccessModal
+        show={showSuccess}
+        handleClose={() => setShowSuccess(false)}
+        message="Operação concluída com sucesso!"
+      />
+      <ErrorModal
+        show={showError}
+        handleClose={() => setShowError(false)}
+        message={errorMsg}
+      />
     </div>
   );
 }
