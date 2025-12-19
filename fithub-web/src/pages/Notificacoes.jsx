@@ -7,7 +7,7 @@ import { SuccessModal } from "../components/common/SuccessModal";
 // Componentes Granulares
 import { NotificationItem } from "../components/notificacoes/NotificacaoItem";
 import { BroadcastModal } from "../components/notificacoes/BroadcastModal";
-import { AdminStatsCards } from "../components/dashboard/AdminStatsCards"; // <--- IMPORTAR AQUI
+
 
 import "../styles/notificacoes.css";
 
@@ -66,10 +66,6 @@ export function Notificacoes() {
     <div className="notificacoes-container py-5">
       <Container>
         
-        {/* --- SEÇÃO DE ANALYTICS (SÓ PARA ADMIN) --- */}
-        {isAdmin && (
-            <AdminStatsCards />
-        )}
 
         {/* Cabeçalho Notificações */}
         <div className="d-flex justify-content-between align-items-center mb-4 mt-2">

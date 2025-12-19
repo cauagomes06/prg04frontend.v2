@@ -3,6 +3,7 @@ import { AuthProvider, AuthContext } from "./context/AuthContext";
 import { useContext } from "react";
 
 // Imports das Páginas
+import AdminPlans from "./pages/AdminPlans";
 import { Login } from "./pages/Login.jsx";
 import { Register } from "./pages/Register";
 import { Layout } from "./components/common/Layout.jsx";
@@ -16,11 +17,11 @@ import { Competicoes } from "./pages/Competicoes.jsx";
 import { Aulas } from "./pages/Aulas";
 import AdminUsers from "./pages/AdminUsers.jsx";
 
-// Imports de Pagamento (Adicionados)
+// Imports de Pagamento
 import { PaymentSuccess } from "./pages/payment/PaymentSuccess";
 import { PaymentFailure } from "./pages/payment/PaymentFailure";
 
-// Componente para proteger rotas
+// 1. Componente para proteger rotas gerais (qualquer usuário logado)
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
 
@@ -33,6 +34,19 @@ const PrivateRoute = ({ children }) => {
   return user ? children : <Navigate to="/login" />;
 };
 
+// 2. Componente para proteger rotas de ADMIN
+const AdminRoute = ({ children }) => {
+  const { user, loading } = useContext(AuthContext);
+
+  if (loading) return <div className="d-flex justify-content-center mt-5">Carregando...</div>;
+
+  // Verifica se o perfil contém "ADMIN" (baseado no seu sistema de perfis)
+  const isAdmin = user?.nomePerfil?.toUpperCase().includes("ROLE_ADMIN");
+
+  // Se for admin, mostra o conteúdo; se não, manda de volta para o dashboard
+  return isAdmin ? children : <Navigate to="/portal/dashboard" />;
+};
+
 function App() {
   return (
     <AuthProvider>
@@ -42,7 +56,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* --- Rotas de Retorno do Pagamento (Públicas ou Protegidas conforme necessidade) --- */}
+          {/* --- Rotas de Retorno do Pagamento --- */}
           <Route path="/sucesso" element={<PaymentSuccess />} />
           <Route path="/falha" element={<PaymentFailure />} />
           <Route path="/pendente" element={<PaymentSuccess />} />
@@ -56,10 +70,9 @@ function App() {
               </PrivateRoute>
             }
           >
-            {/* Redireciona /portal para /portal/dashboard */}
-            <Route index element={<Navigate to="/portal/dashboard" />} />
+            <Route index element={<Navigate to="/portal/perfil" />} />
 
-            {/* Rotas Internas do Portal */}
+            {/* Rotas de Usuário Comum */}
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="notificacoes" element={<Notificacoes />} />
             <Route path="perfil" element={<Perfil />} />
@@ -69,11 +82,20 @@ function App() {
             <Route path="competicoes" element={<Competicoes />} />
             <Route path="aulas" element={<Aulas />} />
             
-            {/* Rota de Admin */}
-            <Route path="admin" element={<AdminUsers />} />
+            {/* 3. Rotas de Admin (Protegidas pelo AdminRoute) */}
+            <Route path="admin" element={
+              <AdminRoute>
+                <AdminUsers />
+              </AdminRoute>
+            } />
+            
+            <Route path="admin/planos" element={
+              <AdminRoute>
+                <AdminPlans />
+              </AdminRoute>
+            } />
           </Route>
-
-          {/* Qualquer rota desconhecida vai para login */}
+          
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </BrowserRouter>

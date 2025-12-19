@@ -10,7 +10,6 @@ export function Layout() {
 
   const isAdmin = user?.nomePerfil && user.nomePerfil.includes("ROLE_ADMIN");
 
-  // Estados de Dados
   const [userData, setUserData] = useState({
     nome: "Carregando...",
     plano: "...",
@@ -18,27 +17,20 @@ export function Layout() {
   });
   const [userRank, setUserRank] = useState(null);
   const [notifCount, setNotifCount] = useState(0);
-
-  // Estado para controlar erro na imagem da sidebar
   const [imgError, setImgError] = useState(false);
-
-  // Estado do Menu Mobile
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Fecha a sidebar sempre que mudar de rota (clicar num link)
   useEffect(() => {
     setIsSidebarOpen(false);
   }, [location]);
 
   useEffect(() => {
-    // 1. Carregar dados do utilizador
+    // 1. Carregar dados básicos do utilizador
     apiFetch("/api/usuarios/me")
       .then((data) => {
         const primeiroNome =
           data.pessoa?.nomeCompleto?.split(" ")[0] || "Utilizador";
-
         setImgError(false);
-
         setUserData({
           id: data.id,
           nome: primeiroNome,
@@ -46,28 +38,34 @@ export function Layout() {
           foto: data.fotoUrl,
         });
 
-        return apiFetch("/api/usuarios/ranking").then((ranking) => {
-          const posicao = ranking.findIndex(
-            (r) => r.usuarioId === data.id || r.id === data.id
+        // 2. Tenta carregar o ranking (falha silenciosamente se for cliente sem acesso)
+        apiFetch("/api/usuarios/ranking")
+          .then((ranking) => {
+            const posicao = ranking.findIndex(
+              (r) => r.usuarioId === data.id || r.id === data.id
+            );
+            if (posicao !== -1) setUserRank(posicao + 1);
+          })
+          .catch((err) =>
+            console.warn("Aviso: Usuário não tem acesso ao ranking.")
           );
-          if (posicao !== -1) setUserRank(posicao + 1);
-        });
       })
-      .catch((err) => console.error("Erro ao carregar dados:", err));
+      .catch((err) => console.error("Erro ao carregar dados do usuário:", err));
 
-    // 2. Notificações
+    // 3. Tenta carregar notificações (falha silenciosamente se não tiver permissão)
     apiFetch("/api/notificacoes/contagem-nao-lidas")
       .then((data) => {
         if (data && typeof data.contagem === "number") {
           setNotifCount(data.contagem);
         }
       })
-      .catch((err) => console.error("Erro ao carregar notificações:", err));
+      .catch((err) =>
+        console.warn("Aviso: Usuário não tem acesso às notificações.")
+      );
   }, []);
 
   return (
     <div className="portal-container">
-      {/* HEADER MOBILE */}
       <header className="mobile-header">
         <button
           className="btn-hamburger"
@@ -77,24 +75,19 @@ export function Layout() {
           <i className="fas fa-bars"></i>
         </button>
         <h5 className="mb-0 fw-bold text-success">FitHub</h5>
-
         <Link to="/portal/notificacoes" className="text-dark position-relative">
           <i className="far fa-bell fa-lg"></i>
           {notifCount > 0 && (
-            <span className="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
-              <span className="visually-hidden">Novos alertas</span>
-            </span>
+            <span className="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
           )}
         </Link>
       </header>
 
-      {/* OVERLAY */}
       <div
         className={`sidebar-overlay ${isSidebarOpen ? "active" : ""}`}
         onClick={() => setIsSidebarOpen(false)}
       ></div>
 
-      {/* SIDEBAR */}
       <aside className={`portal-sidebar ${isSidebarOpen ? "open" : ""}`}>
         <button
           className="btn-close-sidebar"
@@ -118,10 +111,8 @@ export function Layout() {
               <i className="fas fa-user fa-2x text-secondary"></i>
             </div>
           )}
-
           <h3 id="sidebar-nome">Olá, {userData.nome}!</h3>
           <p className="text-muted mb-2">{userData.plano}</p>
-
           {userRank && (
             <div className="badge bg-warning text-dark p-2 px-3 rounded-pill shadow-sm mt-1">
               <i className="fas fa-trophy me-2"></i>
@@ -132,17 +123,21 @@ export function Layout() {
 
         <nav className="portal-menu mt-4">
           <ul>
-            {/* SEÇÃO DE ADMINISTRADOR */}
             {isAdmin && (
               <>
                 <li>
-                  <Link to="/portal/dashboard">
+                  <Link to="/portal/admin/dashboard">
                     <i className="fas fa-chart-line"></i> Dashboard
                   </Link>
                 </li>
                 <li>
                   <Link to="/portal/admin">
                     <i className="fas fa-users-cog"></i> Gerenciar Usuários
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/portal/admin/planos">
+                    <i className="fas fa-tags"></i> Gerenciar Planos
                   </Link>
                 </li>
               </>
@@ -157,10 +152,7 @@ export function Layout() {
                   <i className="fas fa-bullhorn"></i> Notificações
                 </span>
                 {notifCount > 0 && (
-                  <span
-                    className="badge bg-danger rounded-pill"
-                    style={{ fontSize: "0.75rem" }}
-                  >
+                  <span className="badge bg-danger rounded-pill">
                     {notifCount}
                   </span>
                 )}
@@ -204,7 +196,6 @@ export function Layout() {
               )}
 
             <li className="menu-divider"></li>
-
             <li>
               <a
                 href="#"
