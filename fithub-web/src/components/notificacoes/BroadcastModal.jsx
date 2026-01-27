@@ -13,7 +13,7 @@ export function BroadcastModal({ show, onHide, onSuccess }) {
     try {
       await apiFetch("/api/notificacoes/broadcast", {
         method: "POST",
-        body: JSON.stringify({HZ ,mensagem, link }),
+        body: JSON.stringify({mensagem, link }),
       });
       
       // Limpar e notificar sucesso

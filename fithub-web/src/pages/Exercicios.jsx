@@ -3,9 +3,8 @@ import { apiFetch } from "../services/api";
 import { Button } from "react-bootstrap";
 import { AuthContext } from "../context/AuthContext";
 
-// IMPORTAÇÃO DO SEU COMPONENTE DE PAGINAÇÃO
+// Componentes
 import { PaginationComponent } from "../components/common/PaginationComponent";
-
 import { CreateExerciseModal } from "../components/exercicios/CreateExerciseModal";
 import { ConfirmModal } from "../components/common/ConfirmModal";
 import { SuccessModal } from "../components/common/SuccessModal";
@@ -17,23 +16,26 @@ import { ExerciseTable } from "../components/exercicios/ExerciseTable";
 export function Exercicios() {
   const { user } = useContext(AuthContext);
 
+  // Estados de Dados
   const [exercicios, setExercicios] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // --- ESTADOS DE PAGINAÇÃO ---
-  const [paginaAtual, setPaginaAtual] = useState(0); // Índice 0 para bater com seu componente
-  const itensPorPagina = 6;
+  const [paginaAtual, setPaginaAtual] = useState(0);
+  const [totalPaginas, setTotalPaginas] = useState(0); // Vindo da API
+  const itensPorPagina = 6; // Enviado para API
 
+  // Estados de Filtro
+  const [filtroMusculo, setFiltroMusculo] = useState("TODOS");
+  const [termoBusca, setTermoBusca] = useState("");
+
+  // Estados de Modais
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
-
   const [exerciseToDelete, setExerciseToDelete] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
-
-  const [filtroMusculo, setFiltroMusculo] = useState("TODOS");
-  const [termoBusca, setTermoBusca] = useState("");
 
   const gruposMusculares = [
     "TODOS",
@@ -41,7 +43,8 @@ export function Exercicios() {
     "COSTAS",
     "PERNAS",
     "OMBROS",
-    "BRAÇOS",
+    "BÍCEPS",
+    "TRÍCEPS",
     "ABDÔMEN",
     "GLÚTEOS",
     "PANTURRILHA",
@@ -53,51 +56,70 @@ export function Exercicios() {
     (user.nomePerfil.toUpperCase().includes("ROLE_ADMIN") ||
       user.nomePerfil.toUpperCase().includes("ROLE_PERSONAL"));
 
-  const carregarExercicios = () => {
+  // =========================================================
+  // 1. CARREGAMENTO INTELIGENTE (SERVER-SIDE)
+  // =========================================================
+  const carregarExercicios = async () => {
     setLoading(true);
-    apiFetch("/api/exercicios/buscar")
-      .then((data) => {
-        // BLINDAGEM: Garante que o estado sempre receba um Array
-        const listaSaneada = Array.isArray(data) ? data : data?.content || [];
-        setExercicios(listaSaneada);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Erro na requisição:", err);
+
+    // Constrói a URL base
+    let url = `/api/exercicios/buscar?page=${paginaAtual}&size=${itensPorPagina}`;
+
+    if (filtroMusculo && filtroMusculo !== "TODOS") {
+      // Se tem grupo muscular, usa o endpoint de grupo
+      url += `&grupoMuscular=${filtroMusculo}`;
+    } else if (termoBusca) {
+      // Se não tem grupo, mas tem busca, usa o endpoint de busca
+      url += `&search=${encodeURIComponent(termoBusca)}`;
+    }
+
+    try {
+      const data = await apiFetch(url);
+
+      // O Backend agora retorna um Page, então pegamos .content
+      if (data) {
+        setExercicios(data.content || []);
+        setTotalPaginas(data.totalPages || 0); // Ajusta a paginação real
+      } else {
         setExercicios([]);
-        setLoading(false);
-      });
+        setTotalPaginas(0);
+      }
+    } catch (err) {
+      console.error("Erro na requisição:", err);
+      setExercicios([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // =========================================================
+  // 2. EFEITOS 
+  // =========================================================
+
+  // Dispara quando muda Página ou Filtro de Músculo
   useEffect(() => {
     carregarExercicios();
-  }, []);
+  }, [paginaAtual, filtroMusculo]);
 
-  // --- LÓGICA DE FILTRAGEM (Com proteção extra contra o erro de .filter) ---
-  const exerciciosFiltrados = (
-    Array.isArray(exercicios) ? exercicios : []
-  ).filter((ex) => {
-    const termoMusculo = filtroMusculo.toUpperCase();
-    const matchMusculo =
-      filtroMusculo === "TODOS" ||
-      ex.grupoMuscular?.toUpperCase().includes(termoMusculo);
-    const textoBusca = termoBusca.toLowerCase();
-    const matchBusca =
-      ex.nome.toLowerCase().includes(textoBusca) ||
-      ex.descricao?.toLowerCase().includes(textoBusca);
-    return matchMusculo && matchBusca;
-  });
+  // Dispara quando muda a Busca (com Delay/Debounce)
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      // Reseta para página 0 sempre que pesquisa algo novo
+      setPaginaAtual(0);
+      carregarExercicios();
+    }, 500);
 
-  // --- LÓGICA DE RECORTE PARA EXIBIÇÃO ---
-  const totalPaginas = Math.ceil(exerciciosFiltrados.length / itensPorPagina);
-  const inicio = paginaAtual * itensPorPagina;
-  const fim = inicio + itensPorPagina;
-  const itensParaExibir = exerciciosFiltrados.slice(inicio, fim);
+    return () => clearTimeout(delayDebounceFn);
+  }, [termoBusca]);
 
-  // Resetar para a primeira página quando houver nova busca ou filtro
+  // Reset de página ao mudar filtro de músculo
   useEffect(() => {
     setPaginaAtual(0);
-  }, [termoBusca, filtroMusculo]);
+  }, [filtroMusculo]);
+
+  // =========================================================
+  // 3. AÇÕES
+  // =========================================================
 
   const initiateDelete = (id) => {
     setExerciseToDelete(id);
@@ -111,19 +133,19 @@ export function Exercicios() {
         method: "DELETE",
       });
       setShowDeleteConfirm(false);
-      // Remove da lista local para atualizar a UI instantaneamente
-      setExercicios((prev) => prev.filter((ex) => ex.id !== exerciseToDelete));
+
+      // RECARREGA DO SERVIDOR para garantir que a paginação fique certa
+      carregarExercicios();
+
       setExerciseToDelete(null);
       setShowSuccessModal(true);
     } catch (error) {
       setShowDeleteConfirm(false);
-      if (error.message && error.message.includes("integridade")) {
-        setErrorMessage(
-          "Não é possível excluir este exercício pois ele faz parte de fichas ativas."
-        );
-      } else {
-        setErrorMessage(error.message || "Erro ao tentar excluir.");
-      }
+      const msg = error.message?.includes("integridade")
+        ? "Não é possível excluir este exercício pois ele faz parte de fichas ativas."
+        : error.message || "Erro ao tentar excluir.";
+
+      setErrorMessage(msg);
       setShowErrorModal(true);
     }
   };
@@ -131,7 +153,7 @@ export function Exercicios() {
   if (!isPersonalOrAdmin) {
     return (
       <div className="p-5 text-center text-muted">
-        <h3>Acesso restrito a Instrutores.</h3>
+        <h3>Acesso restrito.</h3>
       </div>
     );
   }
@@ -141,9 +163,7 @@ export function Exercicios() {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h2 className="fw-bold text-dark mb-0">Banco de Exercícios</h2>
-          <p className="text-muted mb-0">
-            Gerencie o catálogo de exercícios da academia.
-          </p>
+          <p className="text-muted mb-0">Gerencie o catálogo de exercícios.</p>
         </div>
         <Button
           variant="success"
@@ -155,7 +175,7 @@ export function Exercicios() {
       </div>
 
       <SearchBar
-        placeholder="Pesquisar por nome ou descrição..."
+        placeholder="Pesquisar por nome..."
         value={termoBusca}
         onChange={(e) => setTermoBusca(e.target.value)}
         onClear={() => setTermoBusca("")}
@@ -165,31 +185,34 @@ export function Exercicios() {
         <FilterGroup
           options={gruposMusculares}
           selected={filtroMusculo}
-          onSelect={setFiltroMusculo}
+          onSelect={(val) => {
+            setFiltroMusculo(val);
+            setTermoBusca(""); // Limpa busca texto ao filtrar por grupo (evita conflito)
+          }}
         />
       </div>
 
-      {/* TABELA RECEBE APENAS OS ITENS DA PÁGINA ATUAL */}
       <ExerciseTable
-        exercicios={itensParaExibir}
+        exercicios={exercicios}
         loading={loading}
         onDelete={initiateDelete}
       />
 
-      {/* SEU COMPONENTE DE PAGINAÇÃO CUSTOMIZADO */}
-      <PaginationComponent
-        currentPage={paginaAtual}
-        totalPages={totalPaginas}
-        onPageChange={(page) => setPaginaAtual(page)}
-      />
+      {/* Paginação usando o total que veio do Back */}
+      {totalPaginas > 1 && (
+        <PaginationComponent
+          currentPage={paginaAtual}
+          totalPages={totalPaginas}
+          onPageChange={(page) => setPaginaAtual(page)}
+        />
+      )}
 
-      {/* MODAIS DE FEEDBACK E CRIAÇÃO */}
+      {/* MODAIS */}
       <CreateExerciseModal
         show={showCreateModal}
         handleClose={() => setShowCreateModal(false)}
         onSuccess={() => {
           carregarExercicios();
-          setShowCreateModal(false);
           setShowSuccessModal(true);
         }}
       />
@@ -199,7 +222,7 @@ export function Exercicios() {
         handleClose={() => setShowDeleteConfirm(false)}
         handleConfirm={confirmDelete}
         title="Excluir Exercício"
-        message="Tem certeza que deseja remover este exercício? Esta ação não pode ser desfeita."
+        message="Tem certeza que deseja remover este exercício?"
       />
 
       <SuccessModal
@@ -208,11 +231,10 @@ export function Exercicios() {
         title="Sucesso!"
         message="Operação realizada com sucesso!"
       />
-
       <ErrorModal
         show={showErrorModal}
         handleClose={() => setShowErrorModal(false)}
-        title="Operação Negada"
+        title="Erro"
         message={errorMessage}
       />
     </div>

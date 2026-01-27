@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { apiFetch } from "../services/api";
-import { Container, Spinner, Button } from "react-bootstrap";
+import { Container, Spinner, Button, Row, Col } from "react-bootstrap";
 import { AuthContext } from "../context/AuthContext";
 
 // Componentes do Domínio
@@ -12,7 +12,6 @@ import { ConfirmModal } from "../components/common/ConfirmModal";
 import { SuccessModal } from "../components/common/SuccessModal";
 import { ErrorModal } from "../components/common/ErrorModal";
 import { SearchBar } from "../components/common/SearchBar";
-import { FilterGroup } from "../components/common/FilterGroup";
 
 import "../styles/treinos.css";
 
@@ -20,16 +19,15 @@ export function Biblioteca() {
   const { user } = useContext(AuthContext);
 
   // --- ESTADOS DE DADOS ---
-  const [treinos, setTreinos] = useState([]); // Armazena a página atual vinda do banco
+  const [treinos, setTreinos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // --- ESTADOS DE PAGINAÇÃO (Novos) ---
-  const [currentPage, setCurrentPage] = useState(0); // Página atual (0-indexado)
-  const [totalPages, setTotalPages] = useState(0);   // Total de páginas disponíveis
-  const pageSize = 12; // Quantidade de itens buscados por vez no banco
+  // --- ESTADOS DE PAGINAÇÃO (Implementados) ---
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const pageSize = 3;
 
-  // --- ESTADOS DE FILTRO LOCAL ---
-  const [filtroMusculo, setFiltroMusculo] = useState("TODOS");
+  // --- ESTADOS DE PESQUISA ---
   const [termoBusca, setTermoBusca] = useState("");
 
   // --- ESTADOS DE UI/MODAIS ---
@@ -38,36 +36,26 @@ export function Biblioteca() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
-  
+
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  
+
   const [treinoParaCopiar, setTreinoParaCopiar] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const gruposMusculares = [
-    "TODOS",
-    "PEITO",
-    "COSTAS",
-    "PERNAS",
-    "OMBROS",
-    "BRAÇOS",
-    "ABDÔMEN",
-    "FULL BODY",
-  ];
-
-  // 1. CARREGAR DADOS PAGINADOS (Backend)
+  // 1. CARREGAR DADOS PAGINADOS (Lógica de Backend)
   const carregarTreinos = async () => {
     setLoading(true);
-    // Busca apenas a página específica, sem filtros de busca (pois você quer filtrar no front)
+    // A paginação ocorre aqui, enviando 'page' e 'size' para o Spring Boot
     const url = `/api/treinos/buscar?page=${currentPage}&size=${pageSize}`;
 
     try {
       const data = await apiFetch(url);
-      
+
       if (data && Array.isArray(data.content)) {
         setTreinos(data.content);
         setTotalPages(data.totalPages);
+        window.scrollTo({ top: 0, behavior: "smooth" }); // Melhora o UX ao trocar de página
       } else {
         setTreinos([]);
         setTotalPages(0);
@@ -81,52 +69,34 @@ export function Biblioteca() {
     }
   };
 
-  // 2. USE EFFECT - Dispara sempre que a página mudar
+  // Dispara a busca sempre que a página atual mudar
   useEffect(() => {
     carregarTreinos();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage]); 
+  }, [currentPage]);
 
-  // 3. LÓGICA DE FILTRAGEM LOCAL (Mantida como solicitado)
-  // Aplica os filtros APENAS nos itens carregados da página atual
+  // 2. LÓGICA DE FILTRAGEM LOCAL (Apenas por texto)
   const treinosFiltrados = treinos.filter((treino) => {
-    const termoMusculo = filtroMusculo.toUpperCase();
-    const nome = treino.nome ? treino.nome.toUpperCase() : "";
-    const objetivo = treino.objetivo ? treino.objetivo.toUpperCase() : "";
+    const nome = treino.nome ? treino.nome.toLowerCase() : "";
+    const objetivo = treino.objetivo ? treino.objetivo.toLowerCase() : "";
+    const busca = termoBusca.toLowerCase();
 
-    const matchMusculo =
-      filtroMusculo === "TODOS" ||
-      nome.includes(termoMusculo) ||
-      objetivo.includes(termoMusculo);
-      
-    const matchBusca =
-      nome.toLowerCase().includes(termoBusca.toLowerCase()) ||
-      objetivo.toLowerCase().includes(termoBusca.toLowerCase());
-
-    return matchMusculo && matchBusca;
+    return nome.includes(busca) || objetivo.includes(busca);
   });
 
-  // --- AÇÕES DO USUÁRIO ---
-
+  // --- AÇÕES ---
   const handleShowDetalhes = async (id) => {
     try {
       const treinoDetalhado = await apiFetch(`/api/treinos/${id}`);
       setSelectedTreino(treinoDetalhado);
       setShowDetailModal(true);
     } catch (error) {
-      setErrorMessage("Não foi possível carregar os detalhes do treino.");
+      setErrorMessage("Erro ao carregar detalhes.");
       setShowError(true);
     }
   };
 
-  const solicitarCopia = (treino) => {
-    setTreinoParaCopiar(treino);
-    setShowConfirm(true);
-  };
-
   const executarCopia = async () => {
     if (!treinoParaCopiar) return;
-
     setShowConfirm(false);
     setIsProcessing(true);
 
@@ -135,11 +105,11 @@ export function Biblioteca() {
         method: "POST",
       });
       setSuccessMessage(
-        `O treino "${treinoParaCopiar.nome}" foi adicionado aos seus treinos!`
+        `O treino "${treinoParaCopiar.nome}" foi adicionado à sua lista!`,
       );
       setShowSuccess(true);
     } catch (error) {
-      setErrorMessage("Erro ao copiar treino: " + error.message);
+      setErrorMessage("Erro ao copiar treino.");
       setShowError(true);
     } finally {
       setIsProcessing(false);
@@ -147,127 +117,124 @@ export function Biblioteca() {
     }
   };
 
-  // --- RENDERIZAÇÃO ---
-
   if (loading)
     return (
       <div className="text-center mt-5 p-5">
         <Spinner animation="border" variant="success" />
-        <h3 className="mt-3">Carregando biblioteca...</h3>
+        <h3 className="mt-3 text-success fw-bold">Atualizando Biblioteca...</h3>
       </div>
     );
 
   return (
-    <div className="treinos-container py-5">
+    <div className="treinos-container py-5 bg-light min-vh-100">
       <Container>
-        {/* Header e Filtros */}
+        {/* Header com SearchBar */}
         <div className="mb-5">
-          <h1 className="mb-1 fw-bold text-dark">Biblioteca de Treinos</h1>
-          <p className="text-muted small mb-4">
-            Fichas de treino públicas da comunidade.
-          </p>
-          
-          <SearchBar
-            placeholder="Pesquisar treino por nome ou objetivo..."
-            value={termoBusca}
-            onChange={(e) => setTermoBusca(e.target.value)}
-            onClear={() => setTermoBusca("")}
-          />
-          
-          <FilterGroup
-            options={gruposMusculares}
-            selected={filtroMusculo}
-            onSelect={setFiltroMusculo}
-          />
+          <Row className="align-items-center">
+            <Col md={7}>
+              <h1 className="mb-1 fw-bold text-dark">Biblioteca de Treinos</h1>
+              <p className="text-muted">
+                Encontre fichas de treino para o seu objetivo.
+              </p>
+            </Col>
+            <Col md={5} className="mt-3 mt-md-0">
+              <SearchBar
+                placeholder="Pesquisar por nome ou objetivo..."
+                value={termoBusca}
+                onChange={(e) => setTermoBusca(e.target.value)}
+                onClear={() => setTermoBusca("")}
+              />
+            </Col>
+          </Row>
         </div>
 
-        {/* Lista de Treinos (Filtrada Localmente) */}
+        {/* Grid de Cards */}
         {treinosFiltrados.length === 0 ? (
-          <div className="alert alert-light text-center p-5 border shadow-sm rounded-3">
-            <h5 className="text-muted fs-6">Nenhum treino encontrado nesta página.</h5>
-            <div className="d-flex justify-content-center gap-3 mt-3">
-              <Button
-                variant="link"
-                size="sm"
-                onClick={() => setFiltroMusculo("TODOS")}
-              >
-                Limpar Filtros
+          <div className="text-center py-5 bg-white rounded-4 shadow-sm border">
+            <i className="fas fa-search fa-3x text-muted mb-3 opacity-25"></i>
+            <h5 className="text-muted">
+              Nenhum treino encontrado com este nome nesta página.
+            </h5>
+            {termoBusca && (
+              <Button variant="link" onClick={() => setTermoBusca("")}>
+                Limpar pesquisa
               </Button>
-              <Button
-                variant="link"
-                size="sm"
-                onClick={() => setTermoBusca("")}
-              >
-                Limpar Pesquisa
-              </Button>
-            </div>
+            )}
           </div>
         ) : (
-          <div className="library-grid">
+          <div className="library-grid mb-5">
             {treinosFiltrados.map((treino) => (
               <LibraryCard
                 key={treino.id}
                 treino={treino}
                 onVerDetalhes={handleShowDetalhes}
-                onCopiar={solicitarCopia}
+                onCopiar={(t) => {
+                  setTreinoParaCopiar(t);
+                  setShowConfirm(true);
+                }}
                 disabled={isProcessing}
               />
             ))}
           </div>
         )}
 
-        {/* --- CONTROLES DE PAGINAÇÃO --- */}
-        {/* Exibe apenas se houver mais de uma página no total */}
+        {/* --- CONTROLES DE PAGINAÇÃO (Pill Style) --- */}
         {totalPages > 1 && (
-            <div className="d-flex justify-content-center align-items-center gap-3 mt-5">
-                <Button
-                    variant="outline-success"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
-                    disabled={currentPage === 0 || isProcessing}
-                >
-                    <i className="fas fa-chevron-left me-2"></i> Anterior
-                </Button>
-                
-                <span className="text-muted fw-bold small">
-                    Página {currentPage + 1} de {totalPages}
-                </span>
-                
-                <Button
-                    variant="outline-success"
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))}
-                    disabled={currentPage >= totalPages - 1 || isProcessing}
-                >
-                    Próxima <i className="fas fa-chevron-right ms-2"></i>
-                </Button>
+          <div
+            className="pagination-wrapper d-flex justify-content-center align-items-center gap-4 mt-5 p-3 bg-white rounded-pill shadow-sm mx-auto"
+            style={{ maxWidth: "fit-content" }}
+          >
+            <Button
+              variant="light"
+              className="rounded-circle shadow-sm p-2"
+              style={{ width: "40px", height: "40px" }}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
+              disabled={currentPage === 0}
+            >
+              <i className="fas fa-chevron-left text-success"></i>
+            </Button>
+
+            <div className="text-dark">
+              <span className="fw-bold fs-5">{currentPage + 1}</span>
+              <span className="text-muted mx-2">de</span>
+              <span className="fw-bold fs-5">{totalPages}</span>
             </div>
+
+            <Button
+              variant="light"
+              className="rounded-circle shadow-sm p-2"
+              style={{ width: "40px", height: "40px" }}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))
+              }
+              disabled={currentPage >= totalPages - 1}
+            >
+              <i className="fas fa-chevron-right text-success"></i>
+            </Button>
+          </div>
         )}
 
-        {/* --- MODAIS --- */}
+        {/* Modais de Feedback */}
         <WorkoutModal
           show={showDetailModal}
           handleClose={() => setShowDetailModal(false)}
           treino={selectedTreino}
           readOnly={true}
         />
-        
         <ConfirmModal
           show={showConfirm}
           handleClose={() => setShowConfirm(false)}
           handleConfirm={executarCopia}
           title="Adicionar Treino"
           message={
-            treinoParaCopiar
-              ? `Deseja copiar o treino "${treinoParaCopiar.nome}" para a sua aba 'Meus Treinos'?`
-              : ""
+            treinoParaCopiar ? `Deseja copiar "${treinoParaCopiar.nome}"?` : ""
           }
         />
-        
         <SuccessModal
           show={showSuccess}
           handleClose={() => setShowSuccess(false)}
           message={successMessage}
         />
-
         <ErrorModal
           show={showError}
           handleClose={() => setShowError(false)}
@@ -276,4 +243,4 @@ export function Biblioteca() {
       </Container>
     </div>
   );
-} 
+}

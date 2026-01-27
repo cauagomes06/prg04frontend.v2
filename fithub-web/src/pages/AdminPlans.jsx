@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { apiFetch } from "../services/api";
-import { Button } from "react-bootstrap";
+import { Button, Container, Spinner } from "react-bootstrap";
 
 // COMPONENTES
 import { SearchBar } from "../components/common/SearchBar";
@@ -11,6 +11,9 @@ import { PlanModal } from "../components/planos/PlanModal";
 import { ConfirmModal } from "../components/common/ConfirmModal";
 import { SuccessModal } from "../components/common/SuccessModal";
 import { ErrorModal } from "../components/common/ErrorModal";
+
+// Estilos customizados (pode colocar no seu arquivo CSS global ou criar um AdminPlans.css)
+import "../styles/planos.css";
 
 export default function AdminPlans() {
   const [planos, setPlanos] = useState([]);
@@ -34,20 +37,15 @@ export default function AdminPlans() {
   const carregarPlanos = async () => {
     try {
       setLoading(true);
-      // Ajustado para o seu endpoint que retorna List<Plano>
       const url = `/api/planos/buscar?search=${searchTerm}`;
       const data = await apiFetch(url);
-
-      console.log("Resposta da API:", data); // Verifique no console se é um Array []
 
       if (Array.isArray(data)) {
         setPlanos(data);
       } else {
-        // Fallback caso o backend mude a estrutura inesperadamente
         setPlanos(data?.content || []);
       }
     } catch (error) {
-      // CORREÇÃO: Garante que a mensagem de erro apareça (resolvendo a imagem 3d3286)
       setErrorMsg(error.message || "Não foi possível carregar os planos.");
       setShowError(true);
     } finally {
@@ -61,7 +59,7 @@ export default function AdminPlans() {
       await apiFetch(`/api/planos/delete/${planToDelete}`, {
         method: "DELETE",
       });
-      carregarPlanos(); // Recarrega a lista após apagar
+      carregarPlanos();
       setShowSuccess(true);
     } catch (error) {
       setErrorMsg(error.message || "Erro ao excluir o plano.");
@@ -70,48 +68,63 @@ export default function AdminPlans() {
   };
 
   return (
-    <div className="container-fluid p-4">
-      <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
-        <div>
-          <h2 className="fw-bold mb-0">
-            <i className="fas fa-tags me-2 text-success"></i> Planos
-          </h2>
-          <p className="text-muted mb-0">
-            Gerencie os planos ativos da academia.
-          </p>
-        </div>
+    <div className="admin-plans-wrapper p-4 min-vh-100 bg-light">
+      <Container fluid>
+        <div className="admin-plans-header bg-white p-4 rounded-4 shadow-sm position-relative mb-4">
+          <div className="d-flex justify-content-between align-items-start">
+            <div>
+              <h2 className="fw-bold mb-0 text-dark">
+                Gerenciamento de Planos
+              </h2>
+              <p className="text-muted mb-0 small">
+                Visualize ou adicione novos planos.
+              </p>
+            </div>
 
-        <div className="d-flex align-items-center gap-2">
-          <SearchBar
-            placeholder="Buscar planos..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+            <div className="search-wrapper">
+              <SearchBar
+                placeholder="Pesquisar planos..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+
           <Button
             variant="success"
-            className="fw-bold"
+            className="btn-add-plano-fixed shadow-sm border-0"
             onClick={() => {
               setPlanToEdit(null);
               setShowPlanModal(true);
             }}
           >
-            <i className="fas fa-plus me-2"></i> Novo
+            <i className="fas fa-plus-circle me-2"></i>
+            <span>Novo Plano</span>
           </Button>
         </div>
-      </div>
 
-      {/* TABELA SEM PAGINAÇÃO */}
-      <PlanTable
-        planos={planos}
-        onEdit={(p) => {
-          setPlanToEdit(p);
-          setShowPlanModal(true);
-        }}
-        onDelete={(id) => {
-          setPlanToDelete(id);
-          setShowConfirmDelete(true);
-        }}
-      />
+        {/* ÁREA DA TABELA */}
+        <div className="bg-white rounded-4 shadow-sm overflow-hidden border-0">
+          {loading ? (
+            <div className="text-center py-5">
+              <Spinner animation="border" variant="success" />
+              <p className="mt-2 text-muted">Carregando planos...</p>
+            </div>
+          ) : (
+            <PlanTable
+              planos={planos}
+              onEdit={(p) => {
+                setPlanToEdit(p);
+                setShowPlanModal(true);
+              }}
+              onDelete={(id) => {
+                setPlanToDelete(id);
+                setShowConfirmDelete(true);
+              }}
+            />
+          )}
+        </div>
+      </Container>
 
       {/* MODAIS */}
       <PlanModal
@@ -130,8 +143,9 @@ export default function AdminPlans() {
       <SuccessModal
         show={showSuccess}
         handleClose={() => setShowSuccess(false)}
-        message="Operação concluída com sucesso!"
+        message="Plano processado com sucesso!"
       />
+
       <ErrorModal
         show={showError}
         handleClose={() => setShowError(false)}

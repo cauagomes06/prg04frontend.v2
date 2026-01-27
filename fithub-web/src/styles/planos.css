@@ -1,0 +1,37 @@
+.admin-plans-header {
+  position: relative;
+  min-height: 150px; /* Espaço para o botão respirar embaixo */
+}
+
+/* Barra de busca no topo direito */
+.search-wrapper {
+  max-width: 300px;
+  width: 100%;
+}
+
+/* UX: Texto sempre à esquerda para leitura rápida */
+.search-wrapper input {
+  height: 42px !important;
+  border-radius: 50px !important;
+  padding-left: 45px !important; /* Espaço para o ícone de lupa */
+  text-align: left !important; 
+  border: 1px solid #eee !important;
+}
+
+/* Botão posicionado no canto inferior direito */
+.btn-add-plano-fixed {
+  position: absolute;
+  bottom: 20px;
+  right: 25px;
+  height: 48px;
+  padding: 0 30px;
+  border-radius: 50px !important;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-add-plano-fixed:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3) !important;
+}

@@ -1,17 +1,23 @@
 import { useState, useEffect, useContext } from "react";
 import { apiFetch } from "../services/api";
 import { AuthContext } from "../context/AuthContext";
+import { MyWorkoutCard } from "../components/treinos/MyWorkoutCard";
+
+// Modais
 import { WorkoutModal } from "../components/treinos/WorkoutModal";
 import { CreateWorkoutModal } from "../components/treinos/CreateWorkoutModal";
 import { SuccessModal } from "../components/common/SuccessModal";
 import { ConfirmModal } from "../components/common/ConfirmModal";
-import { ErrorModal } from "../components/common/ErrorModal"; // Importante
-import { MyWorkoutCard } from "../components/treinos/MyWorkoutCard";
+import { ErrorModal } from "../components/common/ErrorModal";
 
 export function MeusTreinos() {
   const { user } = useContext(AuthContext);
-  const [treinos, setTreinos] = useState([]);
+  const [treinos, setTreinos] = useState([]); // Lista completa vinda do banco
   const [loading, setLoading] = useState(true);
+
+  // --- CONFIGURAÇÃO DA PAGINAÇÃO ---
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const itensPorPagina = 5; // Mostra 8 treinos por vez (2 linhas de 4)
 
   // Estados dos Modais
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -33,11 +39,13 @@ export function MeusTreinos() {
     (user.nomePerfil.toUpperCase().includes("ROLE_ADMIN") ||
       user.nomePerfil.toUpperCase().includes("ROLE_PERSONAL"));
 
+  // 1. Carrega TUDO do backend
   const carregarTreinos = () => {
     if (user?.id) {
+      setLoading(true);
       apiFetch(`/api/treinos/usuario/${user.id}`)
         .then((data) => {
-          setTreinos(data);
+          setTreinos(data || []);
           setLoading(false);
         })
         .catch((err) => {
@@ -51,8 +59,18 @@ export function MeusTreinos() {
     carregarTreinos();
   }, [user]);
 
-  // --- HANDLERS ---
+  // 2. Lógica de "Fatiar" a lista (Paginação no Frontend)
+  const indexUltimoItem = paginaAtual * itensPorPagina;
+  const indexPrimeiroItem = indexUltimoItem - itensPorPagina;
+  const treinosAtuais = treinos.slice(indexPrimeiroItem, indexUltimoItem);
+  const totalPaginas = Math.ceil(treinos.length / itensPorPagina);
 
+  const mudarPagina = (numeroPagina) => {
+    setPaginaAtual(numeroPagina);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // --- HANDLERS ---
   const onVerDetalhes = async (id) => {
     try {
       const detalhes = await apiFetch(`/api/treinos/${id}`);
@@ -66,7 +84,6 @@ export function MeusTreinos() {
     }
   };
 
-  // Inicia o fluxo de exclusão (Abre ConfirmModal)
   const onExcluir = (id) => {
     setConfirmData({
       show: true,
@@ -77,13 +94,12 @@ export function MeusTreinos() {
     });
   };
 
-  // Executa a exclusão após confirmação
   const executarExclusao = async (id) => {
-    setConfirmData({ ...confirmData, show: false }); // Fecha confirmação
+    setConfirmData({ ...confirmData, show: false });
     try {
       await apiFetch(`/api/treinos/delete/${id}`, { method: "DELETE" });
       setSuccessData({ show: true, message: "Treino excluído com sucesso!" });
-      carregarTreinos();
+      carregarTreinos(); // Recarrega a lista
     } catch (error) {
       setErrorData({
         show: true,
@@ -92,7 +108,6 @@ export function MeusTreinos() {
     }
   };
 
-  // Inicia o fluxo de publicação (Abre ConfirmModal)
   const onPublicar = (id) => {
     setConfirmData({
       show: true,
@@ -102,11 +117,10 @@ export function MeusTreinos() {
     });
   };
 
-  // Executa a publicação após confirmação
   const executarPublicacao = async (id) => {
     setConfirmData({ ...confirmData, show: false });
     try {
-      await apiFetch(`/api/treinos/${id}/publicar`, { method: "PATCH" }); // Ajuste conforme sua rota real
+      await apiFetch(`/api/treinos/${id}/publicar`, { method: "PATCH" });
       setSuccessData({ show: true, message: "Treino publicado com sucesso!" });
       carregarTreinos();
     } catch (error) {
@@ -118,56 +132,104 @@ export function MeusTreinos() {
   };
 
   if (loading)
-    return <div className="p-4 text-center">Carregando treinos...</div>;
+    return (
+      <div className="p-5 text-center">
+        <div className="spinner-border text-success"></div>
+      </div>
+    );
 
   return (
-    <div className="p-4">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="fw-bold text-dark">Meus Treinos</h2>
+    <div className="p-4 container">
+      {/* Header */}
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5 gap-3">
+        <div>
+          <h2 className="fw-bold text-dark mb-0">Meus Treinos</h2>
+          <p className="text-muted small mb-0">
+            Gerencie suas fichas de treino pessoais.
+          </p>
+        </div>
         <button
-          className="btn btn-success rounded-pill px-4 fw-bold shadow-sm"
+          className="btn btn-success rounded-pill px-4 py-2 fw-bold shadow-sm d-flex align-items-center"
           onClick={() => setShowCreateModal(true)}
         >
           <i className="fas fa-plus me-2"></i> Criar Novo Treino
         </button>
       </div>
 
+      {/* Lista de Cards */}
       {treinos.length === 0 ? (
-        <div className="text-center py-5 bg-white rounded-4 shadow-sm border">
+        <div className="text-center py-5 bg-white rounded-4 shadow-sm border mt-4">
           <i className="fas fa-dumbbell fa-3x text-muted mb-3 opacity-25"></i>
           <p className="text-muted">Você ainda não tem treinos criados.</p>
+          <button
+            className="btn btn-link text-success fw-bold"
+            onClick={() => setShowCreateModal(true)}
+          >
+            Começar agora
+          </button>
         </div>
       ) : (
-        <div className="row g-4">
-          {treinos.map((treino) => (
-            <div className="col-12 col-md-6 col-lg-4" key={treino.id}>
-              <MyWorkoutCard
-                treino={treino}
-                isPersonalOrAdmin={isPersonalOrAdmin}
-                onVerDetalhes={onVerDetalhes}
-                onExcluir={onExcluir}
-                onPublicar={onPublicar}
-              />
+        <>
+          <div className="row g-3">
+            {" "}
+            {/* g-3 para espaçamento mais compacto */}
+            {treinosAtuais.map((treino) => (
+              // AQUI ESTÁ A MUDANÇA: col-lg-3 para 4 cards por linha
+              <div
+                className="col-12 col-sm-6 col-md-4 col-lg-3"
+                key={treino.id}
+              >
+                <MyWorkoutCard
+                  treino={treino}
+                  isPersonalOrAdmin={isPersonalOrAdmin}
+                  onVerDetalhes={onVerDetalhes}
+                  onExcluir={onExcluir}
+                  onPublicar={onPublicar}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* CONTROLES DE PAGINAÇÃO (Só aparece se tiver mais de 1 página) */}
+          {totalPaginas > 1 && (
+            <div className="d-flex justify-content-center align-items-center gap-3 mt-5">
+              <button
+                className="btn btn-light rounded-circle shadow-sm border"
+                style={{ width: "40px", height: "40px" }}
+                onClick={() => mudarPagina(paginaAtual - 1)}
+                disabled={paginaAtual === 1}
+              >
+                <i className="fas fa-chevron-left text-muted"></i>
+              </button>
+
+              <span className="fw-bold text-muted small">
+                Página {paginaAtual} de {totalPaginas}
+              </span>
+
+              <button
+                className="btn btn-light rounded-circle shadow-sm border"
+                style={{ width: "40px", height: "40px" }}
+                onClick={() => mudarPagina(paginaAtual + 1)}
+                disabled={paginaAtual === totalPaginas}
+              >
+                <i className="fas fa-chevron-right text-muted"></i>
+              </button>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
 
       {/* --- MODAIS --- */}
-
       <WorkoutModal
         show={showDetailModal}
         handleClose={() => setShowDetailModal(false)}
         treino={treinoSelecionado}
       />
-
       <CreateWorkoutModal
         show={showCreateModal}
         handleClose={() => setShowCreateModal(false)}
         onSuccess={carregarTreinos}
       />
-
-      {/* Modal de Confirmação (Genérico) */}
       <ConfirmModal
         show={confirmData.show}
         handleClose={() => setConfirmData({ ...confirmData, show: false })}
@@ -175,15 +237,11 @@ export function MeusTreinos() {
         title={confirmData.title}
         message={confirmData.message}
       />
-
-      {/* Modal de Sucesso */}
       <SuccessModal
         show={successData.show}
         handleClose={() => setSuccessData({ ...successData, show: false })}
         message={successData.message}
       />
-
-      {/* Modal de Erro (Adicionado Corretamente) */}
       <ErrorModal
         show={errorData.show}
         handleClose={() => setErrorData({ ...errorData, show: false })}
