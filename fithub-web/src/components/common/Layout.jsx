@@ -46,17 +46,24 @@ export function Layout() {
           foto: data.fotoUrl,
         });
 
-        // 2. Ranking (com catch para não travar o sistema caso o usuário não tenha permissão)
-        return apiFetch("/api/usuarios/ranking")
-          .then((ranking) => {
-            const posicao = ranking.findIndex(
-              (r) => r.usuarioId === data.id || r.id === data.id
-            );
-            if (posicao !== -1) setUserRank(posicao + 1);
-          })
-          .catch(() => console.warn("Usuário sem acesso ao ranking."));
-      })
-      .catch((err) => console.error("Erro ao carregar dados:", err));
+        // 2. Ranking 
+      // Aumentamos o size para garantir que o usuário seja encontrado no topo do ranking
+      return apiFetch("/api/usuarios/ranking?page=0&size=50") 
+        .then((dataRanking) => {
+          // Verifica se dataRanking.content existe (padrão Page do Spring Data)
+          const listaRanking = dataRanking.content || [];
+          
+          const posicao = listaRanking.findIndex(
+            (r) => r.usuarioId === data.id || r.id === data.id
+          );
+          
+          if (posicao !== -1) {
+            setUserRank(posicao + 1);
+          }
+        })
+        .catch(() => console.warn("Usuário sem acesso ao ranking ou erro na busca."));
+    })
+    .catch((err) => console.error("Erro ao carregar dados:", err));
 
     // 3. Notificações (com catch para não travar o sistema caso o usuário não tenha permissão)
     apiFetch("/api/notificacoes/contagem-nao-lidas")

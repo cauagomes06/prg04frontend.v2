@@ -25,7 +25,7 @@ export function Biblioteca() {
   // --- ESTADOS DE PAGINAÇÃO (Implementados) ---
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const pageSize = 3;
+  const pageSize = 6;
 
   // --- ESTADOS DE PESQUISA ---
   const [termoBusca, setTermoBusca] = useState("");
@@ -74,6 +74,38 @@ export function Biblioteca() {
     carregarTreinos();
   }, [currentPage]);
 
+  // --- NOVA FUNÇÃO: SEGUIR / DEIXAR DE SEGUIR ---
+  const handleToggleFollow = async (treinoAlvo) => {
+    const isFollowing = treinoAlvo.seguindo;
+    const originalTreinos = [...treinos]; // Backup em caso de erro
+
+    // 1. Atualização Otimista (Visual Imediato)
+    const novosTreinos = treinos.map((t) => {
+      if (t.id === treinoAlvo.id) {
+        return {
+          ...t,
+          seguindo: !isFollowing,
+          numeroSeguidores: t.numeroSeguidores + (isFollowing ? -1 : 1),
+        };
+      }
+      return t;
+    });
+    setTreinos(novosTreinos);
+
+    // 2. Chamada API
+    try {
+      const endpoint = isFollowing ? "deixar-de-seguir" : "seguir";
+      const method = isFollowing ? "DELETE" : "POST";
+
+      await apiFetch(`/api/treinos/${treinoAlvo.id}/${endpoint}`, { method });
+    } catch (error) {
+      console.error("Erro ao seguir/deixar de seguir:", error);
+      // Reverte se der erro
+      setTreinos(originalTreinos);
+      setErrorMessage("Erro ao atualizar status. Tente novamente.");
+      setShowError(true);
+    }
+  };
   // 2. LÓGICA DE FILTRAGEM LOCAL (Apenas por texto)
   const treinosFiltrados = treinos.filter((treino) => {
     const nome = treino.nome ? treino.nome.toLowerCase() : "";
@@ -163,7 +195,7 @@ export function Biblioteca() {
           </div>
         ) : (
           <div className="library-grid mb-5">
-            {treinosFiltrados.map((treino) => (
+            {treinosFiltrados.map((treino, index) => (
               <LibraryCard
                 key={treino.id}
                 treino={treino}
@@ -172,6 +204,12 @@ export function Biblioteca() {
                   setTreinoParaCopiar(t);
                   setShowConfirm(true);
                 }}
+                onToggleFollow={handleToggleFollow}
+                isMostFollowed={
+                  currentPage === 0 &&
+                  index === 0 &&
+                  treino.numeroSeguidores > 0
+                }
                 disabled={isProcessing}
               />
             ))}
