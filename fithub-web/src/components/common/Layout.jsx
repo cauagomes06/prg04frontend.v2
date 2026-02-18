@@ -116,7 +116,7 @@ export function Layout() {
         <div className="perfil-usuario">
           {userData.foto && !imgError ? (
             <img
-              src={`http://localhost:8080${userData.foto}`}
+              src={`${userData.foto}`}
               alt="User"
               onError={() => setImgError(true)}
             />

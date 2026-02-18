@@ -4,10 +4,16 @@ import { apiFetch } from "../../services/api";
 import { AuthContext } from "../../context/AuthContext";
 import { ConfirmModal } from "../common/ConfirmModal";
 import { SuccessModal } from "../common/SuccessModal";
-import { ErrorModal } from "../common/ErrorModal"; // Importando o Modal de Erro correto
+import { ErrorModal } from "../common/ErrorModal";
 
-export function CreateWorkoutModal({ show, handleClose, onSuccess }) {
+export function CreateWorkoutModal({ show, handleClose, onSuccess, treinoParaEditar }) {
   const { user } = useContext(AuthContext);
+
+  // --- PALETA VERDE CLARO (MINT THEME) ---
+  const mintBg = "#f0fdf4";      // Fundo ultra leve
+  const mintHeader = "#dcfce7";  // Cabeçalhos
+  const mintText = "#15803d";    // Texto verde médio (legível e suave)
+  const mintAction = "#4ade80";  // Verde botões (claro e vibrante)
 
   const [exerciciosDisponiveis, setExerciciosDisponiveis] = useState([]);
   const [loadingExercicios, setLoadingExercicios] = useState(false);
@@ -23,123 +29,56 @@ export function CreateWorkoutModal({ show, handleClose, onSuccess }) {
 
   const [itensTreino, setItensTreino] = useState([]);
 
-  // Estados de Modais Internos
-  const [confirmData, setConfirmData] = useState({
-    show: false,
-    title: "",
-    message: "",
-    onConfirm: null,
-  });
+  const [confirmData, setConfirmData] = useState({ show: false, title: "", message: "", onConfirm: null });
   const [successData, setSuccessData] = useState({ show: false, message: "" });
   const [errorData, setErrorData] = useState({ show: false, message: "" });
 
-  // Carregar exercícios ao abrir o modal
-  // Carregar exercícios ao abrir o modal
   useEffect(() => {
     if (show) {
       setLoadingExercicios(true);
-
-      // ADICIONEI ?size=100 para tentar trazer todos os exercícios para o dropdown
       apiFetch("/api/exercicios/buscar?size=100")
         .then((data) => {
-          // CORREÇÃO: Verifica se é Page (tem .content) ou Lista Pura
-          if (data.content && Array.isArray(data.content)) {
-            setExerciciosDisponiveis(data.content); // Pega a lista de dentro do Page
-          } else if (Array.isArray(data)) {
-            setExerciciosDisponiveis(data); // Caso o backend mude para List no futuro
-          } else {
-            console.warn("Formato de resposta inesperado:", data);
-            setExerciciosDisponisveis([]);
-          }
-        })
-        .catch((err) => {
-          console.error("Erro ao carregar exercícios:", err);
-          setExerciciosDisponiveis([]);
-          setErrorData({
-            show: true,
-            message: "Não foi possível carregar a lista de exercícios.",
-          });
+          const lista = data.content || data;
+          setExerciciosDisponiveis(Array.isArray(lista) ? lista : []);
         })
         .finally(() => setLoadingExercicios(false));
 
-      // Resetar formulário
-      setNome("");
-      setObjetivo("");
-      setItensTreino([]);
-      setFiltroGrupo("TODOS");
-      setExercicioSelecionado("");
+      if (treinoParaEditar) {
+        setNome(treinoParaEditar.nome || "");
+        setObjetivo(treinoParaEditar.descricao || "");
+        const itensFormatados = (treinoParaEditar.items || []).map(item => ({
+          exercicioId: item.exercicioId,
+          nomeExercicio: item.nomeExercicio,
+          series: item.series,
+          repeticoes: item.repeticoes,
+          descanso: item.descanso
+        }));
+        setItensTreino(itensFormatados);
+      } else {
+        setNome("");
+        setObjetivo("");
+        setItensTreino([]);
+      }
     }
-  }, [show]);
+  }, [show, treinoParaEditar]);
 
-  // Derivação segura dos grupos musculares (Evita crash se a lista for nula)
-  const gruposMusculares = [
-    "TODOS",
-    ...new Set(
-      (exerciciosDisponiveis || [])
-        .map((ex) => ex.grupoMuscular)
-        .filter(Boolean),
-    ),
-  ];
-
-  const exerciciosFiltrados =
-    filtroGrupo === "TODOS"
-      ? exerciciosDisponiveis || []
-      : (exerciciosDisponiveis || []).filter(
-          (ex) => ex.grupoMuscular === filtroGrupo,
-        );
-
-  // Adicionar item à tabela
   const handleAddItem = () => {
-    if (!exercicioSelecionado) {
-      setErrorData({ show: true, message: "Selecione um exercício válido!" });
-      return;
-    }
+    if (!exercicioSelecionado) return;
+    const exObj = exerciciosDisponiveis.find(ex => ex.id === parseInt(exercicioSelecionado));
+    if (!exObj) return;
 
-    const exercicioObj = exerciciosDisponiveis.find(
-      (ex) => ex.id === parseInt(exercicioSelecionado),
-    );
-
-    if (!exercicioObj) return;
-
-    const novoItem = {
-      exercicioId: parseInt(exercicioSelecionado),
-      nomeExercicio: exercicioObj.nome,
-      grupo: exercicioObj.grupoMuscular,
+    setItensTreino([...itensTreino, {
+      exercicioId: exObj.id,
+      nomeExercicio: exObj.nome,
       series,
       repeticoes,
       descanso,
-    };
-
-    setItensTreino([...itensTreino, novoItem]);
+    }]);
     setExercicioSelecionado("");
   };
 
-  const handleRemoveItem = (index) => {
-    setItensTreino(itensTreino.filter((_, i) => i !== index));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (itensTreino.length === 0) {
-      setErrorData({
-        show: true,
-        message: "Adicione pelo menos um exercício ao treino!",
-      });
-      return;
-    }
-
-    setConfirmData({
-      show: true,
-      title: "Salvar treino",
-      message: "Deseja realmente salvar esta ficha de treino?",
-      onConfirm: () => executarCriacao(),
-    });
-  };
-
-  const executarCriacao = async () => {
+  const executarPersistencia = async () => {
     setConfirmData({ ...confirmData, show: false });
-
     const treinoDto = {
       nome,
       descricao: objetivo,
@@ -155,234 +94,137 @@ export function CreateWorkoutModal({ show, handleClose, onSuccess }) {
     };
 
     try {
-      await apiFetch("/api/treinos/register", {
-        method: "POST",
-        body: JSON.stringify(treinoDto),
-      });
-
-      setSuccessData({ show: true, message: "Treino criado com sucesso!" });
-
-      // Atualiza a lista no fundo imediatamente
+      const url = treinoParaEditar ? `/api/treinos/update/${treinoParaEditar.id}` : "/api/treinos/register";
+      const method = treinoParaEditar ? "PUT" : "POST";
+      await apiFetch(url, { method, body: JSON.stringify(treinoDto) });
+      setSuccessData({ show: true, message: "Ficha salva com sucesso!" });
       if (onSuccess) onSuccess();
-
-      setTimeout(() => {
-        // Usa 'prev' para garantir que estamos mexendo no estado mais atual,
-        // ou apenas reseta para o estado inicial limpo.
-        setSuccessData((prev) => ({ ...prev, show: false }));
-        handleClose();
-      }, 1500);
+      setTimeout(() => { handleClose(); setSuccessData({show: false, message: ""}); }, 1500);
     } catch (error) {
-      setErrorData({
-        show: true,
-        message: "Erro ao criar treino: " + error.message,
-      });
+      setErrorData({ show: true, message: "Erro: " + error.message });
     }
   };
 
   return (
     <>
-      <Modal show={show} onHide={handleClose} size="lg" centered>
-        <Modal.Header closeButton>
-          <Modal.Title className="fw-bold text-success">
-            <i className="fas fa-file-signature me-2"></i> Criar Nova Ficha
+      <Modal show={show} onHide={handleClose} size="lg" centered contentClassName="border-0 rounded-4 shadow-sm">
+        {/* Header Verde Menta */}
+        <Modal.Header closeButton style={{ backgroundColor: mintHeader, border: 'none' }} className="rounded-top-4 px-4 py-3">
+          <Modal.Title className="fw-bold" style={{ color: mintText }}>
+            <i className={`fas ${treinoParaEditar ? 'fa-edit' : 'fa-plus-circle'} me-2`}></i>
+            {treinoParaEditar ? "Editar Ficha" : "Nova Ficha de Treino"}
           </Modal.Title>
         </Modal.Header>
 
-        <Modal.Body>
-          <Form onSubmit={handleSubmit}>
-            {/* Nome e Objetivo */}
-            <Row className="mb-3">
+        <Modal.Body className="px-4 py-4" style={{ backgroundColor: mintBg }}>
+          <Form onSubmit={(e) => { e.preventDefault(); setConfirmData({ show: true, title: "Confirmar", message: "Salvar dados da ficha?", onConfirm: executarPersistencia }); }}>
+            
+            {/* Informações Básicas */}
+            <Row className="mb-4">
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label className="fw-bold">Nome do Treino</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Ex: Treino A - Peito e Tríceps"
-                    value={nome}
-                    onChange={(e) => setNome(e.target.value)}
-                    required
-                  />
+                  <Form.Label className="fw-bold small" style={{ color: mintText }}>NOME DO TREINO</Form.Label>
+                  <Form.Control className="border-0 shadow-sm rounded-3 py-2" style={{ backgroundColor: '#ffffff' }} type="text" value={nome} onChange={(e) => setNome(e.target.value)} required />
                 </Form.Group>
               </Col>
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label className="fw-bold">Objetivo</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Ex: Hipertrofia"
-                    value={objetivo}
-                    onChange={(e) => setObjetivo(e.target.value)}
-                  />
+                  <Form.Group>
+                    <Form.Label className="fw-bold small" style={{ color: mintText }}>OBJETIVO</Form.Label>
+                    <Form.Control className="border-0 shadow-sm rounded-3 py-2" style={{ backgroundColor: '#ffffff' }} type="text" value={objetivo} onChange={(e) => setObjetivo(e.target.value)} />
+                  </Form.Group>
                 </Form.Group>
               </Col>
             </Row>
 
-            <hr />
-            <h5 className="mb-3 text-muted">Adicionar Exercícios</h5>
+            <h6 className="fw-bold mb-3" style={{ color: mintText, fontSize: '0.8rem', letterSpacing: '1px' }}>
+                <i className="fas fa-list-check me-2"></i>CONFIGURAR EXERCÍCIOS
+            </h6>
 
-            {loadingExercicios ? (
-              <div className="text-center py-3">
-                <Spinner animation="border" variant="success" size="sm" />
-                <span className="ms-2">Carregando lista de exercícios...</span>
-              </div>
-            ) : (
-              <Row className="g-2 mb-2 align-items-end">
-                <Col md={3}>
-                  <Form.Group>
-                    <Form.Label className="small text-muted">Grupo</Form.Label>
-                    <Form.Select
-                      value={filtroGrupo}
-                      onChange={(e) => {
-                        setFiltroGrupo(e.target.value);
-                        setExercicioSelecionado("");
-                      }}
-                    >
-                      {gruposMusculares.map((grupo) => (
-                        <option key={grupo} value={grupo}>
-                          {grupo}
-                        </option>
-                      ))}
-                    </Form.Select>
-                  </Form.Group>
-                </Col>
+            {/* Container de Adição */}
+            <div className="bg-white p-3 rounded-4 shadow-sm mb-4 border border-light">
+                <Row className="g-2 align-items-end mb-3">
+                    <Col md={4}>
+                        <Form.Label className="small fw-bold text-muted">Grupo Muscular</Form.Label>
+                        <Form.Select className="border-0 bg-light" value={filtroGrupo} onChange={(e) => setFiltroGrupo(e.target.value)}>
+                            {["TODOS", ...new Set(exerciciosDisponiveis.map(ex => ex.grupoMuscular))].map(g => <option key={g} value={g}>{g}</option>)}
+                        </Form.Select>
+                    </Col>
+                    <Col md={8}>
+                        <Form.Label className="small fw-bold text-muted">Exercício</Form.Label>
+                        <Form.Select className="border-0 bg-light" value={exercicioSelecionado} onChange={(e) => setExercicioSelecionado(e.target.value)}>
+                            <option value="">-- Selecione --</option>
+                            {exerciciosDisponiveis.filter(ex => filtroGrupo === "TODOS" || ex.grupoMuscular === filtroGrupo).map(ex => <option key={ex.id} value={ex.id}>{ex.nome}</option>)}
+                        </Form.Select>
+                    </Col>
+                </Row>
+                
+                <Row className="g-2 align-items-end">
+                    <Col xs={3}>
+                        <Form.Label className="small fw-bold text-muted">Séries</Form.Label>
+                        <Form.Control className="border-0 bg-light text-center" value={series} onChange={e => setSeries(e.target.value)} />
+                    </Col>
+                    <Col xs={3}>
+                        <Form.Label className="small fw-bold text-muted">Reps</Form.Label>
+                        <Form.Control className="border-0 bg-light text-center" value={repeticoes} onChange={e => setRepeticoes(e.target.value)} />
+                    </Col>
+                    <Col xs={3}>
+                        <Form.Label className="small fw-bold text-muted">Pausa (s)</Form.Label>
+                        <Form.Control className="border-0 bg-light text-center" value={descanso} onChange={e => setDescanso(e.target.value)} />
+                    </Col>
+                    <Col xs={3}>
+                        <Button className="w-100 fw-bold border-0 text-white" style={{ backgroundColor: mintAction }} onClick={handleAddItem}>
+                            <i className="fas fa-plus"></i>
+                        </Button>
+                    </Col>
+                </Row>
+            </div>
 
-                <Col md={9}>
-                  <Form.Group>
-                    <Form.Label className="small text-muted">
-                      Exercício
-                    </Form.Label>
-                    <Form.Select
-                      value={exercicioSelecionado}
-                      onChange={(e) => setExercicioSelecionado(e.target.value)}
-                    >
-                      <option value="">-- Selecione --</option>
-                      {exerciciosFiltrados.map((ex) => (
-                        <option key={ex.id} value={ex.id}>
-                          {ex.nome}{" "}
-                          {filtroGrupo === "TODOS"
-                            ? `(${ex.grupoMuscular})`
-                            : ""}
-                        </option>
-                      ))}
-                    </Form.Select>
-                  </Form.Group>
-                </Col>
-              </Row>
-            )}
-
-            {/* Configuração de Séries/Reps */}
-            <Row className="align-items-end g-2 mb-3">
-              <Col md={3}>
-                <Form.Label className="small text-muted">Séries</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={series}
-                  onChange={(e) => setSeries(e.target.value)}
-                />
-              </Col>
-              <Col md={3}>
-                <Form.Label className="small text-muted">Reps</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={repeticoes}
-                  onChange={(e) => setRepeticoes(e.target.value)}
-                />
-              </Col>
-              <Col md={3}>
-                <Form.Label className="small text-muted">
-                  Descanso (s)
-                </Form.Label>
-                <Form.Control
-                  type="text"
-                  value={descanso}
-                  onChange={(e) => setDescanso(e.target.value)}
-                />
-              </Col>
-              <Col md={3}>
-                <Button
-                  variant="outline-success"
-                  className="w-100 fw-bold"
-                  onClick={handleAddItem}
-                  disabled={loadingExercicios}
-                >
-                  <i className="fas fa-plus me-1"></i> Incluir
-                </Button>
-              </Col>
-            </Row>
-
-            {/* Tabela de Itens Adicionados */}
-            {itensTreino.length > 0 ? (
-              <div className="table-responsive border rounded-3 mt-3">
-                <Table striped hover size="sm" className="mb-0">
-                  <thead className="bg-light">
-                    <tr>
-                      <th className="ps-3">Exercício</th>
-                      <th className="text-center">Séries</th>
-                      <th className="text-center">Reps</th>
-                      <th className="text-center">Desc</th>
-                      <th className="text-center">Ação</th>
+            {/* Tabela Clean */}
+            <div className="table-responsive rounded-4 overflow-hidden shadow-sm border border-light">
+              <Table hover className="mb-0 bg-white">
+                <thead>
+                  <tr style={{ backgroundColor: mintHeader, color: mintText, fontSize: '0.75rem' }}>
+                    <th className="ps-3 py-3 border-0">EXERCÍCIO</th>
+                    <th className="text-center py-3 border-0">SÉRIES</th>
+                    <th className="text-center py-3 border-0">REPS</th>
+                    <th className="text-center py-3 border-0">AÇÃO</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {itensTreino.length > 0 ? itensTreino.map((item, index) => (
+                    <tr key={index} className="align-middle border-light">
+                      <td className="ps-3 fw-bold text-dark" style={{ fontSize: '0.9rem' }}>{item.nomeExercicio}</td>
+                      <td className="text-center text-muted small">{item.series}</td>
+                      <td className="text-center text-muted small">{item.repeticoes}</td>
+                      <td className="text-center">
+                        <Button variant="link" className="text-danger p-0" onClick={() => setItensTreino(itensTreino.filter((_, i) => i !== index))}>
+                          <i className="fas fa-minus-circle"></i>
+                        </Button>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {itensTreino.map((item, index) => (
-                      <tr key={index} className="align-middle">
-                        <td className="ps-3 fw-bold text-secondary">
-                          {item.nomeExercicio}
-                        </td>
-                        <td className="text-center">{item.series}</td>
-                        <td className="text-center">{item.repeticoes}</td>
-                        <td className="text-center">{item.descanso}s</td>
-                        <td className="text-center">
-                          <Button
-                            variant="link"
-                            className="text-danger p-0"
-                            onClick={() => handleRemoveItem(index)}
-                          >
-                            <i className="fas fa-trash-alt"></i>
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </div>
-            ) : (
-              <div className="text-center py-4 text-muted border border-dashed rounded bg-light mt-3">
-                <small>Nenhum exercício adicionado a esta ficha ainda.</small>
-              </div>
-            )}
+                  )) : (
+                    <tr><td colSpan="4" className="text-center py-4 text-muted small">Nenhum exercício na lista</td></tr>
+                  )}
+                </tbody>
+              </Table>
+            </div>
 
-            {/* Botões de Rodapé */}
-            <div className="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
-              <Button variant="light" onClick={handleClose}>
-                Cancelar
-              </Button>
-              <Button variant="success" type="submit" className="px-4 fw-bold">
-                Salvar Ficha
+            {/* Footer */}
+            <div className="d-flex justify-content-end gap-2 mt-4 pt-3 border-top border-light">
+              <Button variant="link" onClick={handleClose} className="text-decoration-none fw-bold text-muted">Cancelar</Button>
+              <Button className="px-5 fw-bold rounded-pill border-0 shadow-sm text-white" style={{ backgroundColor: mintAction }} type="submit">
+                {treinoParaEditar ? "SALVAR" : "CRIAR"}
               </Button>
             </div>
           </Form>
         </Modal.Body>
       </Modal>
 
-      {/* Modais de Feedback */}
-      <ConfirmModal
-        show={confirmData.show}
-        title={confirmData.title}
-        message={confirmData.message}
-        handleClose={() => setConfirmData({ ...confirmData, show: false })}
-        handleConfirm={confirmData.onConfirm}
-      />
-      <SuccessModal
-        show={successData.show}
-        message={successData.message}
-        handleClose={() => setSuccessData({ ...successData, show: false })}
-      />
-      <ErrorModal
-        show={errorData.show}
-        message={errorData.message}
-        handleClose={() => setErrorData({ ...errorData, show: false })}
-      />
+      {/* Modais Feedback */}
+      <ConfirmModal show={confirmData.show} title={confirmData.title} message={confirmData.message} handleClose={() => setConfirmData({ ...confirmData, show: false })} handleConfirm={confirmData.onConfirm} />
+      <SuccessModal show={successData.show} message={successData.message} handleClose={() => setSuccessData({ ...successData, show: false })} />
+      <ErrorModal show={errorData.show} message={errorData.message} handleClose={() => setErrorData({ ...errorData, show: false })} />
     </>
   );
 }

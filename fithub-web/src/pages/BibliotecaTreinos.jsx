@@ -6,6 +6,7 @@ import { AuthContext } from "../context/AuthContext";
 // Componentes do Domínio
 import { WorkoutModal } from "../components/treinos/WorkoutModal";
 import { LibraryCard } from "../components/treinos/LibraryCard";
+import { AvaliacaoModal } from "../components/treinos/AvaliacaoModal";
 
 // Componentes Comuns
 import { ConfirmModal } from "../components/common/ConfirmModal";
@@ -20,20 +21,22 @@ export function Biblioteca() {
 
   // --- ESTADOS DE DADOS ---
   const [treinos, setTreinos] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Controla o carregamento inicial e trocas
 
-  // --- ESTADOS DE PAGINAÇÃO (Implementados) ---
+  // --- ESTADOS DE FILTRO E PESQUISA ---
+  const [filtroAtivo, setFiltroAtivo] = useState("RECENTES");
+  const [termoBusca, setTermoBusca] = useState("");
+
+  // --- ESTADOS DE PAGINAÇÃO ---
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const pageSize = 6;
-
-  // --- ESTADOS DE PESQUISA ---
-  const [termoBusca, setTermoBusca] = useState("");
 
   // --- ESTADOS DE UI/MODAIS ---
   const [selectedTreino, setSelectedTreino] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showAvaliacaoModal, setShowAvaliacaoModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
 
@@ -41,13 +44,13 @@ export function Biblioteca() {
   const [successMessage, setSuccessMessage] = useState("");
 
   const [treinoParaCopiar, setTreinoParaCopiar] = useState(null);
+  const [treinoParaAvaliar, setTreinoParaAvaliar] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // 1. CARREGAR DADOS PAGINADOS (Lógica de Backend)
+  // --- 1. CARREGAR DADOS (SERVER-SIDE) ---
   const carregarTreinos = async () => {
-    setLoading(true);
-    // A paginação ocorre aqui, enviando 'page' e 'size' para o Spring Boot
-    const url = `/api/treinos/buscar?page=${currentPage}&size=${pageSize}`;
+    setLoading(true); // Ativa o spinner toda vez que a função é chamada
+    const url = `/api/treinos/buscar-per-filter?page=${currentPage}&size=${pageSize}&filtro=${filtroAtivo}&termo=${encodeURIComponent(termoBusca)}`;
 
     try {
       const data = await apiFetch(url);
@@ -55,83 +58,83 @@ export function Biblioteca() {
       if (data && Array.isArray(data.content)) {
         setTreinos(data.content);
         setTotalPages(data.totalPages);
-        window.scrollTo({ top: 0, behavior: "smooth" }); // Melhora o UX ao trocar de página
+        window.scrollTo({ top: 0, behavior: "smooth" });
       } else {
         setTreinos([]);
         setTotalPages(0);
       }
     } catch (err) {
       console.error("Erro ao carregar biblioteca:", err);
-      setErrorMessage("Não foi possível carregar a biblioteca de treinos.");
+      setErrorMessage("Não foi possível carregar a biblioteca.");
       setShowError(true);
     } finally {
-      setLoading(false);
+      setLoading(false); // Desativa o spinner ao finalizar (sucesso ou erro)
     }
   };
 
-  // Dispara a busca sempre que a página atual mudar
+  // Efeito com Debounce para busca por texto
   useEffect(() => {
-    carregarTreinos();
-  }, [currentPage]);
+    const timer = setTimeout(() => {
+      carregarTreinos();
+    }, 400); // Reduzi um pouco o delay do debounce para parecer mais responsivo
+    return () => clearTimeout(timer);
+  }, [currentPage, filtroAtivo, termoBusca]);
 
-  // --- NOVA FUNÇÃO: SEGUIR / DEIXAR DE SEGUIR ---
-  const handleToggleFollow = async (treinoAlvo) => {
-    const isFollowing = treinoAlvo.seguindo;
-    const originalTreinos = [...treinos]; // Backup em caso de erro
+  // --- FUNÇÕES DE AÇÃO ---
 
-    // 1. Atualização Otimista (Visual Imediato)
-    const novosTreinos = treinos.map((t) => {
-      if (t.id === treinoAlvo.id) {
-        return {
-          ...t,
-          seguindo: !isFollowing,
-          numeroSeguidores: t.numeroSeguidores + (isFollowing ? -1 : 1),
-        };
-      }
-      return t;
-    });
-    setTreinos(novosTreinos);
-
-    // 2. Chamada API
-    try {
-      const endpoint = isFollowing ? "deixar-de-seguir" : "seguir";
-      const method = isFollowing ? "DELETE" : "POST";
-
-      await apiFetch(`/api/treinos/${treinoAlvo.id}/${endpoint}`, { method });
-    } catch (error) {
-      console.error("Erro ao seguir/deixar de seguir:", error);
-      // Reverte se der erro
-      setTreinos(originalTreinos);
-      setErrorMessage("Erro ao atualizar status. Tente novamente.");
-      setShowError(true);
+  const handleTrocarFiltro = (novoFiltro) => {
+    if (filtroAtivo !== novoFiltro) {
+      setFiltroAtivo(novoFiltro);
+      setCurrentPage(0);
     }
   };
-  // 2. LÓGICA DE FILTRAGEM LOCAL (Apenas por texto)
-  const treinosFiltrados = treinos.filter((treino) => {
-    const nome = treino.nome ? treino.nome.toLowerCase() : "";
-    const objetivo = treino.objetivo ? treino.objetivo.toLowerCase() : "";
-    const busca = termoBusca.toLowerCase();
 
-    return nome.includes(busca) || objetivo.includes(busca);
-  });
-
-  // --- AÇÕES ---
   const handleShowDetalhes = async (id) => {
     try {
-      const treinoDetalhado = await apiFetch(`/api/treinos/${id}`);
-      setSelectedTreino(treinoDetalhado);
+      const data = await apiFetch(`/api/treinos/${id}`);
+      setSelectedTreino(data);
       setShowDetailModal(true);
     } catch (error) {
-      setErrorMessage("Erro ao carregar detalhes.");
+      setErrorMessage("Erro ao carregar detalhes do treino.");
       setShowError(true);
     }
+  };
+
+  const handleToggleFollow = async (treinoAlvo) => {
+    setIsProcessing(true);
+    try {
+      const endpoint = treinoAlvo.seguindo ? "deixar-de-seguir" : "seguir";
+      const method = treinoAlvo.seguindo ? "DELETE" : "POST";
+      await apiFetch(`/api/treinos/${treinoAlvo.id}/${endpoint}`, { method });
+      await carregarTreinos();
+      setSuccessMessage(
+        treinoAlvo.seguindo
+          ? "Treino removido dos favoritos."
+          : "Agora você segue este treino!",
+      );
+      setShowSuccess(true);
+    } catch (error) {
+      setErrorMessage("Erro ao atualizar seguidores.");
+      setShowError(true);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleAbrirAvaliacao = (treino) => {
+    if (treino.criadorId === user.id) {
+      setErrorMessage("Você não pode avaliar o seu próprio treino!");
+      setShowError(true);
+      return;
+    }
+    setTreinoParaAvaliar(treino);
+    setShowAvaliacaoModal(true);
   };
 
   const executarCopia = async () => {
     if (!treinoParaCopiar) return;
     setShowConfirm(false);
     setIsProcessing(true);
-
     try {
       await apiFetch(`/api/treinos/${treinoParaCopiar.id}/clonar`, {
         method: "POST",
@@ -149,110 +152,162 @@ export function Biblioteca() {
     }
   };
 
-  if (loading)
-    return (
-      <div className="text-center mt-5 p-5">
-        <Spinner animation="border" variant="success" />
-        <h3 className="mt-3 text-success fw-bold">Atualizando Biblioteca...</h3>
-      </div>
-    );
-
   return (
     <div className="treinos-container py-5 bg-light min-vh-100">
       <Container>
-        {/* Header com SearchBar */}
-        <div className="mb-5">
+        {/* Header */}
+        <div className="mb-4">
           <Row className="align-items-center">
             <Col md={7}>
               <h1 className="mb-1 fw-bold text-dark">Biblioteca de Treinos</h1>
               <p className="text-muted">
-                Encontre fichas de treino para o seu objetivo.
+                Explore e siga os melhores treinos da comunidade.
               </p>
             </Col>
             <Col md={5} className="mt-3 mt-md-0">
               <SearchBar
-                placeholder="Pesquisar por nome ou objetivo..."
+                placeholder="Pesquisar..."
                 value={termoBusca}
-                onChange={(e) => setTermoBusca(e.target.value)}
-                onClear={() => setTermoBusca("")}
+                onChange={(e) => {
+                  setTermoBusca(e.target.value);
+                  setCurrentPage(0);
+                }}
+                onClear={() => {
+                  setTermoBusca("");
+                  setCurrentPage(0);
+                }}
               />
             </Col>
           </Row>
         </div>
 
-        {/* Grid de Cards */}
-        {treinosFiltrados.length === 0 ? (
+        {/* Barra de Filtros */}
+        <div className="d-flex flex-wrap gap-2 mb-4 pb-2 border-bottom">
+          <Button
+            variant={filtroAtivo === "RECENTES" ? "success" : "outline-success"}
+            className="rounded-pill px-3 fw-bold d-flex align-items-center gap-2"
+            onClick={() => handleTrocarFiltro("RECENTES")}
+            disabled={loading} // Desativa enquanto carrega para evitar spam
+          >
+            <i className="fas fa-history"></i> Recentes
+          </Button>
+
+          <Button
+            variant={
+              filtroAtivo === "MAIS_SEGUIDOS" ? "success" : "outline-success"
+            }
+            className="rounded-pill px-3 fw-bold d-flex align-items-center gap-2"
+            onClick={() => handleTrocarFiltro("MAIS_SEGUIDOS")}
+            disabled={loading}
+          >
+            <i className="fas fa-fire"></i> Populares
+          </Button>
+
+          <Button
+            variant={
+              filtroAtivo === "MELHORES_AVALIADOS"
+                ? "success"
+                : "outline-success"
+            }
+            className="rounded-pill px-3 fw-bold d-flex align-items-center gap-2"
+            onClick={() => handleTrocarFiltro("MELHORES_AVALIADOS")}
+            disabled={loading}
+          >
+            <i className="fas fa-star"></i> Melhores Avaliados
+          </Button>
+
+          <Button
+            variant={filtroAtivo === "SEGUINDO" ? "success" : "outline-success"}
+            className="rounded-pill px-3 fw-bold d-flex align-items-center gap-2"
+            onClick={() => handleTrocarFiltro("SEGUINDO")}
+            disabled={loading}
+          >
+            <i className="fas fa-users-check"></i> Seguindo
+          </Button>
+        </div>
+
+        {/* --- LOGICA DE EXIBIÇÃO: SPINNER OU GRID --- */}
+        {loading ? (
+          <div className="text-center py-5 my-5">
+            <Spinner
+              animation="border"
+              variant="success"
+              style={{ width: "3rem", height: "3rem" }}
+            />
+            <h5 className="mt-3 text-success fw-bold">Buscando treinos...</h5>
+          </div>
+        ) : treinos.length === 0 ? (
           <div className="text-center py-5 bg-white rounded-4 shadow-sm border">
             <i className="fas fa-search fa-3x text-muted mb-3 opacity-25"></i>
-            <h5 className="text-muted">
-              Nenhum treino encontrado com este nome nesta página.
-            </h5>
+            <h5 className="text-muted">Nenhum treino encontrado.</h5>
             {termoBusca && (
-              <Button variant="link" onClick={() => setTermoBusca("")}>
+              <Button
+                variant="link"
+                onClick={() => {
+                  setTermoBusca("");
+                  setCurrentPage(0);
+                }}
+              >
                 Limpar pesquisa
               </Button>
             )}
           </div>
         ) : (
-          <div className="library-grid mb-5">
-            {treinosFiltrados.map((treino, index) => (
-              <LibraryCard
-                key={treino.id}
-                treino={treino}
-                onVerDetalhes={handleShowDetalhes}
-                onCopiar={(t) => {
-                  setTreinoParaCopiar(t);
-                  setShowConfirm(true);
-                }}
-                onToggleFollow={handleToggleFollow}
-                isMostFollowed={
-                  currentPage === 0 &&
-                  index === 0 &&
-                  treino.numeroSeguidores > 0
-                }
-                disabled={isProcessing}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* --- CONTROLES DE PAGINAÇÃO (Pill Style) --- */}
-        {totalPages > 1 && (
-          <div
-            className="pagination-wrapper d-flex justify-content-center align-items-center gap-4 mt-5 p-3 bg-white rounded-pill shadow-sm mx-auto"
-            style={{ maxWidth: "fit-content" }}
-          >
-            <Button
-              variant="light"
-              className="rounded-circle shadow-sm p-2"
-              style={{ width: "40px", height: "40px" }}
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
-              disabled={currentPage === 0}
-            >
-              <i className="fas fa-chevron-left text-success"></i>
-            </Button>
-
-            <div className="text-dark">
-              <span className="fw-bold fs-5">{currentPage + 1}</span>
-              <span className="text-muted mx-2">de</span>
-              <span className="fw-bold fs-5">{totalPages}</span>
+          <>
+            <div className="library-grid mb-5">
+              {treinos.map((treino, index) => (
+                <LibraryCard
+                  key={treino.id}
+                  treino={treino}
+                  onVerDetalhes={handleShowDetalhes}
+                  onCopiar={(t) => {
+                    setTreinoParaCopiar(t);
+                    setShowConfirm(true);
+                  }}
+                  onToggleFollow={handleToggleFollow}
+                  onAvaliar={handleAbrirAvaliacao}
+                  disabled={isProcessing}
+                />
+              ))}
             </div>
 
-            <Button
-              variant="light"
-              className="rounded-circle shadow-sm p-2"
-              style={{ width: "40px", height: "40px" }}
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))
-              }
-              disabled={currentPage >= totalPages - 1}
-            >
-              <i className="fas fa-chevron-right text-success"></i>
-            </Button>
-          </div>
+            {/* Paginação (dentro do bloco de sucesso) */}
+            {totalPages > 1 && (
+              <div
+                className="pagination-wrapper d-flex justify-content-center align-items-center gap-4 mt-5 p-3 bg-white rounded-pill shadow-sm mx-auto"
+                style={{ maxWidth: "fit-content" }}
+              >
+                <Button
+                  variant="light"
+                  className="rounded-circle shadow-sm p-2"
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 0))
+                  }
+                  disabled={currentPage === 0 || loading}
+                >
+                  <i className="fas fa-chevron-left text-success"></i>
+                </Button>
+                <div className="text-dark">
+                  <span className="fw-bold fs-5">{currentPage + 1}</span>
+                  <span className="text-muted mx-2">de</span>
+                  <span className="fw-bold fs-5">{totalPages}</span>
+                </div>
+                <Button
+                  variant="light"
+                  className="rounded-circle shadow-sm p-2"
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))
+                  }
+                  disabled={currentPage >= totalPages - 1 || loading}
+                >
+                  <i className="fas fa-chevron-right text-success"></i>
+                </Button>
+              </div>
+            )}
+          </>
         )}
 
-        {/* Modais de Feedback */}
+        {/* Modais */}
         <WorkoutModal
           show={showDetailModal}
           handleClose={() => setShowDetailModal(false)}
@@ -268,6 +323,12 @@ export function Biblioteca() {
             treinoParaCopiar ? `Deseja copiar "${treinoParaCopiar.nome}"?` : ""
           }
         />
+        <AvaliacaoModal
+          show={showAvaliacaoModal}
+          handleClose={() => setShowAvaliacaoModal(false)}
+          treino={treinoParaAvaliar}
+          onSuccess={() => carregarTreinos()}
+        />
         <SuccessModal
           show={showSuccess}
           handleClose={() => setShowSuccess(false)}
@@ -275,7 +336,7 @@ export function Biblioteca() {
         />
         <ErrorModal
           show={showError}
-          handleClose={() => setShowError(false)}
+          handleClose={() => setShowError(true)}
           message={errorMessage}
         />
       </Container>

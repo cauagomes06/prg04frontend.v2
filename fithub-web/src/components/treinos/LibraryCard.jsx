@@ -1,99 +1,142 @@
-import { Card, Button, Badge } from "react-bootstrap";
-import "../../styles/treinos.css"; // Importa os estilos específicos de treinos
+import { Card, Button, Badge, Image } from "react-bootstrap";
+import "../../styles/treinos.css";
+
+// Função auxiliar para renderizar estrelas estáticas com base na média do DTO
+const renderStars = (media) => {
+  const stars = [];
+  for (let i = 1; i <= 5; i++) {
+    if (media >= i) {
+      stars.push(<i key={i} className="fas fa-star text-warning small"></i>);
+    } else if (media >= i - 0.5) {
+      stars.push(<i key={i} className="fas fa-star-half-alt text-warning small"></i>);
+    } else {
+      stars.push(<i key={i} className="far fa-star text-muted small"></i>);
+    }
+  }
+  return stars;
+};
 
 export function LibraryCard({ 
   treino, 
   onCopiar, 
   onVerDetalhes, 
   onToggleFollow, 
+  onAvaliar, 
   disabled,
-  isMostFollowed // Nova prop para identificar o treino com mais seguidores
+  isMostFollowed 
 }) {
   return (
     <Card className="h-100 shadow-sm border-0 rounded-4 overflow-hidden hover-effect custom-card position-relative">
       
-      {/* Badge "Mais Seguido" (Destaque Dourado) */}
+      {/* Badge "Mais Seguido" - Destaque visual para o topo da lista */}
       {isMostFollowed && (
         <div 
           className="position-absolute top-0 start-0 m-2 px-3 py-1 bg-warning text-dark fw-bold rounded-pill shadow-sm d-flex align-items-center gap-2 border border-white"
           style={{ zIndex: 10, fontSize: '0.7rem', letterSpacing: '0.5px' }}
         >
-          <i className="fas fa-crown text-dark"></i>
-          MAIS POPULAR
+          <i className="fas fa-crown text-dark"></i> MAIS SEGUIDO
         </div>
       )}
 
-      {/* Badge de Contagem de Seguidores */}
-      <div 
-        className="position-absolute top-0 end-0 m-2 px-2 py-1 bg-white rounded-pill shadow-sm d-flex align-items-center gap-1"
-        style={{ zIndex: 10 }}
-      >
+      {/* Badge de Seguidores (Canto superior direito) */}
+      <div className="position-absolute top-0 end-0 m-2 px-2 py-1 bg-white rounded-pill shadow-sm d-flex align-items-center gap-1" style={{ zIndex: 10 }}>
         <i className="fas fa-users text-muted small"></i>
         <span className="fw-bold small text-dark">{treino.numeroSeguidores || 0}</span>
       </div>
 
-      {/* Cabeçalho do Card (Área da "Imagem") */}
-      <div className="card-header-img card-header-library">
+      {/* Imagem/Ícone de Cabeçalho */}
+      <div className="card-header-img card-header-library d-flex align-items-center justify-content-center">
          <i className="fas fa-book-reader fa-3x icon-opacity"></i>
       </div>
 
       <Card.Body className="d-flex flex-column p-3">
-        {/* Título e Nível */}
-        <div className="d-flex justify-content-between align-items-start mb-2">
+        {/* Título e Nível do Treino */}
+        <div className="d-flex justify-content-between align-items-start mb-1">
             <Card.Title className="fw-bold text-dark mb-0 h6 text-truncate" title={treino.nome}>
               {treino.nome}
             </Card.Title>
-            {treino.nivel && (
-                <Badge bg="light" text="dark" className="border">
-                    {treino.nivel}
-                </Badge>
+            {treino.status === "PUBLICO" && (
+              <Badge bg="light" text="success" className="border border-success bg-opacity-10" style={{ fontSize: '0.65rem' }}>
+                PÚBLICO
+              </Badge>
             )}
         </div>
+
+        {/* Exibição de Estrelas e Total de Avaliações */}
+        <div className="d-flex align-items-center mb-2 gap-1" title={`Nota: ${treino.mediaNota || 0}`}>
+            <div className="d-flex">{renderStars(treino.mediaNota || 0)}</div>
+            <span className="text-muted ms-1" style={{fontSize: '0.75rem'}}>
+                ({treino.totalAvaliacoes || 0})
+            </span>
+        </div>
         
-        {/* Criador do Treino */}
-        <Card.Subtitle className="mb-3 text-muted text-small d-flex justify-content-between align-items-center">
-            <span>
-                <i className="fas fa-user-circle me-1"></i>
+        {/* INFO DO CRIADOR: Usa a nova propriedade criadorFoto do seu DTO */}
+        <div className="d-flex align-items-center mb-3">
+            {treino.criadorFoto ? (
+                <Image 
+                    src={treino.criadorFoto} 
+                    roundedCircle 
+                    style={{ width: '24px', height: '24px', objectFit: 'cover' }} 
+                    className="me-2 shadow-sm border border-light"
+                    alt={treino.criadorNome}
+                />
+            ) : (
+                <i className="fas fa-user-circle text-muted me-2 fs-5"></i>
+            )}
+            <span className="text-muted small fw-bold text-truncate">
                 {treino.criadorNome || "Sistema"}
             </span>
-        </Card.Subtitle>
+        </div>
 
-        {/* Grupo de Ações */}
+        {/* Rodapé com Botões de Ação */}
         <div className="mt-auto d-flex flex-column gap-2">
             
-            {/* Botão de Seguir/Deixar de Seguir (Ação Principal) */}
+            {/* Botão de Seguir/Deixar de Seguir (Caminho principal) */}
             <Button
                 variant={treino.seguindo ? "outline-danger" : "success"}
                 size="sm"
                 className={`w-100 fw-bold d-flex align-items-center justify-content-center gap-2 ${!treino.seguindo ? 'text-white' : ''}`}
-                onClick={() => onToggleFollow(treino)}
+                onClick={(e) => { e.stopPropagation(); onToggleFollow(treino); }}
                 disabled={disabled}
             >
                 <i className={treino.seguindo ? "fas fa-heart" : "far fa-heart"}></i>
-                {treino.seguindo ? "Deixar de Seguir" : "Seguir Treino"}
+                {treino.seguindo ? "Deixar de Seguir" : "Seguir"}
             </Button>
 
-            {/* Linha de Ações Secundárias (Ver e Copiar) */}
+            {/* Ações Secundárias */}
             <div className="d-flex gap-2">
                 <Button 
-                  variant="outline-success" 
-                  size="sm" 
-                  className="flex-grow-1 fw-bold" 
-                  onClick={() => onVerDetalhes(treino.id)}
-                  disabled={disabled}
+                    variant="outline-success" 
+                    size="sm" 
+                    className="flex-grow-1 fw-bold" 
+                    onClick={(e) => { e.stopPropagation(); onVerDetalhes(treino.id); }} 
+                    disabled={disabled}
+                    title="Ver detalhes"
                 >
-                  <i className="far fa-eye me-1"></i> Ver
+                  <i className="far fa-eye"></i>
                 </Button>
 
                 <Button 
-                  variant="outline-success"
-                  className="flex-grow-1 fw-bold"
-                  size="sm"
-                  onClick={() => onCopiar(treino)}
-                  disabled={disabled}
-                  title="Criar uma cópia editável"
+                    variant="outline-success" 
+                    size="sm" 
+                    className="flex-grow-1 fw-bold" 
+                    onClick={(e) => { e.stopPropagation(); onCopiar(treino); }} 
+                    disabled={disabled}
+                    title="Clonar treino"
                 >
-                  <i className="fas fa-copy me-1"></i> Copiar
+                  <i className="fas fa-copy"></i>
+                </Button>
+
+                {/* Botão de Avaliação (Estrela Amarela) */}
+                <Button 
+                    variant="outline-warning" 
+                    size="sm" 
+                    className="flex-grow-0 fw-bold" 
+                    onClick={(e) => { e.stopPropagation(); onAvaliar(treino); }} 
+                    disabled={disabled}
+                    title="Avaliar este treino"
+                >
+                  <i className="fas fa-star"></i>
                 </Button>
             </div>
         </div>

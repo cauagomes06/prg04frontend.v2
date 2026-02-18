@@ -117,3 +117,13 @@
 .bg-success {
     background-color: var(--primary-green) !important;
 }
+
+.my-workout-card-hover {
+    transition: all 0.3s ease;
+    border-top: 4px solid transparent;
+}
+
+.my-workout-card-hover:hover {
+    transform: translateY(-5px);
+    border-top-color: #198754; /* Cor verde do Bootstrap */
+}

@@ -5,6 +5,9 @@ export function ProfileHeader({ perfil, onEditData, onOpenConfig }) {
   // Estado para controlar erro na imagem
   const [imgError, setImgError] = useState(false);
 
+  console.log("URL que chegou no componente:", perfil?.fotoUrl);
+  console.log("Objeto perfil completo:", perfil);
+
   // Reseta o estado de erro sempre que o perfil mudar (para tentar carregar nova foto)
   useEffect(() => {
     setImgError(false);
@@ -16,11 +19,13 @@ export function ProfileHeader({ perfil, onEditData, onOpenConfig }) {
         {/* Lógica: Mostra a imagem SE existir URL E não houver erro.
            Caso contrário, mostra o ícone.
         */}
+
         {perfil?.fotoUrl && !imgError ? (
-          <img 
-            src={`http://localhost:8080${perfil.fotoUrl}`} 
-            alt="Avatar" 
-            style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+          <img
+            // No ProfileHeader.jsx
+            src={`${perfil?.fotoUrl || perfil?.criadorFoto}?t=${new Date().getTime()}`}
+            alt="Avatar"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
             onError={() => setImgError(true)} // Se falhar, ativa o modo de erro
           />
         ) : (
@@ -34,7 +39,8 @@ export function ProfileHeader({ perfil, onEditData, onOpenConfig }) {
           <i className="fas fa-envelope me-2"></i> {perfil?.username}
         </p>
         <p className="text-muted mb-2">
-          <i className="fas fa-phone me-2"></i> {perfil?.pessoa?.telefone || "Sem telefone"}
+          <i className="fas fa-phone me-2"></i>{" "}
+          {perfil?.pessoa?.telefone || "Sem telefone"}
         </p>
         <span className="badge badge-plano text-success rounded-pill">
           {perfil?.nomePlano || "Sem Plano"}
