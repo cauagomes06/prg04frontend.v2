@@ -22,8 +22,8 @@ export function Exercicios() {
 
   // --- ESTADOS DE PAGINAÇÃO ---
   const [paginaAtual, setPaginaAtual] = useState(0);
-  const [totalPaginas, setTotalPaginas] = useState(0); // Vindo da API
-  const itensPorPagina = 6; // Enviado para API
+  const [totalPaginas, setTotalPaginas] = useState(0);
+  const itensPorPagina = 6;
 
   // Estados de Filtro
   const [filtroMusculo, setFiltroMusculo] = useState("TODOS");
@@ -34,21 +34,17 @@ export function Exercicios() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+
+  // --- ESTADO PARA EDIÇÃO ---
+  const [exerciseToEdit, setExerciseToEdit] = useState(null);
+
   const [exerciseToDelete, setExerciseToDelete] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
 
   const gruposMusculares = [
-    "TODOS",
-    "PEITO",
-    "COSTAS",
-    "PERNAS",
-    "OMBROS",
-    "BÍCEPS",
-    "TRÍCEPS",
-    "ABDÔMEN",
-    "GLÚTEOS",
-    "PANTURRILHA",
-    "FULL BODY",
+    "TODOS", "PEITO", "COSTAS", "PERNAS", "OMBROS",
+    "BÍCEPS", "TRÍCEPS", "ABDÔMEN", "GLÚTEOS",
+    "PANTURRILHA", "FULL BODY",
   ];
 
   const isPersonalOrAdmin =
@@ -57,29 +53,23 @@ export function Exercicios() {
       user.nomePerfil.toUpperCase().includes("ROLE_PERSONAL"));
 
   // =========================================================
-  // 1. CARREGAMENTO INTELIGENTE (SERVER-SIDE)
+  // 1. CARREGAMENTO DE DADOS
   // =========================================================
   const carregarExercicios = async () => {
     setLoading(true);
-
-    // Constrói a URL base
     let url = `/api/exercicios/buscar?page=${paginaAtual}&size=${itensPorPagina}`;
 
     if (filtroMusculo && filtroMusculo !== "TODOS") {
-      // Se tem grupo muscular, usa o endpoint de grupo
       url += `&grupoMuscular=${filtroMusculo}`;
     } else if (termoBusca) {
-      // Se não tem grupo, mas tem busca, usa o endpoint de busca
       url += `&search=${encodeURIComponent(termoBusca)}`;
     }
 
     try {
       const data = await apiFetch(url);
-
-      // O Backend agora retorna um Page, então pegamos .content
       if (data) {
         setExercicios(data.content || []);
-        setTotalPaginas(data.totalPages || 0); // Ajusta a paginação real
+        setTotalPaginas(data.totalPages || 0);
       } else {
         setExercicios([]);
         setTotalPaginas(0);
@@ -93,33 +83,41 @@ export function Exercicios() {
   };
 
   // =========================================================
-  // 2. EFEITOS 
+  // 2. EFEITOS
   // =========================================================
 
-  // Dispara quando muda Página ou Filtro de Músculo
   useEffect(() => {
     carregarExercicios();
   }, [paginaAtual, filtroMusculo]);
 
-  // Dispara quando muda a Busca (com Delay/Debounce)
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-      // Reseta para página 0 sempre que pesquisa algo novo
       setPaginaAtual(0);
       carregarExercicios();
     }, 500);
-
     return () => clearTimeout(delayDebounceFn);
   }, [termoBusca]);
 
-  // Reset de página ao mudar filtro de músculo
   useEffect(() => {
     setPaginaAtual(0);
   }, [filtroMusculo]);
 
   // =========================================================
-  // 3. AÇÕES
+  // 3. AÇÕES E CONTROLE DE MODAIS
   // =========================================================
+
+  const handleEdit = (exercicio) => {
+    setExerciseToEdit(exercicio);
+    setShowCreateModal(true);
+  };
+
+  const fecharModalCadastro = () => {
+    setShowCreateModal(false);
+    // Timeout evita o "piscar" visual dos dados resetando antes do modal sumir
+    setTimeout(() => {
+      setExerciseToEdit(null);
+    }, 300);
+  };
 
   const initiateDelete = (id) => {
     setExerciseToDelete(id);
@@ -133,10 +131,7 @@ export function Exercicios() {
         method: "DELETE",
       });
       setShowDeleteConfirm(false);
-
-      // RECARREGA DO SERVIDOR para garantir que a paginação fique certa
       carregarExercicios();
-
       setExerciseToDelete(null);
       setShowSuccessModal(true);
     } catch (error) {
@@ -144,7 +139,6 @@ export function Exercicios() {
       const msg = error.message?.includes("integridade")
         ? "Não é possível excluir este exercício pois ele faz parte de fichas ativas."
         : error.message || "Erro ao tentar excluir.";
-
       setErrorMessage(msg);
       setShowErrorModal(true);
     }
@@ -168,7 +162,10 @@ export function Exercicios() {
         <Button
           variant="success"
           className="px-4 fw-bold shadow-sm"
-          onClick={() => setShowCreateModal(true)}
+          onClick={() => {
+            setExerciseToEdit(null);
+            setShowCreateModal(true);
+          }}
         >
           <i className="fas fa-plus me-2"></i> Novo Exercício
         </Button>
@@ -187,7 +184,7 @@ export function Exercicios() {
           selected={filtroMusculo}
           onSelect={(val) => {
             setFiltroMusculo(val);
-            setTermoBusca(""); // Limpa busca texto ao filtrar por grupo (evita conflito)
+            setTermoBusca("");
           }}
         />
       </div>
@@ -196,9 +193,9 @@ export function Exercicios() {
         exercicios={exercicios}
         loading={loading}
         onDelete={initiateDelete}
+        onEdit={handleEdit}
       />
 
-      {/* Paginação usando o total que veio do Back */}
       {totalPaginas > 1 && (
         <PaginationComponent
           currentPage={paginaAtual}
@@ -210,11 +207,12 @@ export function Exercicios() {
       {/* MODAIS */}
       <CreateExerciseModal
         show={showCreateModal}
-        handleClose={() => setShowCreateModal(false)}
+        handleClose={fecharModalCadastro}
         onSuccess={() => {
           carregarExercicios();
           setShowSuccessModal(true);
         }}
+        exerciseToEdit={exerciseToEdit}
       />
 
       <ConfirmModal
@@ -231,6 +229,7 @@ export function Exercicios() {
         title="Sucesso!"
         message="Operação realizada com sucesso!"
       />
+
       <ErrorModal
         show={showErrorModal}
         handleClose={() => setShowErrorModal(false)}

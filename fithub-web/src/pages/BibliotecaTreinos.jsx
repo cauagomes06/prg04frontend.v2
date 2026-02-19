@@ -114,7 +114,7 @@ export function Biblioteca() {
       );
       setShowSuccess(true);
     } catch (error) {
-      setErrorMessage("Erro ao atualizar seguidores.");
+      setErrorMessage(error.message || "Erro ao atualizar seguidores.");
       setShowError(true);
     } finally {
       setIsProcessing(false);
@@ -336,7 +336,7 @@ export function Biblioteca() {
         />
         <ErrorModal
           show={showError}
-          handleClose={() => setShowError(true)}
+          handleClose={() => setShowError(false)}
           message={errorMessage}
         />
       </Container>

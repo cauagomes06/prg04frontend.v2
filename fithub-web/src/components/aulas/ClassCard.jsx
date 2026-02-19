@@ -82,7 +82,7 @@ export function ClassCard({ aula, isInstructor, onReservar, onVerParticipantes, 
             size="sm"
             onClick={() => onVerParticipantes(aula.id)}
           >
-            <i className="fas fa-users me-2"></i> Ver Quem Vai
+            <i className="fas fa-users me-2"></i> Participantes
           </Button>
 
           {/* AÇÕES PARA INSTRUTOR (Apagar) */}

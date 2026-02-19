@@ -1,6 +1,6 @@
 import { Card, Table, Badge, Button, Spinner } from "react-bootstrap";
 
-export function ExerciseTable({ exercicios, loading, onDelete }) {
+export function ExerciseTable({ exercicios, loading, onDelete, onEdit }) {
   return (
     <Card className="shadow-sm border-0 rounded-3 overflow-hidden">
       <Card.Body className="p-0">
@@ -54,6 +54,15 @@ export function ExerciseTable({ exercicios, loading, onDelete }) {
                       )}
                     </td>
                     <td className="pe-4 text-end">
+                      {/* BOTÃO EDITAR ADICIONADO */}
+                      <Button
+                        variant="link"
+                        className="text-primary me-2 p-0"
+                        onClick={() => onEdit(ex)}
+                      >
+                        <i className="fas fa-edit"></i>
+                      </Button>
+
                       <Button
                         variant="link"
                         className="text-danger p-0"
