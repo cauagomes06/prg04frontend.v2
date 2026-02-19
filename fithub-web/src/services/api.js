@@ -12,8 +12,7 @@ export const apiFetch = async (endpoint, options = {}) => {
   const config = {
     ...options,
     headers: {
-      // Se for FormData, o navegador define o Content-Type (multipart).
-      // Se for JSON/Texto, definimos application/json.
+      // Se for FormData, o navegador define o Content-Type automaticamente
       ...(!isFormData && { "Content-Type": "application/json" }),
       
       // Adiciona o Token se existir
@@ -27,45 +26,40 @@ export const apiFetch = async (endpoint, options = {}) => {
   try {
     const response = await fetch(`${API_URL}${cleanEndpoint}`, config);
 
+    // --- A SOLUÇÃO: LER O CORPO UMA ÚNICA VEZ ---
+    let data = null;
+    const text = await response.text(); // Lemos como texto primeiro (abre a "caixa")
+    
+    if (text) {
+      try {
+        data = JSON.parse(text); // Tenta converter para objeto se for JSON
+      } catch (e) {
+        data = text; // Se não for JSON, mantém como texto puro (ex: URL ou String)
+      }
+    }
+
     // 2. Tratamento de Erros HTTP (401, 403, 400, 500)
     if (!response.ok) {
+      // Caso especial: Token expirado ou inválido
       if (response.status === 401) {
         localStorage.removeItem("fithub_token");
         window.location.href = "/login";
         return;
       }
-      if (response.status === 403) {
-        throw new Error("Acesso negado.");
-      }
 
-      // Tenta ler o erro como JSON, se falhar, lê como texto
-      let errorMessage;
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || JSON.stringify(errorData);
-      } catch (e) {
-        errorMessage = await response.text();
-      }
+      // Se chegamos aqui, usamos o 'data' que já lemos lá em cima
+      // O Spring Boot envia o erro no campo 'message' através do seu ErrorMessage
+      const errorMessage = data?.message || (typeof data === 'string' ? data : response.statusText);
       
-      throw new Error(errorMessage || `Erro: ${response.statusText}`);
+      throw new Error(errorMessage || "Erro inesperado no servidor");
     }
 
-    // 3. A MÁGICA (Parsing Seguro)
-    // Lê a resposta como texto primeiro
-    const textData = await response.text();
-
-    // Se a resposta for vazia (ex: status 204), retorna null
-    if (!textData) return null;
-
-    // Tenta converter para JSON. Se funcionar, retorna o Objeto/Array.
-    // Se der erro (SyntaxError), significa que é apenas uma String (ex: URL da foto), então retorna o texto.
-    try {
-      return JSON.parse(textData);
-    } catch (e) {
-      return textData;
-    }
+    // 3. RETORNO DE SUCESSO
+    // Como já fizemos o parse lá em cima, basta retornar a variável 'data'
+    return data;
 
   } catch (error) {
+    // Se o erro for o que acabamos de dar throw, ele cai aqui e é repassado para o componente
     console.error("Erro na API:", error);
     throw error;
   }

@@ -138,6 +138,8 @@ export default function AdminPlans() {
         show={showConfirmDelete}
         handleClose={() => setShowConfirmDelete(false)}
         handleConfirm={confirmDelete}
+        title="Excluir Plano"
+        message="Tem certeza que deseja excluir este plano? Atenção: Todos os usuários vinculados a ele perderão seus benefícios e ficarão 'Sem Plano'."
       />
 
       <SuccessModal
