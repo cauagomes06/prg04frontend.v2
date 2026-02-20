@@ -1,49 +1,41 @@
 import React from 'react';
+import { Button } from 'react-bootstrap';
 
-export function PaginationComponent({ currentPage, totalPages, onPageChange }) {
+export function PaginationComponent({ currentPage, totalPages, onPageChange, loading }) {
   // Não renderiza nada se houver apenas uma página ou nenhuma
   if (totalPages <= 1) return null;
 
-  // Cria um array com os números das páginas (ex: [0, 1, 2])
-  const pages = [...Array(totalPages).keys()];
-
   return (
-    <nav className="d-flex justify-content-center mt-4">
-      <ul className="pagination shadow-sm">
-        {/* Botão Anterior */}
-        <li className={`page-item ${currentPage === 0 ? 'disabled' : ''}`}>
-          <button 
-            className="page-link border-0 text-success" 
-            onClick={() => onPageChange(currentPage - 1)}
-            disabled={currentPage === 0}
-          >
-            <i className="fas fa-chevron-left small"></i>
-          </button>
-        </li>
+    <div
+      className="pagination-wrapper d-flex justify-content-center align-items-center gap-4 mt-5 p-3 bg-white rounded-pill shadow-sm mx-auto"
+      style={{ maxWidth: "fit-content" }}
+    >
+      {/* Botão Voltar */}
+      <Button
+        variant="light"
+        className="rounded-circle shadow-sm p-2"
+        onClick={() => onPageChange(Math.max(currentPage - 1, 0))}
+        disabled={currentPage === 0 || loading}
+      >
+        <i className="fas fa-chevron-left text-success"></i>
+      </Button>
 
-        {/* Números das Páginas */}
-        {pages.map((page) => (
-          <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
-            <button 
-              className={`page-link border-0 ${currentPage === page ? 'bg-success text-white' : 'text-dark'}`}
-              onClick={() => onPageChange(page)}
-            >
-              {page + 1}
-            </button>
-          </li>
-        ))}
+      {/* Indicador de Páginas */}
+      <div className="text-dark">
+        <span className="fw-bold fs-5">{currentPage + 1}</span>
+        <span className="text-muted mx-2">de</span>
+        <span className="fw-bold fs-5">{totalPages}</span>
+      </div>
 
-        {/* Botão Próximo */}
-        <li className={`page-item ${currentPage === totalPages - 1 ? 'disabled' : ''}`}>
-          <button 
-            className="page-link border-0 text-success" 
-            onClick={() => onPageChange(currentPage + 1)}
-            disabled={currentPage === totalPages - 1}
-          >
-            <i className="fas fa-chevron-right small"></i>
-          </button>
-        </li>
-      </ul>
-    </nav>
+      {/* Botão Próximo */}
+      <Button
+        variant="light"
+        className="rounded-circle shadow-sm p-2"
+        onClick={() => onPageChange(Math.min(currentPage + 1, totalPages - 1))}
+        disabled={currentPage >= totalPages - 1 || loading}
+      >
+        <i className="fas fa-chevron-right text-success"></i>
+      </Button>
+    </div>
   );
 }
