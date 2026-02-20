@@ -25,11 +25,11 @@ export function CompeticaoDetailsModal({ show, onHide, competicao, ranking, canM
   };
 
   return (
-    <Modal show={show} onHide={onHide} centered size="lg" contentClassName="modal-custom-content">
-      <Modal.Header closeButton className="modal-header-custom px-4 pt-4">
-        <Modal.Title className="fw-bold">Detalhes</Modal.Title>
+    <Modal show={show} onHide={onHide} centered size="lg" contentClassName="border-0 rounded-4 overflow-hidden">
+      <Modal.Header closeButton className="borda-customizada" style={{ backgroundColor: "var(--bg-light)" }}>
+        <Modal.Title className="fw-bold text-dark">Detalhes da Competição</Modal.Title>
       </Modal.Header>
-      <Modal.Body className="px-4 pb-4 pt-2">
+      <Modal.Body className="p-4" style={{ backgroundColor: "var(--card-bg)" }}>
         {competicao && (
           <>
             <div className="d-flex justify-content-between align-items-start mb-4">
@@ -39,12 +39,11 @@ export function CompeticaoDetailsModal({ show, onHide, competicao, ranking, canM
                     {competicao.status.replace("_", " ")}
                 </span>
               </div>
-              {/* BOTÃO DE APAGAR (SÓ PARA ADMIN) */}
               {isAdmin && (
                 <Button 
-                  variant="danger" 
+                  variant="outline-danger" 
                   size="sm" 
-                  className="rounded-pill px-3"
+                  className="rounded-pill px-3 borda-customizada"
                   onClick={() => onDelete(competicao.id, competicao.nome)}
                 >
                   <i className="fas fa-trash-alt me-2"></i> Excluir
@@ -52,42 +51,31 @@ export function CompeticaoDetailsModal({ show, onHide, competicao, ranking, canM
               )}
             </div>
             
-            <div className="bg-light p-3 rounded-3 mb-4">
+            <div className="p-3 rounded-3 mb-4 borda-customizada" style={{ backgroundColor: "var(--bg-light)" }}>
                <p className="text-muted mb-0" style={{fontSize: "0.95rem", lineHeight: "1.6"}}>
                  {competicao.descricao}
                </p>
             </div>
             
             <Row className="g-3 mb-4">
-              <Col xs={6} md={3}>
-                <div className="detail-box">
-                    <span className="detail-label">Início</span>
-                    <span className="detail-value">{new Date(competicao.dataInicio).toLocaleDateString()}</span>
-                </div>
-              </Col>
-              <Col xs={6} md={3}>
-                <div className="detail-box">
-                    <span className="detail-label">Fim</span>
-                    <span className="detail-value">{new Date(competicao.dataFim).toLocaleDateString()}</span>
-                </div>
-              </Col>
-              <Col xs={6} md={3}>
-                <div className="detail-box">
-                    <span className="detail-label">Pts Vitória</span>
-                    <span className="detail-value text-success">{competicao.pontosVitoria}</span>
-                </div>
-              </Col>
-              <Col xs={6} md={3}>
-                <div className="detail-box">
-                    <span className="detail-label">Inscritos</span>
-                    <span className="detail-value">{competicao.totalInscritos}</span>
-                </div>
-              </Col>
+              {[
+                { label: "Início", value: new Date(competicao.dataInicio).toLocaleDateString() },
+                { label: "Fim", value: new Date(competicao.dataFim).toLocaleDateString() },
+                { label: "Pts Vitória", value: competicao.pontosVitoria, color: "text-success" },
+                { label: "Inscritos", value: competicao.totalInscritos }
+              ].map((item, i) => (
+                <Col key={i} xs={6} md={3}>
+                  <div className="p-3 rounded-3 text-center borda-customizada" style={{ backgroundColor: "var(--bg-light)" }}>
+                      <span className="d-block small text-muted text-uppercase fw-bold mb-1">{item.label}</span>
+                      <span className={`d-block fw-bold fs-5 ${item.color || 'text-dark'}`}>{item.value}</span>
+                  </div>
+                </Col>
+              ))}
             </Row>
 
             {canManage && (
-              <div className="management-area p-3 mb-4">
-                <div className="d-flex justify-content-between align-items-center">
+              <div className="p-3 mb-4 rounded-3 borda-customizada" style={{ border: "1px dashed var(--primary-color)" }}>
+                <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                    <div>
                       <h6 className="fw-bold text-dark mb-0">Área de Gestão</h6>
                       <small className="text-muted">Alterar status da competição</small>
@@ -97,7 +85,8 @@ export function CompeticaoDetailsModal({ show, onHide, competicao, ranking, canM
                         size="sm" 
                         value={novoStatus} 
                         onChange={(e) => setNovoStatus(e.target.value)}
-                        style={{width: "160px", borderRadius: "8px"}}
+                        className="shadow-none border-0"
+                        style={{width: "160px", borderRadius: "8px", backgroundColor: "var(--bg-light)", color: "var(--text-dark)"}}
                       >
                         <option value="ABERTA">ABERTA</option>
                         <option value="EM_ANDAMENTO">EM ANDAMENTO</option>
@@ -105,7 +94,8 @@ export function CompeticaoDetailsModal({ show, onHide, competicao, ranking, canM
                         <option value="CANCELADA">CANCELADA</option>
                       </Form.Select>
                       <Button 
-                        className="btn-custom-primary rounded-3"
+                        variant="success"
+                        className="rounded-pill px-3 fw-bold"
                         size="sm" 
                         onClick={handleSalvarStatus}
                         disabled={novoStatus === competicao.status}
@@ -117,20 +107,20 @@ export function CompeticaoDetailsModal({ show, onHide, competicao, ranking, canM
               </div>
             )}
 
-            <h5 className="fw-bold mt-4 mb-3">Leaderboard</h5>
+            <h5 className="fw-bold mt-4 mb-3 text-dark"><i className="fas fa-medal me-2 text-warning"></i>Leaderboard</h5>
             {ranking.length === 0 ? (
-              <div className="text-center py-3 text-muted bg-light rounded-3 border border-dashed">
+              <div className="text-center py-4 text-muted rounded-3 borda-customizada" style={{ backgroundColor: "var(--bg-light)" }}>
                   Nenhum resultado submetido.
               </div>
             ) : (
-              <ListGroup variant="flush" className="rounded-3 overflow-hidden border">
+              <ListGroup variant="flush" className="rounded-3 overflow-hidden borda-customizada">
                 {ranking.map((r, index) => (
-                  <ListGroup.Item key={r.usuarioId} className="px-3 py-2 d-flex justify-content-between bg-white">
+                  <ListGroup.Item key={r.usuarioId} className="px-3 py-3 d-flex justify-content-between align-items-center bg-transparent border-color-custom">
                     <div className="d-flex align-items-center">
-                      <span className="fw-bold text-muted me-3" style={{width: "20px"}}>#{index + 1}</span>
-                      <span className="text-dark">{r.nomeUsuario}</span>
+                      <span className="fw-bold text-muted me-3" style={{width: "25px"}}>#{index + 1}</span>
+                      <span className="text-dark fw-bold">{r.nomeUsuario}</span>
                     </div>
-                    <Badge bg="light" text="dark" className="border">
+                    <Badge pill style={{ backgroundColor: "var(--bg-light)", color: "var(--primary-color)", border: "1px solid var(--border-color)" }} className="px-3 py-2">
                       {r.resultado}
                     </Badge>
                   </ListGroup.Item>
@@ -140,8 +130,8 @@ export function CompeticaoDetailsModal({ show, onHide, competicao, ranking, canM
           </>
         )}
       </Modal.Body>
-      <Modal.Footer className="border-0 pt-0">
-        <Button variant="light" onClick={onHide} className="rounded-pill px-4">Fechar</Button>
+      <Modal.Footer className="borda-customizada" style={{ backgroundColor: "var(--bg-light)" }}>
+        <Button variant="outline-secondary" onClick={onHide} className="rounded-pill px-4">Fechar</Button>
       </Modal.Footer>
     </Modal>
   );

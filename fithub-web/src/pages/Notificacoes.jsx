@@ -7,21 +7,17 @@ import { SuccessModal } from "../components/common/SuccessModal";
 // Componentes Granulares
 import { NotificationItem } from "../components/notificacoes/NotificacaoItem";
 import { BroadcastModal } from "../components/notificacoes/BroadcastModal";
-import { AdminStatsCards } from "../components/dashboard/AdminStatsCards"; // <--- IMPORTAR AQUI
 
 import "../styles/notificacoes.css";
 
 export function Notificacoes() {
   const { user } = useContext(AuthContext);
   
-  // Estados
   const [notificacoes, setNotificacoes] = useState([]);
   const [loading, setLoading] = useState(true);
-  
   const [showBroadcast, setShowBroadcast] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // Verifica se é admin
   const isAdmin = user?.nomePerfil && user.nomePerfil.includes("ROLE_ADMIN");
 
   const carregarNotificacoes = async () => {
@@ -57,7 +53,7 @@ export function Notificacoes() {
   };
 
   if (loading) return (
-    <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
+    <div className="d-flex justify-content-center align-items-center vh-100" style={{ backgroundColor: 'var(--bg-light)' }}>
       <Spinner animation="border" variant="success" />
     </div>
   );
@@ -65,10 +61,8 @@ export function Notificacoes() {
   return (
     <div className="notificacoes-container py-5">
       <Container>
-        
-
-        {/* Cabeçalho Notificações */}
-        <div className="d-flex justify-content-between align-items-center mb-4 mt-2">
+        {/* Cabeçalho */}
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 mt-2 gap-3">
           <div>
             <h2 className="fw-bold text-dark mb-1">
                 {isAdmin ? "Centro de Mensagens" : "Notificações"}
@@ -79,26 +73,34 @@ export function Notificacoes() {
           <div className="d-flex gap-2">
              {isAdmin && (
               <Button 
-                className="btn-custom-primary rounded-pill shadow-sm" 
+                className="btn-custom-primary rounded-pill shadow-sm px-4" 
                 onClick={() => setShowBroadcast(true)}
               >
                 <i className="fas fa-paper-plane me-2"></i> Enviar Geral
               </Button>
             )}
 
-            <Button variant="light" onClick={carregarNotificacoes} className="rounded-pill shadow-sm">
-              <i className="fas fa-sync-alt me-2"></i> Atualizar
+            <Button 
+              variant="outline-secondary" 
+              onClick={carregarNotificacoes} 
+              className="rounded-pill shadow-sm px-4 d-flex align-items-center gap-2"
+              style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-dark)', borderColor: 'var(--border-color)' }}
+            >
+              <i className="fas fa-sync-alt"></i> Atualizar
             </Button>
           </div>
         </div>
 
         {/* Lista de Notificações */}
         <Row>
-          <Col lg={isAdmin ? 12 : 8} className={isAdmin ? "" : "mx-auto"}>
+          <Col lg={isAdmin ? 12 : 9} className={isAdmin ? "" : "mx-auto"}>
             {notificacoes.length === 0 ? (
-              <div className="text-center py-5 bg-white rounded-4 shadow-sm">
+              <div 
+                className="text-center py-5 rounded-4 shadow-sm borda-customizada"
+                style={{ backgroundColor: 'var(--card-bg)' }}
+              >
                 <i className="far fa-bell-slash fa-3x text-muted mb-3 opacity-25"></i>
-                <p className="text-muted">Você não tem novas notificações.</p>
+                <p className="text-muted fw-bold">Você não tem novas notificações.</p>
               </div>
             ) : (
               <div className="d-flex flex-column gap-3">
@@ -115,7 +117,6 @@ export function Notificacoes() {
         </Row>
       </Container>
 
-      {/* Modais */}
       <BroadcastModal 
         show={showBroadcast} 
         onHide={() => setShowBroadcast(false)} 

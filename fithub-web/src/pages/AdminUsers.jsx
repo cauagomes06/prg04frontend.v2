@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { apiFetch } from "../services/api";
+import { Container, Spinner } from "react-bootstrap";
 
 // COMPONENTES VISUAIS
 import { SearchBar } from "../components/common/SearchBar";
 import { UserTable } from "../components/admin/UserTable";
 import { EditUserModal } from "../components/admin/EditUserModal";
 import { PaginationComponent } from "../components/common/PaginationComponent";
-import { FilterGroup } from "../components/common/FilterGroup"; // Import do FilterGroup
+import { FilterGroup } from "../components/common/FilterGroup";
 
 // MODAIS DE FEEDBACK
 import { ConfirmModal } from "../components/common/ConfirmModal";
@@ -23,7 +24,6 @@ export default function AdminUsers() {
   const [pageSize] = useState(10);
 
   const [searchTerm, setSearchTerm] = useState("");
-  // ESTADO DO FILTRO DE PERFIL
   const [filtroPerfil, setFiltroPerfil] = useState("TODOS");
   const [editingUser, setEditingUser] = useState(null);
 
@@ -34,10 +34,8 @@ export default function AdminUsers() {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
 
-  // OPÇÕES DE FILTRO
   const opcoesPerfis = ["TODOS", "ROLE_ADMIN", "ROLE_PERSONAL", "ROLE_CLIENTE"];
 
-  // Função de carregamento isolada para ser reutilizada (Agora recebe o perfil)
   const carregarDados = useCallback(
     async (page, search, perfil) => {
       try {
@@ -75,7 +73,6 @@ export default function AdminUsers() {
     [pageSize],
   );
 
-  // Efeito com Debounce para busca combinada com filtro
   useEffect(() => {
     const handler = setTimeout(() => {
       carregarDados(currentPage, searchTerm, filtroPerfil);
@@ -122,61 +119,95 @@ export default function AdminUsers() {
   };
 
   return (
-    <div className="container-fluid p-4">
-      <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
-        <h2 className="fw-bold text-dark mb-3 mb-md-0">
-          <i className="fas fa-users-cog me-2 text-success"></i>
-          Gerenciar Usuários
-        </h2>
+    <div
+      className="p-3 p-md-4 min-vh-100"
+      style={{ backgroundColor: "var(--bg-light)" }}
+    >
+      <Container fluid className="px-0">
+        {/* CABEÇALHO RESPONSIVO */}
+        <div className="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3">
+          <div>
+            <h2 className="fw-bold text-dark mb-1">
+              <i className="fas fa-users-cog me-2 text-success"></i>
+              Gerenciar Usuários
+            </h2>
+            <p className="text-muted small mb-0">
+              Controle de acessos e permissões da plataforma.
+            </p>
+          </div>
 
-        <div className="w-100 w-md-50" style={{ maxWidth: "400px" }}>
-          <SearchBar
-            placeholder="Buscar por username..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            onClear={() => {
-              setSearchTerm("");
+          <div
+            className="flex-grow-1"
+            style={{ maxWidth: "500px", marginBottom: "-1.5rem" }}
+          >
+            <SearchBar
+              placeholder="Buscar por username..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              onClear={() => {
+                setSearchTerm("");
+                setCurrentPage(0);
+              }}
+            />
+          </div>
+        </div>
+
+        {/* GRUPO DE FILTROS */}
+        <div className="mb-4">
+          <FilterGroup
+            options={opcoesPerfis}
+            selected={filtroPerfil}
+            onSelect={(val) => {
+              setFiltroPerfil(val);
               setCurrentPage(0);
             }}
           />
         </div>
-      </div>
 
-      {/* RENDERIZAÇÃO DO FILTRO GROUP */}
-      <div className="mb-4">
-        <FilterGroup
-          options={opcoesPerfis}
-          selected={filtroPerfil}
-          onSelect={(val) => {
-            setFiltroPerfil(val);
-            setCurrentPage(0); // Volta para a pág 0 ao trocar o filtro
-          }}
-        />
-      </div>
+        {/* ÁREA DA TABELA COM FEEDBACK DE CARREGAMENTO */}
+        <div
+          className="rounded-4 shadow-sm overflow-hidden borda-customizada"
+          style={{ backgroundColor: "var(--card-bg)", minHeight: "400px" }}
+        >
+          {loading ? (
+            <div
+              className="d-flex flex-column justify-content-center align-items-center"
+              style={{ height: "400px" }}
+            >
+              <Spinner
+                animation="border"
+                variant="success"
+                style={{ width: "3rem", height: "3rem" }}
+              />
+              <p className="mt-3 fw-bold text-success">
+                Sincronizando usuários...
+              </p>
+            </div>
+          ) : (
+            <>
+              <UserTable
+                users={usuarios}
+                onEdit={setEditingUser}
+                onDelete={(id) => {
+                  setUserToDelete(id);
+                  setShowConfirmDelete(true);
+                }}
+              />
 
-      {loading && usuarios.length === 0 ? (
-        <div className="text-center p-5">
-          <div className="spinner-border text-success" role="status"></div>
+              {/* PAGINAÇÃO PADRONIZADA */}
+              <div className="pb-4">
+                <PaginationComponent
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            </>
+          )}
         </div>
-      ) : (
-        <>
-          <UserTable
-            users={usuarios}
-            onEdit={setEditingUser}
-            onDelete={(id) => {
-              setUserToDelete(id);
-              setShowConfirmDelete(true);
-            }}
-          />
+      </Container>
 
-          <PaginationComponent
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
-        </>
-      )}
-
+      {/* MODAIS */}
       <EditUserModal
         show={!!editingUser}
         user={editingUser}
@@ -190,7 +221,7 @@ export default function AdminUsers() {
         handleClose={() => setShowConfirmDelete(false)}
         handleConfirm={confirmDeleteAction}
         title="Excluir Usuário"
-        message="Esta ação é irreversível. Deseja continuar?"
+        message="Esta ação é irreversível e removerá todos os dados vinculados a este usuário. Deseja continuar?"
       />
 
       <SuccessModal

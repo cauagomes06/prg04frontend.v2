@@ -1,22 +1,5 @@
-/* --- ESTILOS GERAIS --- */
-@import url("https://fonts.googleapis.com/css2?family=Alan+Sans:wght@300..900&family=Anton&family=Bebas+Neue&display=swap");
-
-:root {
-  --primary-color: #0ad354;
-  --primary-hover: #08a441;
-  --bg-light: #f8f9fa;
-  --border-color: #e9ecef;
-  --text-dark: #333;
-  --text-muted: #555;
-}
-
-body {
-  margin: 0;
-  font-family: "Alan Sans", sans-serif;
-  color: var(--text-dark);
-  background-color: #fff;
-  box-sizing: border-box;
-}
+/* src/styles/portal.css */
+/* A importação de fontes e variáveis :root agora vivem APENAS no global.css */
 
 /* --- LAYOUT PRINCIPAL --- */
 .portal-container {
@@ -28,7 +11,7 @@ body {
 
 /* --- SIDEBAR --- */
 .portal-sidebar {
-  background-color: var(--bg-light);
+  background-color: var(--card-bg); /* Usa a variável adaptável */
   border-right: 1px solid var(--border-color);
   padding: 30px;
   display: flex;
@@ -58,6 +41,7 @@ body {
 .perfil-usuario h3 {
   margin: 0;
   font-size: 1.5rem;
+  color: var(--text-dark); /* Adicionado para dark mode */
 }
 
 .perfil-usuario p {
@@ -90,7 +74,7 @@ body {
 
 /* --- BOTÃO FECHAR (Só aparece no mobile) --- */
 .btn-close-sidebar {
-    display: none; /* Escondido no desktop */
+    display: none; 
     position: absolute;
     top: 15px;
     right: 15px;
@@ -104,22 +88,23 @@ body {
 /* --- ÁREA DE CONTEÚDO --- */
 .portal-conteudo {
   padding: 40px;
-  background-color: #fff;
+  background-color: transparent; /* Deixa o body do global.css brilhar */
   width: 100%;
-  overflow-x: hidden; /* Evita scroll horizontal indesejado */
+  overflow-x: hidden; 
 }
 
 /* --- BOTÃO HAMBÚRGUER (Header Mobile) --- */
 .mobile-header {
-    display: none; /* Escondido no desktop */
+    display: none; 
     padding: 15px 20px;
-    background-color: white;
+    background-color: var(--card-bg); /* Usa a variável adaptável */
     border-bottom: 1px solid var(--border-color);
     align-items: center;
     justify-content: space-between;
     position: sticky;
     top: 0;
     z-index: 900;
+    transition: background-color 0.3s ease;
 }
 
 .btn-hamburger {
@@ -154,24 +139,22 @@ body {
 .portal-sidebar::-webkit-scrollbar {
   width: 6px;
 }
-
 .portal-sidebar::-webkit-scrollbar-track {
   background: transparent;
 }
-
 .portal-sidebar::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: var(--border-color);
   border-radius: 10px;
 }
-
 .portal-sidebar::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: var(--text-muted);
 }
+
 /* --- RESPONSIVIDADE (MOBILE) --- */
 @media (max-width: 992px) {
   .portal-container {
-    grid-template-columns: 1fr; /* Sidebar sai do grid */
-    display: block; /* Muda para block para header fixo funcionar melhor */
+    grid-template-columns: 1fr; 
+    display: block; 
   }
 
   .mobile-header {
@@ -180,16 +163,16 @@ body {
 
   .portal-sidebar {
     position: fixed;
-    left: -280px; /* Esconde fora da tela */
+    left: -280px; 
     top: 0;
     height: 100%;
     width: 280px;
-    background-color: white;
-    box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+    background-color: var(--card-bg); /* Usa a variável adaptável */
+    box-shadow: 4px 0 15px rgba(0,0,0,0.5);
   }
 
   .portal-sidebar.open {
-      transform: translateX(280px); /* Desliza para dentro */
+      transform: translateX(280px); 
   }
 
   .btn-close-sidebar {
@@ -197,6 +180,6 @@ body {
   }
   
   .portal-conteudo {
-      padding: 20px; /* Menos padding no mobile */
+      padding: 20px; 
   }
 }

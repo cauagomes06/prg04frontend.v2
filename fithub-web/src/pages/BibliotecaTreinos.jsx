@@ -154,7 +154,7 @@ export function Biblioteca() {
   };
 
   return (
-    <div className="treinos-container py-5 bg-light min-vh-100">
+    <div className="treinos-container py-5 min-vh-100">
       <Container>
         {/* Header */}
         <div className="mb-4">
@@ -165,7 +165,7 @@ export function Biblioteca() {
                 Explore e siga os melhores treinos da comunidade.
               </p>
             </Col>
-            <Col md={5} className="mt-3 mt-md-0">
+            <Col md={5} className="mt-3mt-md-0">
               <SearchBar
                 placeholder="Pesquisar..."
                 value={termoBusca}
@@ -182,8 +182,8 @@ export function Biblioteca() {
           </Row>
         </div>
 
-        {/* Barra de Filtros */}
-        <div className="d-flex flex-wrap gap-2 mb-4 pb-2 border-bottom">
+        {/* Barra de Filtros - AQUI USAMOS A CLASSE CUSTOMIZADA */}
+        <div className="d-flex flex-wrap gap-2 mb-4 pb-2 borda-inferior-customizada">
           <Button
             variant={filtroAtivo === "RECENTES" ? "success" : "outline-success"}
             className="rounded-pill px-3 fw-bold d-flex align-items-center gap-2"
@@ -227,7 +227,7 @@ export function Biblioteca() {
           </Button>
         </div>
 
-        {/* LOGICA DE EXIBIÇÃO */}
+        {/* LÓGICA DE EXIBIÇÃO */}
         {loading ? (
           <div className="text-center py-5 my-5">
             <Spinner
@@ -237,8 +237,12 @@ export function Biblioteca() {
             />
             <h5 className="mt-3 text-success fw-bold">Buscando treinos...</h5>
           </div>
-        ) : treinos.length === 0 ? (
-          <div className="text-center py-5 bg-white rounded-4 shadow-sm border">
+        ) : treinos?.length === 0 ? (
+          /* AQUI USAMOS A CLASSE CUSTOMIZADA EM VEZ DO BORDER DO BOOTSTRAP */
+          <div
+            className="text-center py-5 rounded-4 shadow-sm borda-customizada"
+            style={{ backgroundColor: "var(--card-bg)" }}
+          >
             <i className="fas fa-search fa-3x text-muted mb-3 opacity-25"></i>
             <h5 className="text-muted">Nenhum treino encontrado.</h5>
             {termoBusca && (
@@ -256,7 +260,8 @@ export function Biblioteca() {
         ) : (
           <>
             <div className="library-grid mb-5">
-              {treinos.map((treino) => (
+              {/* O PONTO DE INTERROGAÇÃO AQUI EVITA O ERRO DO .MAP */}
+              {treinos?.map((treino) => (
                 <LibraryCard
                   key={treino.id}
                   treino={treino}
@@ -268,7 +273,7 @@ export function Biblioteca() {
                   onToggleFollow={handleToggleFollow}
                   onAvaliar={handleAbrirAvaliacao}
                   disabled={isProcessing}
-                  onIniciarTreino={(t) => setTreinoEmExecucao(t)} 
+                  onIniciarTreino={(t) => setTreinoEmExecucao(t)}
                 />
               ))}
             </div>
@@ -284,13 +289,11 @@ export function Biblioteca() {
         />
 
         {/* Modais */}
-
         {treinoEmExecucao && (
           <WorkoutPlayer
             treino={treinoEmExecucao}
             onFechar={() => setTreinoEmExecucao(null)}
             onIniciarTreino={(t) => setTreinoEmExecucao(t)}
-
           />
         )}
         <WorkoutModal
@@ -299,7 +302,6 @@ export function Biblioteca() {
           treino={selectedTreino}
           readOnly={true}
           onIniciarTreino={(t) => setTreinoEmExecucao(t)}
-
         />
         <ConfirmModal
           show={showConfirm}

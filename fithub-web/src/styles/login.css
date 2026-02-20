@@ -1,38 +1,34 @@
-/* Importa a fonte (se ainda não estiver no custom.css) */
+/* src/styles/login.css */
+/* Importa a fonte (se ainda não estiver no global.css) */
 @import url("https://fonts.googleapis.com/css2?family=Alan+Sans:wght@300..900&display=swap");
 
 body {
   font-family: "Alan Sans", sans-serif ;
 }
 
-/* Define a cor verde personalizada do Fit-Hub */
-:root {
-  --bs-success: #0ad354;
-  --bs-success-rgb: 10, 211, 84;
-  --bs-success-hover: #08a441; 
-}
-
-/* --- BOTÕES --- */
+/* --- BOTÕES (Usando as variáveis do global.css) --- */
 .btn-success {
   --bs-btn-color: #fff;
-  --bs-btn-bg: var(--bs-success);
-  --bs-btn-border-color: var(--bs-success);
+  --bs-btn-bg: var(--primary-color);
+  --bs-btn-border-color: var(--primary-color);
   --bs-btn-hover-color: #fff;
-  --bs-btn-hover-bg: var(--bs-success-hover);
-  --bs-btn-hover-border-color: var(--bs-success-hover);
+  --bs-btn-hover-bg: var(--primary-hover);
+  --bs-btn-hover-border-color: var(--primary-hover);
 }
 
 .text-success {
-  color: var(--bs-success) ;
+  color: var(--primary-color) !important;
 }
+
 .alert-success {
-  background-color: #e6fff1;
+  background-color: var(--primary-light);
   color: #056a2a;
   border-color: #b3e6c9;
 }
 
 /* --- COLUNA DA IMAGEM --- */
 .login-imagem {
+  /* Usando o verde nos gradientes */
   background-image: linear-gradient(rgba(10, 211, 84, 0.8), rgba(8, 164, 65, 0.8)),
       url("../assets/images/danielle-cerullo-CQfNt66ttZM-unsplash.jpg"); 
   background-size: cover;
@@ -41,15 +37,16 @@ body {
 
 /* --- FORMULÁRIO --- */
 .login-formulario {
-  background-color: #fff;
-}
-/* Ajusta o foco dos inputs para usar a cor verde */
-.form-control:focus {
-  border-color: #0ad354;
-  box-shadow: 0 0 0 0.25rem rgba(10, 211, 84, 0.25);
+  background-color: var(--card-bg);
 }
 
-/* --- divisor "OU" --- */
+/* Ajusta o foco dos inputs para usar a cor verde global */
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.25rem var(--primary-transparent);
+}
+
+/* --- divisor "OU" e Senha (Mantidos iguais) --- */
 .divisor {
   display: flex;
   align-items: center;
@@ -59,23 +56,13 @@ body {
 .divisor::after {
   content: "";
   flex: 1;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid var(--border-color);
 }
-.divisor:not(:empty)::before {
-  margin-right: 0.5em;
-}
-.divisor:not(:empty)::after {
-  margin-left: 0.5em;
-}
-.senha-container {
-  position: relative;
-}
+.divisor:not(:empty)::before { margin-right: 0.5em; }
+.divisor:not(:empty)::after { margin-left: 0.5em; }
 
-.senha-input {
-  padding-right: 3rem !important;
-}
-
-/* ícone dentro do input */
+.senha-container { position: relative; }
+.senha-input { padding-right: 3rem !important; }
 .senha-icone {
   position: absolute;
   top: 50%;
@@ -83,11 +70,7 @@ body {
   transform: translateY(-50%);
   font-size: 1.3rem;
   cursor: pointer;
-  color: #6c757d;
-  z-index: 5; /* garante que fique acima do fundo */
+  color: var(--text-muted);
+  z-index: 5;
 }
-
-/* hover opcional */
-.senha-icone:hover {
-  color: #343a40;
-}
+.senha-icone:hover { color: var(--text-dark); }

@@ -1,18 +1,7 @@
-/* --- VARIÁVEIS ESPECÍFICAS PARA TREINOS --- */
-:root {
-  --primary-green: #0ad354;
-  --primary-green-dark: #08b346;
-  --primary-green-light: #e7fdf0;
-  --text-dark: #2c3e50;
-  --text-muted: #6c757d;
-  --card-bg: #ffffff;
-  --bg-main: #f8f9fa;
-  --blue-light: #e3f2fd;
-  --blue-primary: #0d6efd;
-}
+/* src/styles/treinos.css */
 
 .treinos-container {
-  background-color: var(--bg-main);
+  background-color: var(--bg-light);
   min-height: 100vh;
   padding-bottom: 3rem;
 }
@@ -25,7 +14,7 @@
 
 /* --- BOTÕES --- */
 .btn-custom-primary {
-  background-color: var(--primary-green) !important;
+  background-color: var(--primary-color) !important;
   border: none !important;
   color: white !important;
   font-weight: 600;
@@ -33,9 +22,9 @@
 }
 
 .btn-custom-primary:hover {
-  background-color: var(--primary-green-dark) !important;
+  background-color: var(--primary-hover) !important;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(10, 211, 84, 0.3);
+  box-shadow: 0 4px 12px var(--primary-transparent);
 }
 
 /* --- CARDS --- */
@@ -62,61 +51,38 @@
   justify-content: center;
 }
 
-/* Estilo para Biblioteca (Azul) */
 .card-header-library {
-  background-color: var(--blue-light);
-  color: var(--blue-primary);
+  background-color: rgba(13, 110, 253, 0.1); 
+  color: #0d6efd;
 }
 
-/* Estilo para Meus Treinos (Verde) */
 .card-header-my-workout {
-  background-color: var(--primary-green-light); /* Fundo verde claro */
-  color: var(--primary-green); /* Ícone verde */
+  background-color: var(--primary-light); 
+  color: var(--primary-color); 
 }
 
-/* --- UTILITÁRIOS DE TEXTO --- */
-.text-small {
-  font-size: 0.75rem;
-}
+/* --- UTILITÁRIOS --- */
+.text-small { font-size: 0.75rem; }
+.text-filter-small { font-size: 0.85rem !important; }
 
-.text-filter-small {
-  font-size: 0.85rem !important;
-}
-
-/* --- GRIDS E LAYOUTS --- */
 .library-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 1.5rem;
 }
 
-.search-container {
-  max-width: 600px;
-}
+.search-container { max-width: 600px; }
+.icon-opacity { opacity: 0.5; }
 
-/* --- ÍCONES --- */
-.icon-opacity {
-  opacity: 0.5;
-}
-
-/* --- ESTILO PARA ITENS DENTRO DA MODAL/LISTA (Mini-Cards) --- */
-.bg-light { 
-    background-color: var(--card-bg) !important; 
-}
-
-.text-filter-small {
-    font-size: 0.75rem !important; 
-    letter-spacing: 0.5px; 
-}
+/* --- ITENS DE LISTA --- */
+.bg-light { background-color: var(--card-bg) !important; }
 
 .list-group-item.hover-effect:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.bg-success {
-    background-color: var(--primary-green) !important;
-}
+.bg-success { background-color: var(--primary-color) !important; }
 
 .my-workout-card-hover {
     transition: all 0.3s ease;
@@ -125,5 +91,36 @@
 
 .my-workout-card-hover:hover {
     transform: translateY(-5px);
-    border-top-color: #198754; /* Cor verde do Bootstrap */
+    border-top-color: var(--primary-color); 
+}
+
+/* =========================================================
+   BLINDAGEM CONTRA BORDAS BRANCAS NA BIBLIOTECA
+   ========================================================= */
+
+/* Classes estruturais sem cor de borda fixa */
+.biblioteca-filtros-container {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.biblioteca-empty-state {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+}
+
+/* Regras de Força Bruta para o Modo Escuro (Dark Mode) */
+[data-theme="dark"] .biblioteca-filtros-container {
+  border-bottom: 1px solid #2d2d2d !important;
+}
+
+[data-theme="dark"] .biblioteca-empty-state {
+  background-color: #1e1e1e !important;
+  border: 1px solid #2d2d2d !important;
+}
+
+/* Garante que o input da Barra de Pesquisa também escureça */
+[data-theme="dark"] .treinos-container input.form-control {
+  background-color: #121212 !important;
+  border: 1px solid #2d2d2d !important;
+  color: #f8f9fa !important;
 }

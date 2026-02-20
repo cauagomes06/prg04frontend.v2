@@ -5,7 +5,7 @@ export function UserTable({ users, onEdit, onDelete }) {
     const p = perfil?.toUpperCase() || "";
     if (p.includes("ADMIN")) return "bg-danger text-white";
     if (p.includes("PERSONAL")) return "bg-warning text-dark";
-    if (p.includes("CLIENTE")) return "bg-info text-dark";
+    if (p.includes("CLIENTE")) return "bg-success text-dark";
     return "bg-secondary text-white";
   };
 
@@ -13,16 +13,27 @@ export function UserTable({ users, onEdit, onDelete }) {
     perfil ? perfil.replace("ROLE_", "") : "SEM PERFIL";
 
   return (
-    <div className="card shadow-sm border-0 rounded-3 overflow-hidden">
+    <div 
+      className="shadow-sm rounded-3 overflow-hidden borda-customizada" 
+      style={{ backgroundColor: "var(--card-bg)" }}
+    >
       <div className="table-responsive">
-        <table className="table table-hover mb-0 align-middle">
-          <thead className="bg-light text-uppercase small fw-bold text-muted">
-            <tr>
-              <th className="ps-4">ID</th>
-              <th>Usuário</th>
-              <th>Perfil</th>
-              <th>Plano</th>
-              <th className="text-end pe-4">Ações</th>
+        <table 
+          className="table table-hover mb-0 align-middle"
+          style={{ 
+            '--bs-table-bg': 'transparent', 
+            '--bs-table-color': 'var(--text-dark)', 
+            '--bs-table-border-color': 'var(--border-color)',
+            '--bs-table-hover-bg': 'var(--bg-light)'
+          }}
+        >
+          <thead style={{ backgroundColor: "var(--bg-light)" }}>
+            <tr className="text-uppercase small fw-bold text-muted">
+              <th className="ps-4 border-bottom-0">ID</th>
+              <th className="border-bottom-0">Usuário</th>
+              <th className="border-bottom-0">Perfil</th>
+              <th className="border-bottom-0">Plano</th>
+              <th className="text-end pe-4 border-bottom-0">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -30,40 +41,36 @@ export function UserTable({ users, onEdit, onDelete }) {
               <tr key={user.id}>
                 <td className="ps-4 text-muted">#{user.id}</td>
                 <td className="fw-bold text-dark">
-                  <td className="fw-bold text-dark">
-                    <div className="d-flex align-items-center">
-                      {user.fotoUrl ? (
-                        <img
-                          src={user.fotoUrl}
-                          className="rounded-circle me-2 shadow-sm border"
-                          style={{
-                            width: "32px",
-                            height: "32px",
-                            objectFit: "cover",
-                          }}
-                          alt={user.username}
-                          onError={(e) => {
-                            // Se a URL der erro (ex: imagem apagada do Supabase), coloca o placeholder padrão
-                            e.target.src =
-                              "https://via.placeholder.com/32?text=U";
-                          }}
-                        />
-                      ) : (
-                        // Ícone usado quando o usuário não tem nenhuma foto cadastrada
-                        <i
-                          className="fas fa-user-circle text-muted me-2"
-                          style={{ fontSize: "32px" }}
-                        ></i>
-                      )}
+                  <div className="d-flex align-items-center">
+                    {user.fotoUrl ? (
+                      <img
+                        src={user.fotoUrl}
+                        className="rounded-circle me-2 shadow-sm border-0"
+                        style={{
+                          width: "32px",
+                          height: "32px",
+                          objectFit: "cover",
+                        }}
+                        alt={user.username}
+                        onError={(e) => {
+                          // Se a URL der erro, coloca o placeholder padrão
+                          e.target.src = "https://via.placeholder.com/32?text=U";
+                        }}
+                      />
+                    ) : (
+                      <i
+                        className="fas fa-user-circle text-muted me-2"
+                        style={{ fontSize: "32px" }}
+                      ></i>
+                    )}
 
-                      <span
-                        className="text-truncate"
-                        style={{ maxWidth: "150px" }}
-                      >
-                        {user.username}
-                      </span>
-                    </div>
-                  </td>
+                    <span
+                      className="text-truncate"
+                      style={{ maxWidth: "150px" }}
+                    >
+                      {user.username}
+                    </span>
+                  </div>
                 </td>
                 <td>
                   <span
@@ -73,21 +80,25 @@ export function UserTable({ users, onEdit, onDelete }) {
                   </span>
                 </td>
                 <td>
-                  <span className="badge bg-white text-dark border fw-normal">
+                  <span 
+                    className="badge fw-normal borda-customizada"
+                    style={{ backgroundColor: "var(--bg-light)", color: "var(--text-dark)" }}
+                  >
                     {user.nomePlano || "Nenhum Plano"}
                   </span>
                 </td>
                 <td className="text-end pe-4">
+                  {/* Botões ajustados para não terem o fundo branco forçado */}
                   <button
                     onClick={() => onEdit(user)}
-                    className="btn btn-sm btn-light text-primary me-2 border-0 shadow-xs"
+                    className="btn btn-sm btn-link text-primary me-2 text-decoration-none shadow-none"
                     title="Editar Perfil"
                   >
                     <i className="fas fa-user-edit"></i>
                   </button>
                   <button
                     onClick={() => onDelete(user.id)}
-                    className="btn btn-sm btn-light text-danger border-0 shadow-xs"
+                    className="btn btn-sm btn-link text-danger text-decoration-none shadow-none"
                     title="Excluir Usuário"
                   >
                     <i className="fas fa-trash-alt"></i>

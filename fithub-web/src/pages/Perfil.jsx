@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { apiFetch } from "../services/api";
-import { execucaoApi } from "../services/api"; // <-- Importamos a API de execuções
+import { execucaoApi } from "../services/api"; 
 import { paymentService } from "../services/PaymentService";
-import { Spinner, Badge } from "react-bootstrap"; // <-- Elementos visuais pro Feed
+import { Spinner, Badge } from "react-bootstrap";
 
 import { SuccessModal } from "../components/common/SuccessModal";
 import { ConfirmModal } from "../components/common/ConfirmModal";
 import { ErrorModal } from "../components/common/ErrorModal";
-import { PaginationComponent } from "../components/common/PaginationComponent"; // <-- Paginação pro Histórico
+import { XPProgressBar } from "../components/perfil/XpProgressBar";
+import { PaginationComponent } from "../components/common/PaginationComponent";
 
 import "../styles/perfil.css";
-import "../styles/Historico.css"; // <-- Importe o CSS do histórico que criamos
+import "../styles/Historico.css";
 
 // Componentes Granulares
 import { ProfileHeader } from "../components/perfil/ProfileHeader";
@@ -160,6 +161,9 @@ export function Perfil() {
         onOpenConfig={() => setShowConfig(true)}
       />
 
+      <div className="my-4">
+        <XPProgressBar />
+      </div>
       <ProfileStats
         scoreTotal={perfil?.scoreTotal}
         dataCriacao={perfil?.dataCriacao}

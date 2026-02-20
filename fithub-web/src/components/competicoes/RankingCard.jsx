@@ -1,6 +1,5 @@
 import { Card, ListGroup, Button } from "react-bootstrap";
 
-// Função para colorir as medalhas (1º, 2º, 3º)
 const getPosBadgeClass = (pos) => {
   if (pos === 1) return "badge-pos badge-gold";
   if (pos === 2) return "badge-pos badge-silver";
@@ -15,17 +14,23 @@ export function RankingCard({
   onPageChange,
 }) {
   return (
-    <Card className="custom-card h-100">
-      {/* Cabeçalho do Card */}
-      <div className="custom-card-header">
+    <Card className="custom-card h-100 shadow-sm border-0">
+      <div
+        className="custom-card-header borda-customizada"
+        style={{ borderBottom: "1px solid var(--border-color)" }}
+      >
         <div className="d-flex justify-content-between align-items-center w-100">
-          <span>
-            <i className="fas fa-trophy card-icon"></i> Ranking Geral
+          <span className="fw-bold text-dark">
+            <i className="fas fa-trophy card-icon text-warning me-2"></i>{" "}
+            Ranking Geral
           </span>
-          {/* Mostra a página atual discretamente no topo */}
           <span
-            className="badge bg-light text-dark opacity-75"
-            style={{ fontSize: "0.7em" }}
+            className="badge borda-customizada"
+            style={{
+              fontSize: "0.7em",
+              backgroundColor: "var(--bg-light)",
+              color: "var(--text-dark)",
+            }}
           >
             Top {ranking.length > 0 ? ranking[0].posicao : 0} -{" "}
             {ranking.length > 0 ? ranking[ranking.length - 1].posicao : 0}
@@ -33,9 +38,11 @@ export function RankingCard({
         </div>
       </div>
 
-      <Card.Body className="p-0 d-flex flex-column">
-        {/* Lista de Usuários */}
-        <ListGroup variant="flush" className="flex-grow-1">
+      <Card.Body
+        className="p-0 d-flex flex-column"
+        style={{ backgroundColor: "var(--card-bg)" }}
+      >
+        <ListGroup variant="flush" className="flex-grow-1 bg-transparent">
           {ranking.length === 0 ? (
             <div className="p-4 text-center text-muted">
               <i className="fas fa-chart-line fa-2x mb-3 opacity-25"></i>
@@ -44,13 +51,11 @@ export function RankingCard({
           ) : (
             ranking.map((u) => (
               <ListGroup.Item
-                key={u.usuarioId || u.username} // Use ID ou Username único
-                className="ranking-item d-flex justify-content-between align-items-center"
+                key={u.usuarioId || u.username}
+                className="ranking-item d-flex justify-content-between align-items-center bg-transparent borda-customizada"
               >
                 <div className="d-flex align-items-center">
-                  {/* Badge da Posição (Vem calculado do Java) */}
                   <div className={getPosBadgeClass(u.posicao)}>{u.posicao}</div>
-
                   <div className="ms-2">
                     <div
                       className="fw-bold text-dark"
@@ -58,7 +63,6 @@ export function RankingCard({
                     >
                       {u.nome || u.nomeCompleto || "Usuário"}
                     </div>
-                    {/* Coroa apenas para o 1º lugar absoluto */}
                     {u.posicao === 1 && (
                       <span
                         className="leader-crown text-warning"
@@ -69,7 +73,6 @@ export function RankingCard({
                     )}
                   </div>
                 </div>
-
                 <div className="text-end">
                   <span className="score-text d-block fw-bold text-success">
                     {u.scoreTotal}
@@ -83,27 +86,30 @@ export function RankingCard({
           )}
         </ListGroup>
 
-        {/* Rodapé com Paginação (Só aparece se tiver mais de 1 página) */}
         {totalPages > 1 && (
-          <div className="p-2 border-top bg-light d-flex justify-content-between align-items-center mt-auto">
+          <div
+            className="p-2 border-top d-flex justify-content-between align-items-center mt-auto"
+            style={{
+              backgroundColor: "var(--bg-light)",
+              borderColor: "var(--border-color) !important",
+            }}
+          >
             <Button
               variant="link"
               size="sm"
-              className="text-decoration-none text-dark"
+              className="text-decoration-none text-dark shadow-none"
               disabled={currentPage === 0}
               onClick={() => onPageChange(currentPage - 1)}
             >
               <i className="fas fa-chevron-left"></i>
             </Button>
-
             <span className="small text-muted fw-bold">
               Página {currentPage + 1} de {totalPages}
             </span>
-
             <Button
               variant="link"
               size="sm"
-              className="text-decoration-none text-dark"
+              className="text-decoration-none text-dark shadow-none"
               disabled={currentPage >= totalPages - 1}
               onClick={() => onPageChange(currentPage + 1)}
             >

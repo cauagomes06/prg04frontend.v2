@@ -7,7 +7,8 @@
   width: 100vw;
   height: 100vh;
   z-index: 9999;
-  background-color: #f8f9fa; /* Fundo levemente cinza para destacar os cards brancos */
+  /* Fundo dinâmico que se adapta ao tema */
+  background-color: var(--bg-light); 
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -15,44 +16,38 @@
 }
 
 @keyframes slideUp {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-/* Layout de Conteúdo */
 .player-content {
   flex: 1;
   overflow-y: auto;
   padding: 1.5rem;
-  padding-bottom: 120px; /* Evita que o footer cubra o timer ou as últimas séries */
+  padding-bottom: 120px;
 }
 
-/* Linhas das Séries */
+/* Linhas das Séries - Refatoradas para suportar Dark Mode */
 .set-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 1.2rem;
-  background: white;
+  background: var(--card-bg); /* Dinâmico */
   border-radius: 15px;
   margin-bottom: 0.8rem;
-  border: 1px solid #eee;
+  border: 1px solid var(--border-color); /* Dinâmico */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
   transition: all 0.2s ease;
 }
 
+/* Estado de Concluído: Verde suave em ambos os temas */
 .set-row.completed {
-  background: #e8f5e9;
-  border-color: #c8e6c9;
+  background: rgba(10, 211, 84, 0.1) !important;
+  border-color: var(--primary-color) !important;
 }
 
-/* --- NOVO: Cronômetro Inline Destacado --- */
+/* --- Cronômetro Inline Destacado --- */
 .inline-rest-container {
   display: flex;
   flex-direction: column;
@@ -60,10 +55,10 @@
   justify-content: center;
   margin-top: 2rem;
   padding: 2.5rem 1rem;
-  background: #ffffff;
+  background: var(--card-bg);
   border-radius: 24px;
-  border: 2px dashed #0ad354;
-  box-shadow: 0 10px 30px rgba(25, 135, 84, 0.1);
+  border: 2px dashed var(--primary-color);
+  box-shadow: 0 10px 30px rgba(10, 211, 84, 0.1);
   animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -71,108 +66,63 @@
   width: 160px;
   height: 160px;
   border-radius: 50%;
-  background: #f0fdf4;
-  border: 8px solid #0ad354;
+  background: var(--bg-light); 
+  border: 3px solid var(--primary-color);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.05);
   margin-bottom: 1.5rem;
 }
 
 .inline-rest-number {
   font-size: 4rem;
   font-weight: 900;
-  color: #0ad354;
+  color: var(--primary-color);
   line-height: 1;
-  font-variant-numeric: tabular-nums; /* Dica Ninja: Mantém os números alinhados para não tremerem na contagem */
-  letter-spacing: -2px; /* Deixa os números um pouco mais juntinhos e com cara de app fitness */
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -2px;
 }
 
-@keyframes popIn {
-  0% {
-    transform: scale(0.9);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* --- CSS DA TELA DE VITÓRIA --- */
-
-/* Fundo Gradiente Premium */
+/* --- CSS DA TELA DE VITÓRIA (Sempre Vibrante) --- */
 .success-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 10000; /* Z-index máximo para cobrir tudo */
-  /* Gradiente usando o verde padrão (#198754) indo para um tom ligeiramente mais escuro */
-  background: linear-gradient(135deg, #14d134 0%, #146c43 100%);
+  z-index: 10000;
+  /* Gradiente premium do Fit Hub */
+  background: linear-gradient(135deg, var(--primary-color) 0%, #08b346 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   color: white;
-  /* Animação de entrada da tela inteira */
   animation: victoryPopIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Animação da Tela inteira surgindo */
-@keyframes victoryPopIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Classes utilitárias para animar elementos em cascata (um depois do outro) */
-.animate-up-1 {
-  animation: slideUpFade 0.6s ease 0.1s forwards;
-  opacity: 0;
-  transform: translateY(30px);
-}
-.animate-up-2 {
-  animation: slideUpFade 0.6s ease 0.3s forwards;
-  opacity: 0;
-  transform: translateY(30px);
-}
-.animate-up-3 {
-  animation: slideUpFade 0.6s ease 0.5s forwards;
-  opacity: 0;
-  transform: translateY(30px);
-}
-
-@keyframes slideUpFade {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Efeito de "respiração" e brilho dourado no troféu */
+/* Brilho Dourado do Troféu */
 .trophy-pulse {
   animation: pulseGold 2.5s infinite ease-in-out;
-  filter: drop-shadow(0 0 10px rgba(255, 193, 7, 0.3));
+  filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.5));
 }
 
 @keyframes pulseGold {
-  0% {
-    transform: scale(1);
+  0% { transform: scale(1); }
+  50% { 
+    transform: scale(1.08); 
+    filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.8));
   }
-  50% {
-    transform: scale(1.05);
-    filter: drop-shadow(0 0 25px rgba(255, 193, 7, 0.6));
-  }
-  100% {
-    transform: scale(1);
-  }
+  100% { transform: scale(1); }
+}
+
+/* Ajustes de texto para Dark Mode dentro do Player */
+[data-theme="dark"] .set-row span,
+[data-theme="dark"] .set-row strong {
+  color: var(--text-dark) !important;
+}
+
+[data-theme="dark"] .inline-rest-container {
+  background-color: rgba(10, 211, 84, 0.05);
 }

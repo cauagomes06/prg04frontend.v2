@@ -42,9 +42,17 @@ export function Exercicios() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const gruposMusculares = [
-    "TODOS", "PEITO", "COSTAS", "PERNAS", "OMBROS",
-    "BÍCEPS", "TRÍCEPS", "ABDÔMEN", "GLÚTEOS",
-    "PANTURRILHA", "FULL BODY",
+    "TODOS",
+    "PEITO",
+    "COSTAS",
+    "PERNAS",
+    "OMBROS",
+    "BÍCEPS",
+    "TRÍCEPS",
+    "ABDÔMEN",
+    "GLÚTEOS",
+    "PANTURRILHA",
+    "FULL BODY",
   ];
 
   const isPersonalOrAdmin =
@@ -153,15 +161,20 @@ export function Exercicios() {
   }
 
   return (
-    <div className="p-4">
-      <div className="d-flex justify-content-between align-items-center mb-4">
+    <div
+      className="p-3 p-md-4 min-vh-100"
+      style={{ backgroundColor: "var(--bg-light)" }}
+    >
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
         <div>
           <h2 className="fw-bold text-dark mb-0">Banco de Exercícios</h2>
-          <p className="text-muted mb-0">Gerencie o catálogo de exercícios.</p>
+          <p className="text-muted mb-0">
+            Gerencie o catálogo oficial do sistema.
+          </p>
         </div>
         <Button
           variant="success"
-          className="px-4 fw-bold shadow-sm"
+          className="px-4 py-2 fw-bold shadow-sm rounded-pill"
           onClick={() => {
             setExerciseToEdit(null);
             setShowCreateModal(true);
@@ -171,14 +184,14 @@ export function Exercicios() {
         </Button>
       </div>
 
-      <SearchBar
-        placeholder="Pesquisar por nome..."
-        value={termoBusca}
-        onChange={(e) => setTermoBusca(e.target.value)}
-        onClear={() => setTermoBusca("")}
-      />
-
+      {/* SearchBar e Filtros já integrados com as refatorações anteriores */}
       <div className="mb-4">
+        <SearchBar
+          placeholder="Pesquisar por nome..."
+          value={termoBusca}
+          onChange={(e) => setTermoBusca(e.target.value)}
+          onClear={() => setTermoBusca("")}
+        />
         <FilterGroup
           options={gruposMusculares}
           selected={filtroMusculo}

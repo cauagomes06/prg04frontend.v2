@@ -1,7 +1,6 @@
 import { Card, Button, Badge } from "react-bootstrap";
 
-export function ClassCard({ aula, isInstructor, onReservar, onVerParticipantes, onDelete }) { // <--- Adicionado onDelete
-  
+export function ClassCard({ aula, isInstructor, onReservar, onVerParticipantes, onDelete }) {
   const dataAula = new Date(aula.dataHoraInicio);
   const agora = new Date();
   const isPassada = dataAula < agora;
@@ -18,32 +17,47 @@ export function ClassCard({ aula, isInstructor, onReservar, onVerParticipantes, 
   let btnDisabled = false;
 
   if (isPassada) {
-      btnLabel = "Encerrada";
-      btnVariant = "light"; 
-      btnDisabled = true;
+    btnLabel = "Encerrada";
+    btnVariant = "outline-secondary"; 
+    btnDisabled = true;
   } else if (isReservado) {
-      btnLabel = "Reservado";
-      btnVariant = "secondary";
-      btnDisabled = true;
+    btnLabel = "Reservado";
+    btnVariant = "secondary";
+    btnDisabled = true;
   } else if (isEsgotada) {
-      btnLabel = "Lotado";
-      btnVariant = "danger";
-      btnDisabled = true;
+    btnLabel = "Lotado";
+    btnVariant = "danger";
+    btnDisabled = true;
   }
 
   return (
-    <Card className={`h-100 shadow-sm border-0 rounded-4 overflow-hidden hover-effect ${isPassada ? 'opacity-75' : ''}`}>
-      <div className={`p-4 text-center border-bottom position-relative ${isPassada ? 'bg-secondary-subtle' : 'bg-light'}`}>
-          <i className={`fas fa-calendar-check fa-3x opacity-50 ${isPassada ? 'text-secondary' : 'text-success'}`}></i>
+    <Card className={`h-100 shadow-sm border-0 rounded-4 overflow-hidden hover-effect custom-card ${isPassada ? 'opacity-75' : ''}`}>
+      {/* Cabeçalho adaptável */}
+      <div 
+        className={`p-4 text-center border-bottom position-relative`}
+        style={{ backgroundColor: isPassada ? 'rgba(0,0,0,0.05)' : 'var(--bg-light)' }}
+      >
+          <i className={`fas fa-calendar-check fa-3x opacity-5 ${isPassada ? 'text-muted' : 'text-success'}`}></i>
           
-          {isPassada && (
-            <Badge bg="secondary" className="position-absolute top-0 end-0 m-3">ENCERRADA</Badge>
+{isPassada && (
+            <Badge bg="secondary" className="position-absolute top-0 end-0 m-3">
+              ENCERRADA
+            </Badge>
           )}
+
           {!isPassada && isReservado && (
-            <Badge bg="info" className="position-absolute top-0 end-0 m-3 shadow-sm">INSCRITO</Badge>
+            <Badge 
+              className="position-absolute top-0 end-0 m-3 shadow-sm border-0"
+              style={{ backgroundColor: "var(--primary-color)", color: "#fff" }}
+            >
+              INSCRITO
+            </Badge>
           )}
+
           {!isPassada && !isReservado && isEsgotada && (
-            <Badge bg="danger" className="position-absolute top-0 end-0 m-3">ESGOTADO</Badge>
+            <Badge bg="danger" className="position-absolute top-0 end-0 m-3">
+              ESGOTADO
+            </Badge>
           )}
       </div>
 
@@ -53,39 +67,38 @@ export function ClassCard({ aula, isInstructor, onReservar, onVerParticipantes, 
             {aula.nome}
           </h5>
           {!isEsgotada && !isReservado && !isPassada && (
-             <Badge bg="success" pill>{aula.vagasDisponiveis} vagas</Badge>
+             <Badge bg="success" pill className="px-3">{aula.vagasDisponiveis} vagas</Badge>
           )}
         </div>
         
         <p className="text-muted small mb-3 flex-grow-1">{aula.descricao || "Sem descrição."}</p>
         
-        <div className="mb-4 small text-secondary">
+        <div className="mb-4 small">
           <div className="d-flex align-items-center mb-2">
-            <i className={`far fa-clock me-2 width-icon ${isPassada ? 'text-muted' : 'text-primary'}`}></i>
-            <strong className={isPassada ? 'text-muted text-decoration-line-through' : ''}>{dataFormatada}</strong>
+            <i className={`far fa-clock me-2 ${isPassada ? 'text-muted' : 'text-primary'}`} style={{width: '20px'}}></i>
+            <strong className={isPassada ? 'text-muted text-decoration-line-through' : 'text-dark'}>{dataFormatada}</strong>
           </div>
-          <div className="d-flex align-items-center mb-2">
-            <i className="fas fa-stopwatch me-2 text-muted width-icon"></i>
+          <div className="d-flex align-items-center mb-2 text-muted">
+            <i className="fas fa-stopwatch me-2" style={{width: '20px'}}></i>
             <span>{aula.duracaoMinutos} min</span>
           </div>
-          <div className="d-flex align-items-center">
-            <i className="far fa-user me-2 text-muted width-icon"></i>
+          <div className="d-flex align-items-center text-muted">
+            <i className="far fa-user me-2" style={{width: '20px'}}></i>
             <span>{aula.instrutor?.nomeCompleto || "Instrutor"}</span>
           </div>
         </div>
 
         <div className="d-grid gap-2 mt-auto">
-          {/* AÇÕES PARA TODOS (Ver Lista) */}
           <Button 
-            variant="outline-dark" 
-            className="fw-bold rounded-pill" 
+            variant="outline-secondary" 
+            className="fw-bold rounded-pill shadow-none" 
             size="sm"
+            style={{ color: 'var(--text-dark)', borderColor: 'var(--border-color)' }}
             onClick={() => onVerParticipantes(aula.id)}
           >
             <i className="fas fa-users me-2"></i> Participantes
           </Button>
 
-          {/* AÇÕES PARA INSTRUTOR (Apagar) */}
           {isInstructor && (
              <Button 
                variant="outline-danger" 
@@ -97,11 +110,10 @@ export function ClassCard({ aula, isInstructor, onReservar, onVerParticipantes, 
              </Button>
           )}
 
-          {/* AÇÕES PARA ALUNO (Reservar) */}
           {!isInstructor && (
               <Button 
                   variant={btnVariant}
-                  className="fw-bold rounded-pill"
+                  className="fw-bold rounded-pill shadow-sm"
                   disabled={btnDisabled}
                   onClick={() => onReservar(aula.id)}
               >

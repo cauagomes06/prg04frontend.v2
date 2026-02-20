@@ -1,33 +1,43 @@
-import { Modal, Button, Form, Row, Col } from "react-bootstrap";
+import { Modal, Button, Form, Row, Col, Spinner } from "react-bootstrap";
 import { useState, useEffect } from "react";
 import { apiFetch } from "../../services/api";
 
-export function CreateExerciseModal({ show, handleClose, onSuccess, exerciseToEdit }) {
+export function CreateExerciseModal({
+  show,
+  handleClose,
+  onSuccess,
+  exerciseToEdit,
+}) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     nome: "",
     grupoMuscular: "",
     descricao: "",
-    urlVideo: ""
+    urlVideo: "",
   });
 
-  // Lista de grupos (mesma da sua tela principal)
   const gruposMusculares = [
-    "PEITO", "COSTAS", "PERNAS", "OMBROS", "BÍCEPS", 
-    "TRÍCEPS", "ABDÔMEN", "GLÚTEOS", "PANTURRILHA", "FULL BODY"
+    "PEITO",
+    "COSTAS",
+    "PERNAS",
+    "OMBROS",
+    "BÍCEPS",
+    "TRÍCEPS",
+    "ABDÔMEN",
+    "GLÚTEOS",
+    "PANTURRILHA",
+    "FULL BODY",
   ];
 
-  // Efeito para preencher o formulário se for edição
   useEffect(() => {
     if (exerciseToEdit) {
       setFormData({
         nome: exerciseToEdit.nome || "",
         grupoMuscular: exerciseToEdit.grupoMuscular || "",
         descricao: exerciseToEdit.descricao || "",
-        urlVideo: exerciseToEdit.urlVideo || ""
+        urlVideo: exerciseToEdit.urlVideo || "",
       });
     } else {
-      // Limpa o formulário se for um novo cadastro
       setFormData({ nome: "", grupoMuscular: "", descricao: "", urlVideo: "" });
     }
   }, [exerciseToEdit, show]);
@@ -35,64 +45,94 @@ export function CreateExerciseModal({ show, handleClose, onSuccess, exerciseToEd
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-    // Define a URL e o Método dependendo se existe um ID (Edição) ou não (Cadastro)
     const isEditing = !!exerciseToEdit?.id;
-    const url = isEditing 
-      ? `/api/exercicios/update/${exerciseToEdit.id}` 
+    const url = isEditing
+      ? `/api/exercicios/update/${exerciseToEdit.id}`
       : "/api/exercicios/register";
     const method = isEditing ? "PUT" : "POST";
 
     try {
-      await apiFetch(url, {
-        method: method,
-        body: JSON.stringify(formData),
-      });
-
-      onSuccess(); // Recarrega a tabela e mostra o SuccessModal
+      await apiFetch(url, { method, body: JSON.stringify(formData) });
+      onSuccess();
       handleClose();
     } catch (error) {
-      alert("Erro ao salvar exercício: " + error.message);
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Modal show={show} onHide={handleClose} centered size="lg" backdrop="static">
-      <Modal.Header closeButton className="bg-light">
+    <Modal
+      show={show}
+      onHide={handleClose}
+      centered
+      size="lg"
+      backdrop="static"
+      contentClassName="border-0 rounded-4 overflow-hidden shadow"
+    >
+      <Modal.Header
+        closeButton
+        className="borda-customizada"
+        style={{ backgroundColor: "var(--bg-light)" }}
+      >
         <Modal.Title className="fw-bold text-success">
-          <i className={`fas ${exerciseToEdit ? 'fa-edit' : 'fa-plus-circle'} me-2`}></i>
-          {exerciseToEdit ? "Editar Exercício" : "Novo Exercício"}
+          <i
+            className={`fas ${exerciseToEdit ? "fa-edit" : "fa-plus-circle"} me-2`}
+          ></i>
+          {exerciseToEdit ? "Editar Exercício" : "Cadastrar Exercício"}
         </Modal.Title>
       </Modal.Header>
 
       <Form onSubmit={handleSubmit}>
-        <Modal.Body className="p-4">
+        <Modal.Body
+          className="p-4"
+          style={{ backgroundColor: "var(--card-bg)" }}
+        >
           <Row>
             <Col md={7}>
               <Form.Group className="mb-3">
-                <Form.Label className="fw-bold small">NOME DO EXERCÍCIO</Form.Label>
+                <Form.Label className="fw-bold small text-success">
+                  NOME DO EXERCÍCIO
+                </Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Ex: Supino Reto"
                   required
+                  className="border-0 p-3 shadow-none"
+                  style={{
+                    backgroundColor: "var(--bg-light)",
+                    color: "var(--text-dark)",
+                  }}
                   value={formData.nome}
-                  onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, nome: e.target.value })
+                  }
                 />
               </Form.Group>
             </Col>
             <Col md={5}>
               <Form.Group className="mb-3">
-                <Form.Label className="fw-bold small">GRUPO MUSCULAR</Form.Label>
+                <Form.Label className="fw-bold small text-success">
+                  GRUPO MUSCULAR
+                </Form.Label>
                 <Form.Select
                   required
+                  className="border-0 p-3 shadow-none"
+                  style={{
+                    backgroundColor: "var(--bg-light)",
+                    color: "var(--text-dark)",
+                  }}
                   value={formData.grupoMuscular}
-                  onChange={(e) => setFormData({ ...formData, grupoMuscular: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, grupoMuscular: e.target.value })
+                  }
                 >
                   <option value="">Selecione...</option>
-                  {gruposMusculares.map(g => (
-                    <option key={g} value={g}>{g}</option>
+                  {gruposMusculares.map((g) => (
+                    <option key={g} value={g}>
+                      {g}
+                    </option>
                   ))}
                 </Form.Select>
               </Form.Group>
@@ -100,43 +140,68 @@ export function CreateExerciseModal({ show, handleClose, onSuccess, exerciseToEd
           </Row>
 
           <Form.Group className="mb-3">
-            <Form.Label className="fw-bold small">URL DO VÍDEO (OPCIONAL)</Form.Label>
+            <Form.Label className="fw-bold small text-success">
+              URL DO VÍDEO (YOUTUBE/VIMEO)
+            </Form.Label>
             <Form.Control
               type="url"
-              placeholder="https://youtube.com/..."
+              placeholder="https://..."
+              className="border-0 p-3 shadow-none"
+              style={{
+                backgroundColor: "var(--bg-light)",
+                color: "var(--text-dark)",
+              }}
               value={formData.urlVideo}
-              onChange={(e) => setFormData({ ...formData, urlVideo: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, urlVideo: e.target.value })
+              }
             />
           </Form.Group>
 
           <Form.Group className="mb-0">
-            <Form.Label className="fw-bold small">DESCRIÇÃO / INSTRUÇÕES</Form.Label>
+            <Form.Label className="fw-bold small text-success">
+              INSTRUÇÕES DE EXECUÇÃO
+            </Form.Label>
             <Form.Control
               as="textarea"
               rows={4}
-              placeholder="Descreva a execução correta..."
+              placeholder="Descreva o passo a passo..."
+              className="border-0 p-3 shadow-none"
+              style={{
+                backgroundColor: "var(--bg-light)",
+                color: "var(--text-dark)",
+              }}
               value={formData.descricao}
-              onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, descricao: e.target.value })
+              }
             />
           </Form.Group>
         </Modal.Body>
 
-        <Modal.Footer className="bg-light border-0">
-          <Button variant="link" onClick={handleClose} className="text-muted fw-bold text-decoration-none">
+        <Modal.Footer
+          className="borda-customizada border-0"
+          style={{ backgroundColor: "var(--bg-light)" }}
+        >
+          <Button
+            variant="link"
+            onClick={handleClose}
+            className="text-muted fw-bold text-decoration-none shadow-none"
+          >
             Cancelar
           </Button>
-          <Button 
-            type="submit" 
-            variant="success" 
-            className="px-4 fw-bold shadow-sm"
+          <Button
+            type="submit"
+            variant="success"
+            className="px-4 rounded-pill fw-bold shadow-sm"
             disabled={loading}
           >
             {loading ? (
-              <>
-                <i className="fas fa-spinner fa-spin me-2"></i> Salvando...
-              </>
+              <Spinner animation="border" size="sm" />
+            ) : exerciseToEdit ? (
+              "Salvar Alterações"
             ) : (
-              exerciseToEdit ? "Salvar Alterações" : "Cadastrar Exercício"
+              "Salvar Exercício"
             )}
           </Button>
         </Modal.Footer>

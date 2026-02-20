@@ -2,24 +2,27 @@ import { Modal, Button } from "react-bootstrap";
 
 export function ErrorModal({ show, handleClose, title, message }) {
   return (
-    <Modal show={show} onHide={handleClose} centered>
-      <Modal.Header closeButton className="bg-danger text-white">
-        <Modal.Title>
-            <i className="fas fa-exclamation-circle me-2"></i> 
-            {title || "Erro"}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body className="text-center p-4">
-        <div className="text-danger mb-3">
-            <i className="fas fa-times-circle fa-4x"></i>
+    <Modal 
+      show={show} 
+      onHide={handleClose} 
+      centered 
+      contentClassName="border-0 rounded-4 overflow-hidden shadow"
+    >
+      <Modal.Body className="text-center p-5" style={{ backgroundColor: "var(--card-bg)" }}>
+        <div className="mb-4" style={{ color: "#ef4444" }}>
+            <i className="fas fa-times-circle fa-5x opacity-5"></i>
         </div>
-        <p className="fs-5">{message || "Ocorreu um erro inesperado."}</p>
-      </Modal.Body>
-      <Modal.Footer className="justify-content-center">
-        <Button variant="secondary" onClick={handleClose}>
+        <h4 className="fw-bold text-dark mb-2">{title || "Ops! Algo correu mal"}</h4>
+        <p className="text-muted mb-4">{message || "Ocorreu um erro inesperado. Por favor, tente novamente."}</p>
+        <Button 
+          variant="secondary" 
+          onClick={handleClose}
+          className="rounded-pill px-5 fw-bold border-0"
+          style={{ backgroundColor: "var(--bg-light)", color: "var(--text-dark)" }}
+        >
           Fechar
         </Button>
-      </Modal.Footer>
+      </Modal.Body>
     </Modal>
   );
 }

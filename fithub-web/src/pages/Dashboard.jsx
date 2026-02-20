@@ -38,7 +38,7 @@ export function Dashboard() {
   }, []);
 
   if (loading) return (
-    <div className="d-flex justify-content-center align-items-center vh-100">
+    <div className="d-flex justify-content-center align-items-center vh-100" style={{ backgroundColor: 'var(--bg-light)' }}>
       <Spinner animation="border" variant="success"/>
     </div>
   );
@@ -47,11 +47,11 @@ export function Dashboard() {
     <div className="dashboard-admin-container">
       <Container>
         
-        {/* CABEÇALHO DO DASHBOARD (Mantendo sua estrutura de layout) */}
-        <div className="d-flex justify-content-between align-items-center mb-4 mt-2">
+        {/* CABEÇALHO DO DASHBOARD */}
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 mt-2 gap-3">
           <div>
-            <h4 className="dashboard-admin-title mb-1">
-                <i className="fas fa-chart-line me-2"></i>
+            <h4 className="dashboard-admin-title mb-1 text-dark">
+                <i className="fas fa-chart-line me-2 text-success"></i>
                 {isAdmin ? "Painel de Administração" : "Meu Resumo"}
             </h4>
             <p className="text-muted mb-0 small">
@@ -62,26 +62,33 @@ export function Dashboard() {
           </div>
 
           <div className="d-flex gap-2">
-            <Button variant="light" onClick={carregarDadosDashboard} className="rounded-pill shadow-sm">
+            {/* Botão de atualizar refatorado para respeitar os temas */}
+            <Button 
+              variant="outline-secondary" 
+              onClick={carregarDadosDashboard} 
+              className="rounded-pill shadow-sm d-flex align-items-center gap-2"
+              style={{ backgroundColor: "var(--card-bg)", color: "var(--text-dark)", borderColor: "var(--border-color)" }}
+            >
               <i className="fas fa-sync-alt"></i> Atualizar
             </Button>
           </div>
         </div>
 
-        {/* 1. SEÇÃO DE CARDS (Usando classes do CSS externo) */}
+        {/* 1. SEÇÃO DE CARDS */}
         {isAdmin && (
           <Row className="mb-4">
             <Col lg={12}>
+                {/* O CSS que fizemos no passo anterior vai brilhar dentro deste componente */}
                 <AdminStatsCards dados={stats} />
             </Col>
           </Row>
         )}
 
-        {/* 2. SEÇÃO DO GRÁFICO (Usando classe dashboard-chart-section do CSS externo) */}
+        {/* 2. SEÇÃO DO GRÁFICO */}
         <Row>
           <Col lg={12}>
             <div className="dashboard-chart-section">
-               <h5 className="fw-bold mb-4">Desempenho de Vendas e Faturamento</h5>
+               <h5 className="fw-bold mb-4 text-dark">Desempenho de Vendas e Faturamento</h5>
                
                {isAdmin ? (
                  <RevenueChart dados={stats} />

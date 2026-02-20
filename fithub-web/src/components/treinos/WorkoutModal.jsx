@@ -70,7 +70,7 @@ export function WorkoutModal({
 
             {(treino.items || []).length > 0 ? (
               <ListGroup variant="flush" className="gap-3">
-                {treino.items.map((item, index) => (
+                {treino?.items.map((item, index) => (
                   <ListGroup.Item
                     key={index}
                     className="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3 px-3 px-md-4 border-0 rounded-4 shadow-sm bg-light hover-effect"

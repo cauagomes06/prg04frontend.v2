@@ -21,8 +21,6 @@ export function Aulas() {
   const [showCreate, setShowCreate] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
-  // 2. Estados de Erro
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -66,7 +64,6 @@ export function Aulas() {
       setShowSuccess(true);
       carregarDados();
     } catch (error) {
-      // 3. Substituir alert
       setErrorMessage("Não foi possível reservar: " + error.message);
       setShowError(true);
     }
@@ -85,10 +82,9 @@ export function Aulas() {
       setShowConfirm(false);
       carregarDados();
     } catch (error) {
-      // 3. Substituir alert
       setErrorMessage("Erro ao cancelar aula: " + error.message);
       setShowError(true);
-      setShowConfirm(false); // Fecha confirmação para mostrar erro
+      setShowConfirm(false);
     }
   };
 
@@ -100,7 +96,7 @@ export function Aulas() {
 
   if (loading)
     return (
-      <div className="d-flex justify-content-center align-items-center vh-100">
+      <div className="d-flex justify-content-center align-items-center vh-100" style={{ backgroundColor: 'var(--bg-light)' }}>
         <Spinner animation="border" variant="success" />
       </div>
     );
@@ -111,31 +107,34 @@ export function Aulas() {
   }));
 
   return (
-    <div
-      className="py-5"
-      style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}
-    >
+    <div className="py-5 min-vh-100" style={{ backgroundColor: "var(--bg-light)" }}>
       <Container>
-        <div className="d-flex justify-content-between align-items-center mb-5">
+        {/* Cabeçalho Refatorado para Responsividade e Tema */}
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
           <div>
-            <h2 className="fw-bold text-dark mb-1">Agenda de Aulas</h2>
+            <h2 className="fw-bold text-dark mb-1">
+              <i className="fas fa-calendar-check me-2 text-success"></i>
+              Agenda de Aulas
+            </h2>
             <p className="text-muted mb-0">
               Reserve o seu lugar e treine em grupo.
             </p>
           </div>
+          
           <div className="d-flex gap-2">
             {isInstructor && (
               <Button
                 variant="success"
-                className="shadow-sm rounded-pill px-4 fw-bold"
+                className="shadow-sm rounded-pill px-4 fw-bold d-flex align-items-center gap-2"
                 onClick={() => setShowCreate(true)}
               >
-                <i className="fas fa-plus me-2"></i> Agendar Aula
+                <i className="fas fa-plus"></i> Agendar Aula
               </Button>
             )}
             <Button
-              variant="light"
-              className="shadow-sm rounded-pill"
+              variant="outline-secondary"
+              className="shadow-sm rounded-pill d-flex align-items-center justify-content-center"
+              style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-dark)', borderColor: 'var(--border-color)', width: '45px' }}
               onClick={carregarDados}
             >
               <i className="fas fa-sync-alt"></i>
@@ -143,17 +142,21 @@ export function Aulas() {
           </div>
         </div>
 
-        <ClassGrid
-          aulas={aulasComStatus}
-          isInstructor={isInstructor}
-          onReservar={handleReservar}
-          onVerParticipantes={(id) => {
-            setSelectedAulaId(id);
-            setShowParticipants(true);
-          }}
-          onDelete={handleDeleteRequest}
-        />
+        {/* Grid de Aulas */}
+        <div className="borda-customizada rounded-4 p-2 p-md-4" style={{ backgroundColor: 'var(--card-bg)' }}>
+             <ClassGrid
+              aulas={aulasComStatus}
+              isInstructor={isInstructor}
+              onReservar={handleReservar}
+              onVerParticipantes={(id) => {
+                setSelectedAulaId(id);
+                setShowParticipants(true);
+              }}
+              onDelete={handleDeleteRequest}
+            />
+        </div>
 
+        {/* Modais de Fluxo */}
         <ParticipantsModal
           show={showParticipants}
           handleClose={() => setShowParticipants(false)}
@@ -165,6 +168,7 @@ export function Aulas() {
           onSuccess={handleCreateSuccess}
         />
 
+        {/* Modais de Feedback */}
         <ConfirmModal
           show={showConfirm}
           handleClose={() => setShowConfirm(false)}
@@ -177,8 +181,6 @@ export function Aulas() {
           handleClose={() => setShowSuccess(false)}
           message={successMsg}
         />
-
-        {/* 4. Inserir ErrorModal */}
         <ErrorModal
           show={showError}
           handleClose={() => setShowError(false)}

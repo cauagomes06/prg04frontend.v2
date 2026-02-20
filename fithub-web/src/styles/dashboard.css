@@ -1,16 +1,16 @@
-/* DashboardAdmin.css */
+/* src/styles/dashboard.css */
 
 .dashboard-admin-container {
     padding: 20px;
-    background-color: #f4f7f6;
+    background-color: var(--bg-light);
     min-height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .dashboard-admin-title {
-    color: #2c3e50;
+    color: var(--text-dark);
     margin-bottom: 25px;
     font-size: 1.8rem;
+    font-weight: bold;
 }
 
 .dashboard-cards-grid {
@@ -20,50 +20,70 @@
     flex-wrap: wrap;
 }
 
+/* CARDS DO DASHBOARD */
 .dashboard-info-card {
-    background-color: #ffffff;
+    background-color: var(--card-bg);
     padding: 24px;
     border-radius: 12px;
     flex: 1;
     min-width: 250px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid transparent; /* Preparação para o Dark Mode */
 }
 
 .dashboard-info-card:hover {
     transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
+/* Títulos "Faturamento Total" etc */
 .dashboard-info-card h3 {
     margin: 0;
-    color: #7f8c8d;
+    color: var(--text-muted);
     font-size: 1rem;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
+/* Números Gigantes (Vem do Backend) */
 .dashboard-info-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #2ecc71; /* Verde para faturamento */
-    margin-top: 12px;
+    /* Aumentamos de 2.2rem para 2.8rem */
+    font-size: 2.8rem; 
+    font-weight: 800;
+    color: var(--primary-color);
+    margin-top: 5px;
+    line-height: 1; /* Garante que o número não empurre o card para baixo */
+    display: block;
+    letter-spacing: -1px; /* Dá um toque mais moderno a números grandes */
 }
+
+/* No mobile, reduzimos um pouco para não quebrar o layout */
+@media (max-width: 768px) {
+    .dashboard-info-value {
+        font-size: 2.2rem;
+    }
+}   
 
 .dashboard-info-value.vendas {
-    color: #3498db; /* Azul para quantidade */
+    color: #3498db; /* Vendas Azul */
 }
 
+/* ÁREA DO GRÁFICO */
 .dashboard-chart-section {
-    background-color: #ffffff;
+    background-color: var(--card-bg);
     padding: 25px;
     border-radius: 12px;
     min-height: 400px; 
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     margin-top: 20px; 
+    border: 1px solid transparent; /* Preparação para o Dark Mode */
 }
 
-.dashboard-chart-section h3 {
-    color: #2c3e50;
+.dashboard-chart-section h3, 
+.dashboard-chart-section h5 {
+    color: var(--text-dark);
     margin-bottom: 20px;
 }
 
@@ -71,5 +91,29 @@
     text-align: center;
     padding: 50px;
     font-size: 1.2rem;
-    color: #7f8c8d;
+    color: var(--text-muted);
+}
+
+/* =========================================================
+   BLINDAGEM E ILUMINAÇÃO PARA O MODO ESCURO (DARK MODE)
+   ========================================================= */
+
+/* No dark mode, precisamos de bordas para não parecer que as secções flutuam soltas */
+[data-theme="dark"] .dashboard-info-card,
+[data-theme="dark"] .dashboard-chart-section {
+    border: 1px solid var(--border-color) !important;
+}
+
+/* Iluminar os Títulos (R$ Faturamento) */
+[data-theme="dark"] .dashboard-info-card h3 {
+    color: #adb5bd !important; /* Cinza mais claro/iluminado */
+}
+
+/* Iluminar os Números Gigantes! */
+[data-theme="dark"] .dashboard-info-value {
+    color: #2ecc71 !important; /* Verde mais vibrante e claro contra o fundo escuro */
+}
+
+[data-theme="dark"] .dashboard-info-value.vendas {
+    color: #5dade2 !important; /* Azul "Gelo" mais brilhante para ler facilmente no escuro */
 }

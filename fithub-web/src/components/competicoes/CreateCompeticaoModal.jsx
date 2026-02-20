@@ -1,10 +1,10 @@
-import { Modal, Button, Form, Row, Col } from "react-bootstrap";import { useState, useEffect } from "react";
+import { Modal, Button, Form, Row, Col } from "react-bootstrap";
+import { useState, useEffect } from "react";
 import { apiFetch } from "../../services/api";
 import { ConfirmModal } from "../common/ConfirmModal";
 import { SuccessModal } from "../common/SuccessModal";
 
 export default function CreateCompeticaoModal({ show, handleClose, onSuccess }) {
-  // Estados do Formulário
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
   const [dataInicio, setDataInicio] = useState("");
@@ -12,103 +12,86 @@ export default function CreateCompeticaoModal({ show, handleClose, onSuccess }) 
   const [pontosVitoria, setPontosVitoria] = useState(0);
   const [tipoOrdenacao, setTipoOrdenacao] = useState("MAIOR_MELHOR");
 
-  // Estados dos Modais
   const [showConfirm, setShowConfirm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // Função auxiliar para formatar data no padrão datetime-local
   const formatToLocalISO = (date) => {
     const pad = (n) => n.toString().padStart(2, '0');
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
   };
 
-  // Resetar campos ao abrir
   useEffect(() => {
     if (show) {
       setNome("");
       setDescricao("");
       setPontosVitoria(0);
       setTipoOrdenacao("MAIOR_MELHOR");
-
       const now = new Date();
       now.setMinutes(now.getMinutes() + 10);
       setDataInicio(formatToLocalISO(now));
-
       const nextWeek = new Date(now);
       nextWeek.setDate(nextWeek.getDate() + 7);
       setDataFim(formatToLocalISO(nextWeek));
     }
   }, [show]);
 
-  // 1. Validação simples antes de abrir a confirmação
   const handlePreSubmit = () => {
-    if (!nome || !descricao) {
-      alert("Por favor, preencha o nome e a descrição.");
-      return;
-    }
+    if (!nome || !descricao) return;
     setShowConfirm(true);
   };
 
-  // 2. Ação confirmada: Chama API
   const handleConfirmarCriacao = async () => {
-    setShowConfirm(false); // Fecha o modal de confirmação
-    
+    setShowConfirm(false);
     try {
       await apiFetch("/api/competicoes/register", {
         method: "POST",
         body: JSON.stringify({
-          nome,
-          descricao,
-          dataInicio,
-          dataFim,
+          nome, descricao, dataInicio, dataFim,
           pontosVitoria: parseInt(pontosVitoria),
           tipoOrdenacao,
         }),
       });
-
-      // 3. Sucesso: Abre modal de sucesso
       setShowSuccess(true);
-      
     } catch (err) {
-      console.error("Erro ao criar competição:", err);
-      const msg = err.message || "Erro desconhecido";
-      alert("Não foi possível criar a competição.\n\nErro: " + msg);
+      console.error(err);
     }
   };
 
-  // 4. Ao fechar o modal de sucesso, finaliza tudo
   const handleCloseSuccess = () => {
     setShowSuccess(false);
-    if (onSuccess) onSuccess(); // Recarrega a lista no pai
-    if (handleClose) handleClose(); // Fecha o modal de criação
+    if (onSuccess) onSuccess();
+    if (handleClose) handleClose();
   };
 
   return (
     <>
-      {/* --- MODAL DE CRIAÇÃO (FORMULÁRIO) --- */}
-      <Modal show={show} onHide={handleClose} centered backdrop="static">
-        <Modal.Header closeButton>
-          <Modal.Title>Criar Nova Competição</Modal.Title>
+      <Modal show={show} onHide={handleClose} centered backdrop="static" contentClassName="border-0 rounded-4 overflow-hidden">
+        <Modal.Header closeButton className="borda-customizada" style={{ backgroundColor: "var(--bg-light)" }}>
+          <Modal.Title className="fw-bold text-dark">Agendar Competição</Modal.Title>
         </Modal.Header>
 
-        <Modal.Body>
+        <Modal.Body className="p-4" style={{ backgroundColor: "var(--card-bg)" }}>
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Nome</Form.Label>
+              <Form.Label className="fw-bold text-success small">NOME</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Ex: Desafio de Supino"
                 value={nome}
+                className="border-0 shadow-none p-3"
+                style={{ backgroundColor: "var(--bg-light)", color: "var(--text-dark)" }}
                 onChange={(e) => setNome(e.target.value)}
               />
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Descrição</Form.Label>
+              <Form.Label className="fw-bold text-success small">DESCRIÇÃO</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
                 placeholder="Regras e detalhes..."
+                className="border-0 shadow-none p-3"
+                style={{ backgroundColor: "var(--bg-light)", color: "var(--text-dark)" }}
                 value={descricao}
                 onChange={(e) => setDescricao(e.target.value)}
               />
@@ -117,9 +100,11 @@ export default function CreateCompeticaoModal({ show, handleClose, onSuccess }) 
             <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Início (Margem de segurança)</Form.Label>
+                  <Form.Label className="fw-bold text-success small">INÍCIO</Form.Label>
                   <Form.Control
                     type="datetime-local"
+                    className="border-0 shadow-none"
+                    style={{ backgroundColor: "var(--bg-light)", color: "var(--text-dark)" }}
                     value={dataInicio}
                     onChange={(e) => setDataInicio(e.target.value)}
                   />
@@ -127,9 +112,11 @@ export default function CreateCompeticaoModal({ show, handleClose, onSuccess }) 
               </Col>
               <Col md={6}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Fim</Form.Label>
+                  <Form.Label className="fw-bold text-success small">FIM</Form.Label>
                   <Form.Control
                     type="datetime-local"
+                    className="border-0 shadow-none"
+                    style={{ backgroundColor: "var(--bg-light)", color: "var(--text-dark)" }}
                     value={dataFim}
                     onChange={(e) => setDataFim(e.target.value)}
                   />
@@ -140,9 +127,11 @@ export default function CreateCompeticaoModal({ show, handleClose, onSuccess }) 
             <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Pontos Vitória</Form.Label>
+                  <Form.Label className="fw-bold text-success small">PONTOS VITÓRIA</Form.Label>
                   <Form.Control
                     type="number"
+                    className="border-0 shadow-none"
+                    style={{ backgroundColor: "var(--bg-light)", color: "var(--text-dark)" }}
                     value={pontosVitoria}
                     onChange={(e) => setPontosVitoria(e.target.value)}
                   />
@@ -150,8 +139,10 @@ export default function CreateCompeticaoModal({ show, handleClose, onSuccess }) 
               </Col>
               <Col md={6}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Ordenação</Form.Label>
+                  <Form.Label className="fw-bold text-success small">ORDENAÇÃO</Form.Label>
                   <Form.Select
+                    className="border-0 shadow-none"
+                    style={{ backgroundColor: "var(--bg-light)", color: "var(--text-dark)" }}
                     value={tipoOrdenacao}
                     onChange={(e) => setTipoOrdenacao(e.target.value)}
                   >
@@ -164,31 +155,16 @@ export default function CreateCompeticaoModal({ show, handleClose, onSuccess }) 
           </Form>
         </Modal.Body>
 
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Cancelar
-          </Button>
-          <Button variant="success" onClick={handlePreSubmit}>
+        <Modal.Footer className="borda-customizada" style={{ backgroundColor: "var(--bg-light)" }}>
+          <Button variant="link" onClick={handleClose} className="text-muted fw-bold text-decoration-none">Cancelar</Button>
+          <Button variant="success" className="rounded-pill px-4 fw-bold" onClick={handlePreSubmit}>
             Criar Competição
           </Button>
         </Modal.Footer>
       </Modal>
 
-      {/* --- MODAL DE CONFIRMAÇÃO --- */}
-      <ConfirmModal 
-        show={showConfirm}
-        handleClose={() => setShowConfirm(false)}
-        handleConfirm={handleConfirmarCriacao}
-        title="Confirmar Criação"
-        message={`Deseja realmente criar a competição "${nome}"?`}
-      />
-
-      {/* --- MODAL DE SUCESSO --- */}
-      <SuccessModal 
-        show={showSuccess}
-        handleClose={handleCloseSuccess}
-        message="Competição criada com sucesso!"
-      />
+      <ConfirmModal show={showConfirm} handleClose={() => setShowConfirm(false)} handleConfirm={handleConfirmarCriacao} title="Confirmar Criação" message={`Deseja realmente criar a competição "${nome}"?`} />
+      <SuccessModal show={showSuccess} handleClose={handleCloseSuccess} message="Competição criada com sucesso!" />
     </>
   );
 }

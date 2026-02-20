@@ -12,7 +12,7 @@ import { ConfirmModal } from "../components/common/ConfirmModal";
 import { SuccessModal } from "../components/common/SuccessModal";
 import { ErrorModal } from "../components/common/ErrorModal";
 
-// Estilos customizados (pode colocar no seu arquivo CSS global ou criar um AdminPlans.css)
+// Estilos customizados
 import "../styles/planos.css";
 
 export default function AdminPlans() {
@@ -68,47 +68,62 @@ export default function AdminPlans() {
   };
 
   return (
-    <div className="admin-plans-wrapper p-4 min-vh-100 bg-light">
-      <Container fluid>
-        <div className="admin-plans-header bg-white p-4 rounded-4 shadow-sm position-relative mb-4">
-          <div className="d-flex justify-content-between align-items-start">
-            <div>
-              <h2 className="fw-bold mb-0 text-dark">
-                Gerenciamento de Planos
-              </h2>
-              <p className="text-muted mb-0 small">
-                Visualize ou adicione novos planos.
-              </p>
-            </div>
+    <div className="p-3 p-md-4 min-vh-100">
+      <Container fluid className="px-0">
+        
+        {/* CABEÇALHO RESPONSIVO E ADAPTADO AO MODO ESCURO */}
+        <div 
+          className="p-3 p-md-4 rounded-4 shadow-sm mb-4 borda-customizada d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4"
+          style={{ backgroundColor: "var(--card-bg)" }}
+        >
+          {/* Lado Esquerdo: Título e Descrição */}
+          <div className="mb-2 mb-lg-0">
+            <h2 className="fw-bold mb-1 text-dark">
+              Gerenciamento de Planos
+            </h2>
+            <p className="text-muted mb-0 small">
+              Visualize ou adicione novos planos.
+            </p>
+          </div>
 
-            <div className="search-wrapper">
+          {/* Lado Direito: Ações (Barra de Pesquisa + Botão Novo) */}
+          <div className="d-flex flex-column flex-md-row align-items-md-start gap-3 w-100" style={{ maxWidth: "700px" }}>
+            
+            {/* SearchBar ocupa o espaço restante */}
+            <div className="flex-grow-1" style={{ marginBottom: "-1.5rem" }}>
               <SearchBar
                 placeholder="Pesquisar planos..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onClear={() => setSearchTerm("")} /* Propriedade ativada com sucesso! */
               />
             </div>
-          </div>
 
-          <Button
-            variant="success"
-            className="btn-add-plano-fixed shadow-sm border-0"
-            onClick={() => {
-              setPlanToEdit(null);
-              setShowPlanModal(true);
-            }}
-          >
-            <i className="fas fa-plus-circle me-2"></i>
-            <span>Novo Plano</span>
-          </Button>
+            {/* Botão Novo Plano alinhado com a altura do SearchBar */}
+            <Button
+              variant="success"
+              className="shadow-sm border-0 d-flex align-items-center justify-content-center px-4 rounded-pill flex-shrink-0"
+              style={{ height: "54px" }} 
+              onClick={() => {
+                setPlanToEdit(null);
+                setShowPlanModal(true);
+              }}
+            >
+              <i className="fas fa-plus-circle me-2"></i>
+              <span className="fw-bold text-nowrap">Novo Plano</span>
+            </Button>
+          </div>
         </div>
 
         {/* ÁREA DA TABELA */}
-        <div className="bg-white rounded-4 shadow-sm overflow-hidden border-0">
+        <div 
+          className="rounded-4 shadow-sm overflow-hidden borda-customizada"
+          style={{ backgroundColor: "var(--card-bg)" }}
+        >
           {loading ? (
             <div className="text-center py-5">
-              <Spinner animation="border" variant="success" />
-              <p className="mt-2 text-muted">Carregando planos...</p>
+              <Spinner animation="border" variant="success" style={{ width: '3rem', height: '3rem' }} />
+              <p className="mt-3 fw-bold text-success">Carregando planos...</p>
             </div>
           ) : (
             <PlanTable

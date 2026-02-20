@@ -1,20 +1,16 @@
-/* --- VARIÁVEIS GERAIS --- */
+/* --- VARIÁVEIS GERAIS (Sincronizadas com o global.css) --- */
 :root {
-  --primary-color: #0ad354; /* Verde do Projeto */
+  --primary-color: #0ad354;
   --primary-dark: #08b346;
-  --primary-light: #e7fdf0;
-  --text-dark: #2c3e50;
-  --text-muted: #6c757d;
-  --card-bg: #ffffff;
-  --bg-main: #f8f9fa;
-  --gold: #FFD700;
-  --silver: #C0C0C0;
-  --bronze: #CD7F32;
+  --primary-light: rgba(10, 211, 84, 0.1); /* Opacidade para fundos suaves */
+  --gold: #f1c40f;
+  --silver: #bdc3c7;
+  --bronze: #e67e22;
 }
 
 /* --- ESTRUTURA GERAL --- */
 .competicoes-container {
-  background-color: var(--bg-main);
+  background-color: var(--bg-light); /* Ajustado para variável dinâmica */
   min-height: 100vh;
   padding-bottom: 3rem;
 }
@@ -26,7 +22,6 @@
 }
 
 /* --- BOTÕES CUSTOMIZADOS --- */
-/* Adicionado !important para garantir a cor sobre o Bootstrap */
 .btn-custom-primary {
   background-color: var(--primary-color) !important;
   border: none;
@@ -41,19 +36,6 @@
   box-shadow: 0 4px 12px rgba(10, 211, 84, 0.3);
 }
 
-.btn-custom-outline {
-  border: 1px solid var(--primary-color);
-  color: var(--primary-color);
-  background: transparent;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.btn-custom-outline:hover {
-  background-color: var(--primary-color);
-  color: white;
-}
-
 .btn-custom-ghost {
   background: transparent;
   color: var(--text-muted);
@@ -61,29 +43,26 @@
 }
 
 .btn-custom-ghost:hover {
-  background: rgba(0,0,0,0.05);
+  background: var(--bg-light); /* Adaptado para o tema */
   color: var(--text-dark);
 }
 
 /* --- CARDS --- */
 .custom-card {
-  border: none;
+  border: 1px solid var(--border-color); /* Adicionado para definição no Dark Mode */
   border-radius: 16px;
-  background-color: var(--card-bg);
+  background-color: var(--card-bg); /* Dinâmico */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   height: 100%;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   overflow: hidden;
 }
 
-.custom-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-}
-
 .custom-card-header {
-  background-color: white;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background-color: transparent; /* Herda do card-bg */
+  border-bottom: 1px solid var(--border-color);
   padding: 1.5rem;
   font-weight: 700;
   font-size: 1.1rem;
@@ -96,21 +75,19 @@
   margin-right: 0.75rem;
   color: var(--primary-color);
   font-size: 1.2rem;
+  filter: brightness(1.1); /* Brilho extra para o Dark Mode */
 }
 
 /* --- RANKING --- */
 .ranking-item {
-  border-bottom: 1px solid #f1f3f5;
+  border-bottom: 1px solid var(--border-color);
   padding: 1rem 1.5rem;
   transition: background-color 0.2s;
-}
-
-.ranking-item:last-child {
-  border-bottom: none;
+  background-color: transparent;
 }
 
 .ranking-item:hover {
-  background-color: #fcfcfc;
+  background-color: var(--bg-light); /* Destaque sutil ao passar o mouse */
 }
 
 .badge-pos {
@@ -126,15 +103,24 @@
   flex-shrink: 0;
 }
 
-.badge-gold { background-color: var(--gold); color: white; box-shadow: 0 2px 5px rgba(255, 215, 0, 0.3); }
-.badge-silver { background-color: var(--silver); color: white; }
-.badge-bronze { background-color: var(--bronze); color: white; }
-.badge-default { background-color: #f1f3f5; color: var(--text-muted); font-size: 0.8rem; width: 28px; height: 28px; }
-
-.leader-crown {
-  color: var(--gold);
-  font-size: 0.75rem;
-  margin-left: 0.5rem;
+/* Medalhas Iluminadas */
+.badge-gold {
+  background: linear-gradient(45deg, #f1c40f, #f39c12);
+  color: #000;
+  box-shadow: 0 2px 8px rgba(241, 196, 15, 0.3);
+}
+.badge-silver {
+  background: linear-gradient(45deg, #bdc3c7, #95a5a6);
+  color: #000;
+}
+.badge-bronze {
+  background: linear-gradient(45deg, #e67e22, #d35400);
+  color: #000;
+}
+.badge-default {
+  background-color: var(--bg-light);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
 }
 
 .score-text {
@@ -143,10 +129,10 @@
   font-size: 1.1rem;
 }
 
-/* --- COMPETIÇÕES ATIVAS --- */
+/* --- COMPETIÇÕES --- */
 .comp-item {
-  background-color: #fcfcfc;
-  border: 1px solid #f1f3f5;
+  background-color: var(--bg-light); /* Fundo secundário dinâmico */
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   position: relative;
   overflow: hidden;
@@ -155,6 +141,7 @@
 
 .comp-item:hover {
   border-color: var(--primary-color);
+  background-color: var(--card-bg); /* Inverte o fundo no hover para destaque */
 }
 
 .status-bar {
@@ -165,76 +152,63 @@
   width: 4px;
 }
 
-.status-bar.aberta { background-color: var(--primary-color); }
-.status-bar.em-andamento { background-color: #3b82f6; }
-
-/* --- BADGES DE STATUS --- */
+/* --- BADGES DE STATUS (ADAPTÁVEIS) --- */
 .status-pill {
   padding: 6px 12px;
   border-radius: 20px;
-  font-weight: 600;
-  font-size: 0.75rem;
-  letter-spacing: 0.5px;
+  font-weight: 700;
+  font-size: 0.65rem;
   text-transform: uppercase;
 }
 
 .status-pill.aberta {
-  background-color: var(--primary-light);
-  color: var(--primary-dark);
+  background-color: rgba(10, 211, 84, 0.15);
+  color: #2ecc71;
 }
-
 .status-pill.em-andamento {
-  background-color: #dbeafe;
-  color: #1e40af;
+  background-color: rgba(52, 152, 219, 0.15);
+  color: #3498db;
 }
-
 .status-pill.encerrada {
-  background-color: #f3f4f6;
-  color: #4b5563;
+  background-color: rgba(108, 117, 125, 0.15);
+  color: #adb5bd;
 }
 
-.status-pill.cancelada {
-  background-color: #fee2e2;
-  color: #991b1b;
-}
-
-/* --- MODAIS --- */
-.modal-custom-content {
-  border: none;
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-}
-
-.modal-header-custom {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
+/* --- MODAIS E DETALHES --- */
 .detail-box {
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 0.75rem;
   text-align: center;
   height: 100%;
-  background: #fff;
+  background: var(--bg-light); /* Adaptável */
 }
 
 .detail-label {
   font-size: 0.7rem;
   text-transform: uppercase;
   color: var(--text-muted);
-  letter-spacing: 0.5px;
+  font-weight: 700;
   display: block;
   margin-bottom: 4px;
 }
 
-.detail-value {
-  font-weight: 700;
-  color: var(--text-dark);
-}
-
 .management-area {
-  background-color: var(--bg-main);
+  background-color: var(--bg-light);
   border: 1px dashed var(--primary-color);
   border-radius: 12px;
+  padding: 1.5rem;
+}
+
+/* --- MODO ESCURO ESPECÍFICO --- */
+[data-theme="dark"] .custom-card {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .status-pill.aberta {
+  background-color: rgba(10, 211, 84, 0.1);
+  color: #2ecc71;
+}
+[data-theme="dark"] .comp-item:hover {
+  border-color: var(--primary-color) !important;
 }

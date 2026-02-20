@@ -3,11 +3,14 @@ import { ClassCard } from "./ClassCard";
 
 export function ClassGrid({ aulas, isInstructor, onReservar, onVerParticipantes, onDelete}) {
   
-  if (aulas.length === 0) {
+  if (aulas?.length === 0) {
     return (
-      <div className="text-center py-5 text-muted bg-white rounded-4 shadow-sm border">
+      <div 
+        className="text-center py-5 text-muted rounded-4 shadow-sm borda-customizada"
+        style={{ backgroundColor: "var(--card-bg)" }}
+      >
         <i className="far fa-calendar-times fa-3x mb-3 opacity-25"></i>
-        <h5>Não há aulas agendadas no momento.</h5>
+        <h5 className="fw-bold">Não há aulas agendadas no momento.</h5>
         <p className="small">Fique atento a novas atualizações na agenda!</p>
       </div>
     );

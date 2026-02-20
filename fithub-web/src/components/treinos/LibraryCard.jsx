@@ -26,24 +26,24 @@ export function LibraryCard({
   onAvaliar,
   disabled,
   isMostFollowed,
-  onIniciarTreino, // <-- Adicionado aqui
+  onIniciarTreino,
 }) {
   return (
     <Card className="h-100 shadow-sm border-0 rounded-4 overflow-hidden hover-effect custom-card position-relative">
-      {/* Badge "Mais Seguido" - Destaque visual para o topo da lista */}
+      {/* Badge "Mais Seguido" */}
       {isMostFollowed && (
         <div
-          className="position-absolute top-0 start-0 m-2 px-3 py-1 bg-warning text-dark fw-bold rounded-pill shadow-sm d-flex align-items-center gap-2 border border-white"
+          className="position-absolute top-0 start-0 m-2 px-3 py-1 bg-warning text-dark fw-bold rounded-pill shadow-sm d-flex align-items-center gap-2 border"
           style={{ zIndex: 10, fontSize: "0.7rem", letterSpacing: "0.5px" }}
         >
           <i className="fas fa-crown text-dark"></i> MAIS SEGUIDO
         </div>
       )}
 
-      {/* Badge de Seguidores (Canto superior direito) */}
+      {/* Badge de Seguidores */}
       <div
-        className="position-absolute top-0 end-0 m-2 px-2 py-1 bg-white rounded-pill shadow-sm d-flex align-items-center gap-1"
-        style={{ zIndex: 10 }}
+        className="position-absolute top-0 end-0 m-2 px-2 py-1 rounded-pill shadow-sm d-flex align-items-center gap-1"
+        style={{ zIndex: 10, backgroundColor: "var(--card-bg)" }}
       >
         <i className="fas fa-users text-muted small"></i>
         <span className="fw-bold small text-dark">
@@ -60,24 +60,27 @@ export function LibraryCard({
         {/* Título e Nível do Treino */}
         <div className="d-flex justify-content-between align-items-start mb-1">
           <Card.Title
-            className="fw-bold text-dark mb-0 h6 text-truncate"
+            className="fw-bold text-dark mb-0 h6 text-truncate pe-2"
             title={treino.nome}
           >
             {treino.nome}
           </Card.Title>
+
           {treino.status === "PUBLICO" && (
             <Badge
-              bg="light"
-              text="success"
-              className="border border-success bg-opacity-10"
-              style={{ fontSize: "0.65rem" }}
+              className="border border-success"
+              style={{
+                fontSize: "0.65rem",
+                backgroundColor: "var(--primary-light)",
+                color: "var(--primary-color)",
+              }}
             >
               PÚBLICO
             </Badge>
           )}
         </div>
 
-        {/* Exibição de Estrelas e Total de Avaliações */}
+        {/* Exibição de Estrelas */}
         <div
           className="d-flex align-items-center mb-2 gap-1"
           title={`Nota: ${treino.mediaNota || 0}`}
@@ -94,8 +97,9 @@ export function LibraryCard({
             <Image
               src={treino.criadorFoto}
               roundedCircle
+              /* ❌ AQUI: Removi o borderColor de dentro do style */
               style={{ width: "24px", height: "24px", objectFit: "cover" }}
-              className="me-2 shadow-sm border border-light"
+              className="me-2 shadow-sm border"
               alt={treino.criadorNome}
             />
           ) : (
@@ -108,8 +112,6 @@ export function LibraryCard({
 
         {/* Rodapé com Botões de Ação */}
         <div className="mt-auto d-flex flex-column gap-2">
-          
-          {/* Botão de Seguir/Deixar de Seguir */}
           <Button
             variant={treino.seguindo ? "outline-danger" : "outline-success"}
             size="sm"
@@ -120,11 +122,12 @@ export function LibraryCard({
             }}
             disabled={disabled}
           >
-            <i className={treino.seguindo ? "fas fa-heart" : "far fa-heart"}></i>
+            <i
+              className={treino.seguindo ? "fas fa-heart" : "far fa-heart"}
+            ></i>
             {treino.seguindo ? "Deixar de Seguir" : "Seguir"}
           </Button>
 
-          {/* NOVO BOTÃO INICIAR TREINO (Retangular e com texto) */}
           <Button
             variant="success"
             size="sm"
@@ -138,7 +141,7 @@ export function LibraryCard({
             <i className="fas fa-play"></i> Iniciar Treino
           </Button>
 
-          {/* Ações Secundárias (Olho, Copiar, Estrela) */}
+          {/* Ações Secundárias */}
           <div className="d-flex gap-2 mt-1">
             <Button
               variant="outline-success"

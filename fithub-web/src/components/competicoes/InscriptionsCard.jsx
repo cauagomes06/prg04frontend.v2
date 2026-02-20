@@ -15,35 +15,57 @@ export function InscriptionsCard({ inscricoes, competicoes, onSubmeter }) {
             </div>
           ) : (
             inscricoes.map((insc) => {
-              const comp = competicoes.find(c => c.id === insc.competicaoId || c.nome === insc.competicaoNome);
+              const comp = competicoes.find(
+                (c) =>
+                  c.id === insc.competicaoId || c.nome === insc.competicaoNome,
+              );
               const statusAtual = comp ? comp.status : "DESCONHECIDO";
               const isEmAndamento = statusAtual === "EM_ANDAMENTO";
 
               return (
-                <ListGroup.Item key={insc.idInscricao} className="ranking-item">
+                <ListGroup.Item
+                  key={insc.idInscricao}
+                  className="ranking-item bg-transparent borda-customizada"
+                  style={{ borderBottom: "1px solid var(--border-color)" }}
+                >
                   <div className="d-flex justify-content-between align-items-center">
                     <div>
-                      <div className="fw-bold text-dark mb-1">{insc.competicaoNome}</div>
+                      <div className="fw-bold text-dark mb-1">
+                        {insc.competicaoNome}
+                      </div>
                       <div className="small text-muted">
-                        Status: <span className={insc.resultado ? "text-success fw-bold" : "text-warning fw-bold"}>
+                        Status:{" "}
+                        <span
+                          className={
+                            insc.resultado
+                              ? "text-success fw-bold"
+                              : "text-warning fw-bold"
+                          }
+                        >
                           {insc.resultado ? "Concluído" : "Pendente"}
                         </span>
                       </div>
                     </div>
-                    
                     {insc.resultado ? (
-                       <div className="bg-light px-3 py-1 rounded-3 border">
-                          <strong className="text-dark">{insc.resultado}</strong>
-                       </div>
+                      <div className="bg-light px-3 py-1 rounded-3 border">
+                        <strong className="text-dark">{insc.resultado}</strong>
+                      </div>
                     ) : (
-                      <Button 
-                        className={isEmAndamento ? "btn-custom-primary rounded-pill px-3" : "btn-light rounded-pill px-3 text-muted"}
-                        size="sm" 
+                      <Button
+                        className={
+                          isEmAndamento
+                            ? "btn-custom-primary rounded-pill px-3"
+                            : "btn-light rounded-pill px-3 text-muted"
+                        }
+                        size="sm"
                         disabled={!isEmAndamento}
                         onClick={() => onSubmeter(insc.idInscricao)}
                       >
-                        {isEmAndamento ? "Submeter Resultado" : 
-                         statusAtual === "ABERTA" ? "Aguarde Início" : "Encerrada"}
+                        {isEmAndamento
+                          ? "Submeter Resultado"
+                          : statusAtual === "ABERTA"
+                            ? "Aguarde Início"
+                            : "Encerrada"}
                       </Button>
                     )}
                   </div>

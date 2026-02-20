@@ -13,7 +13,7 @@ export function AdminStatsCards() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="text-center py-3"><Spinner animation="border" size="sm" /></div>;
+  if (loading) return <div className="text-center py-3"><Spinner animation="border" size="sm" variant="success" /></div>;
   if (!stats) return null;
 
   const cards = [
@@ -22,27 +22,31 @@ export function AdminStatsCards() {
     { label: "Aulas Agendadas", value: stats.aulasAgendadas, icon: "fa-calendar-alt", color: "warning" },
     { label: "Competições", value: stats.competicoesAtivas, icon: "fa-trophy", color: "danger" },
     { 
-        label: "Receita Mensal", 
-        value: `R$ ${stats.receitaEstimadaMensal?.toFixed(2)}`, 
+        label: "Receita Mensal Estimada", 
+        value: `R$ ${stats.receitaEstimadaMensal?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 
         icon: "fa-sack-dollar", 
         color: "success", 
-        fullWidth: true 
+        fullWidth: true,
+        isRevenue: true // Marcador para usarmos a cor de faturamento
     },
   ];
 
   return (
-    <div className="mb-5">
-        <h4 className="fw-bold text-dark mb-3"><i className="fas fa-chart-line me-2"></i>Visão Geral</h4>
+    <div className="mb-4">
         <Row className="g-3">
             {cards.map((item, idx) => (
                 <Col key={idx} md={item.fullWidth ? 12 : 6} lg={item.fullWidth ? 12 : 3}>
-                    <Card className={`border-0 shadow-sm h-100 border-start border-4 border-${item.color}`}>
+                    {/* Adicionada a classe dashboard-info-card que refatoramos no CSS */}
+                    <Card className="dashboard-info-card h-100 border-0 shadow-sm">
                         <Card.Body className="d-flex align-items-center">
                             <div className={`bg-${item.color} bg-opacity-10 p-3 rounded-circle me-3 text-${item.color}`}>
                                 <i className={`fas ${item.icon} fa-2x`}></i>
                             </div>
                             <div>
-                                <h3 className="fw-bold mb-0">{item.value}</h3>
+                                {/* Aplicadas as classes de iluminação dinâmica */}
+                                <h3 className={`dashboard-info-value mb-0 ${!item.isRevenue ? 'vendas' : ''}`}>
+                                  {item.value}
+                                </h3>
                                 <p className="text-muted mb-0 small text-uppercase fw-bold">{item.label}</p>
                             </div>
                         </Card.Body>
