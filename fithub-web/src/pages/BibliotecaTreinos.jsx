@@ -7,12 +7,14 @@ import { AuthContext } from "../context/AuthContext";
 import { WorkoutModal } from "../components/treinos/WorkoutModal";
 import { LibraryCard } from "../components/treinos/LibraryCard";
 import { AvaliacaoModal } from "../components/treinos/AvaliacaoModal";
+import { WorkoutPlayer } from "../components/treinos/WorkoutPlayer";
 
 // Componentes Comuns
 import { ConfirmModal } from "../components/common/ConfirmModal";
 import { SuccessModal } from "../components/common/SuccessModal";
 import { ErrorModal } from "../components/common/ErrorModal";
 import { SearchBar } from "../components/common/SearchBar";
+import { PaginationComponent } from "../components/common/PaginationComponent";
 
 import "../styles/treinos.css";
 
@@ -21,7 +23,7 @@ export function Biblioteca() {
 
   // --- ESTADOS DE DADOS ---
   const [treinos, setTreinos] = useState([]);
-  const [loading, setLoading] = useState(true); // Controla o carregamento inicial e trocas
+  const [loading, setLoading] = useState(true);
 
   // --- ESTADOS DE FILTRO E PESQUISA ---
   const [filtroAtivo, setFiltroAtivo] = useState("RECENTES");
@@ -39,6 +41,7 @@ export function Biblioteca() {
   const [showAvaliacaoModal, setShowAvaliacaoModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
+  const [treinoEmExecucao, setTreinoEmExecucao] = useState(null);
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -47,9 +50,9 @@ export function Biblioteca() {
   const [treinoParaAvaliar, setTreinoParaAvaliar] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // --- 1. CARREGAR DADOS (SERVER-SIDE) ---
+  // --- 1. CARREGAR DADOS ---
   const carregarTreinos = async () => {
-    setLoading(true); // Ativa o spinner toda vez que a função é chamada
+    setLoading(true);
     const url = `/api/treinos/buscar-per-filter?page=${currentPage}&size=${pageSize}&filtro=${filtroAtivo}&termo=${encodeURIComponent(termoBusca)}`;
 
     try {
@@ -68,20 +71,18 @@ export function Biblioteca() {
       setErrorMessage("Não foi possível carregar a biblioteca.");
       setShowError(true);
     } finally {
-      setLoading(false); // Desativa o spinner ao finalizar (sucesso ou erro)
+      setLoading(false);
     }
   };
 
-  // Efeito com Debounce para busca por texto
   useEffect(() => {
     const timer = setTimeout(() => {
       carregarTreinos();
-    }, 400); // Reduzi um pouco o delay do debounce para parecer mais responsivo
+    }, 400);
     return () => clearTimeout(timer);
   }, [currentPage, filtroAtivo, termoBusca]);
 
   // --- FUNÇÕES DE AÇÃO ---
-
   const handleTrocarFiltro = (novoFiltro) => {
     if (filtroAtivo !== novoFiltro) {
       setFiltroAtivo(novoFiltro);
@@ -187,7 +188,7 @@ export function Biblioteca() {
             variant={filtroAtivo === "RECENTES" ? "success" : "outline-success"}
             className="rounded-pill px-3 fw-bold d-flex align-items-center gap-2"
             onClick={() => handleTrocarFiltro("RECENTES")}
-            disabled={loading} // Desativa enquanto carrega para evitar spam
+            disabled={loading}
           >
             <i className="fas fa-history"></i> Recentes
           </Button>
@@ -226,7 +227,7 @@ export function Biblioteca() {
           </Button>
         </div>
 
-        {/* --- LOGICA DE EXIBIÇÃO: SPINNER OU GRID --- */}
+        {/* LOGICA DE EXIBIÇÃO */}
         {loading ? (
           <div className="text-center py-5 my-5">
             <Spinner
@@ -255,7 +256,7 @@ export function Biblioteca() {
         ) : (
           <>
             <div className="library-grid mb-5">
-              {treinos.map((treino, index) => (
+              {treinos.map((treino) => (
                 <LibraryCard
                   key={treino.id}
                   treino={treino}
@@ -267,52 +268,38 @@ export function Biblioteca() {
                   onToggleFollow={handleToggleFollow}
                   onAvaliar={handleAbrirAvaliacao}
                   disabled={isProcessing}
+                  onIniciarTreino={(t) => setTreinoEmExecucao(t)} 
                 />
               ))}
             </div>
-
-            {/* Paginação (dentro do bloco de sucesso) */}
-            {totalPages > 1 && (
-              <div
-                className="pagination-wrapper d-flex justify-content-center align-items-center gap-4 mt-5 p-3 bg-white rounded-pill shadow-sm mx-auto"
-                style={{ maxWidth: "fit-content" }}
-              >
-                <Button
-                  variant="light"
-                  className="rounded-circle shadow-sm p-2"
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 0))
-                  }
-                  disabled={currentPage === 0 || loading}
-                >
-                  <i className="fas fa-chevron-left text-success"></i>
-                </Button>
-                <div className="text-dark">
-                  <span className="fw-bold fs-5">{currentPage + 1}</span>
-                  <span className="text-muted mx-2">de</span>
-                  <span className="fw-bold fs-5">{totalPages}</span>
-                </div>
-                <Button
-                  variant="light"
-                  className="rounded-circle shadow-sm p-2"
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))
-                  }
-                  disabled={currentPage >= totalPages - 1 || loading}
-                >
-                  <i className="fas fa-chevron-right text-success"></i>
-                </Button>
-              </div>
-            )}
           </>
         )}
 
+        {/* Paginação Padronizada */}
+        <PaginationComponent
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+          loading={loading}
+        />
+
         {/* Modais */}
+
+        {treinoEmExecucao && (
+          <WorkoutPlayer
+            treino={treinoEmExecucao}
+            onFechar={() => setTreinoEmExecucao(null)}
+            onIniciarTreino={(t) => setTreinoEmExecucao(t)}
+
+          />
+        )}
         <WorkoutModal
           show={showDetailModal}
           handleClose={() => setShowDetailModal(false)}
           treino={selectedTreino}
           readOnly={true}
+          onIniciarTreino={(t) => setTreinoEmExecucao(t)}
+
         />
         <ConfirmModal
           show={showConfirm}

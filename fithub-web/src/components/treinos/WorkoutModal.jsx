@@ -1,115 +1,146 @@
 import { Modal, Button, ListGroup, Badge } from "react-bootstrap";
-import "../../styles/treinos.css"; // Importa os estilos globais e variáveis
+import "../../styles/treinos.css";
 
-export function WorkoutModal({ show, handleClose, treino, readOnly = false }) {
-  
-  // Função auxiliar para formatar o tempo de descanso
+export function WorkoutModal({
+  show,
+  handleClose,
+  treino,
+  readOnly = false,
+  onIniciarTreino,
+}) {
   const formatarDescanso = (descanso) => {
     if (!descanso) return "N/A";
-    // Se o descanso for um número, assume segundos
     if (!isNaN(descanso)) return `${descanso}s`;
     return descanso;
   };
 
   return (
-    <Modal 
-      show={show} 
-      onHide={handleClose} 
-      size="lg" 
+    <Modal
+      show={show}
+      onHide={handleClose}
+      size="lg"
       centered
-      // 1. Aplica o estilo de card arredondado e com sombra (custom-card style)
       contentClassName="rounded-4 border-0 overflow-hidden shadow-lg custom-card"
     >
-      {/* 2. Cabeçalho usa o estilo de "Meus Treinos" (Verde Claro/Verde Escuro) */}
-      {/* Usamos text-white para garantir contraste caso o fundo seja mais escuro */}
-      <Modal.Header 
-        closeButton 
-        className="card-header-my-workout border-0 text-white" 
-        data-bs-theme="dark" // Garante que o ícone de fechar fique branco
+      <Modal.Header
+        closeButton
+        className="card-header-my-workout border-0 text-white"
+        data-bs-theme="dark"
       >
-        <Modal.Title className="fw-bold d-flex align-items-center text-dark">
-          {/* O ícone herda a cor do .card-header-my-workout (var(--primary-green)) */}
-          <i className="fas fa-dumbbell me-2 icon-opacity"></i> 
+        <Modal.Title className="fw-bold d-flex align-items-center text-dark fs-5">
+          <i className="fas fa-dumbbell me-2 icon-opacity"></i>
           {treino?.nome || "Detalhes do Treino"}
         </Modal.Title>
       </Modal.Header>
-      
-      <Modal.Body className="p-4">
+
+      <Modal.Body className="p-3 p-md-4">
         {treino ? (
           <div>
             {/* Cabeçalho com Detalhes Gerais */}
             <div className="mb-4 text-center text-md-start">
-              <h5 className="text-muted mb-2 text-uppercase small fw-bold">Sobre o Treino</h5>
-              <p className="lead fs-6 mb-3 text-dark">{treino.descricao || "Sem descrição disponível."}</p>
-              
+              <h5 className="text-muted mb-2 text-uppercase small fw-bold">
+                Sobre o Treino
+              </h5>
+              <p className="lead fs-6 mb-3 text-dark px-2 px-md-0">
+                {treino.descricao || "Sem descrição disponível."}
+              </p>
+
               <div className="d-flex gap-2 flex-wrap justify-content-center justify-content-md-start">
-                
-                {/* Badge para Duração */}
-                <Badge bg="success" className="p-2 rounded-pill shadow-sm">
-                  <i className="fas fa-clock me-1"></i> {treino.duracaoMinutos ? `${treino.duracaoMinutos} min` : "Livre"}
+                <Badge bg="success" className="p-2 px-3 rounded-pill shadow-sm">
+                  <i className="fas fa-clock me-1"></i>{" "}
+                  {treino.duracaoMinutos
+                    ? `${treino.duracaoMinutos} min`
+                    : "Livre"}
                 </Badge>
-                
-                {/* Badge para Status (usando classes Bootstrap/Variáveis se definidas) */}
-                <Badge 
-                  className={`p-2 rounded-pill shadow-sm 
-                  ${treino.status === "PUBLICO" ? "bg-primary" : "bg-secondary"}`}
+
+                <Badge
+                  className={`p-2 px-3 rounded-pill shadow-sm ${treino.status === "PUBLICO" ? "bg-primary" : "bg-secondary"}`}
                 >
-                   {treino.status === "PUBLICO" ? "Público" : "Privado"}
+                  {treino.status === "PUBLICO" ? "Público" : "Privado"}
                 </Badge>
               </div>
             </div>
 
-            <hr className="text-muted opacity-25" />
+            <hr className="text-muted opacity-25 mb-4" />
 
-            {/* Lista de Exercícios */} 
-            <h5 className="mb-3 text-success fw-bold">
-              <i className="fas fa-list-ol me-2"></i>
-              Sequência de Exercícios
+            {/* Lista de Exercícios */}
+            <h5 className="mb-3 text-success fw-bold px-2 px-md-0">
+              <i className="fas fa-list-ol me-2"></i> Sequência de Exercícios
             </h5>
-            
+
             {(treino.items || []).length > 0 ? (
-              <ListGroup variant="flush" className="gap-2">
+              <ListGroup variant="flush" className="gap-3">
                 {treino.items.map((item, index) => (
-                  <ListGroup.Item 
-                    key={index} 
-                    // 3. Estiliza o item como um "mini card" com sombra e cantos
-                    className="d-flex flex-column flex-md-row justify-content-between align-items-center py-3 px-3 border-0 rounded-3 shadow-sm bg-light hover-effect"
+                  <ListGroup.Item
+                    key={index}
+                    className="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3 px-3 px-md-4 border-0 rounded-4 shadow-sm bg-light hover-effect"
                   >
+                    {/* Lado Esquerdo: Número e Nome do Exercício */}
                     <div className="d-flex align-items-center gap-3 w-100 mb-3 mb-md-0">
-                      
-                      {/* Círculo do número */}
-                      <div className="bg-success text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm flex-shrink-0" style={{width: '40px', height: '40px', fontWeight: 'bold'}}>
+                      <div
+                        className="bg-success text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm flex-shrink-0"
+                        style={{
+                          width: "42px",
+                          height: "42px",
+                          fontWeight: "900",
+                          fontSize: "1.1rem",
+                        }}
+                      >
                         {index + 1}
                       </div>
-                      
-                      <div>
-                        <div className="fw-bold fs-5 text-dark">
-                          {item.nomeExercicio || "Exercício não identificado"}
-                        </div>
+                      <div className="fw-bold fs-5 text-dark lh-sm pe-2">
+                        {item.nomeExercicio || "Exercício não identificado"}
                       </div>
                     </div>
 
-                    <div className="d-flex gap-4 text-center justify-content-center w-100 w-md-auto">
-                      <div className="px-2">
-                        <div className="fw-bold text-dark fs-5">{item.series}</div>
-                        <small className="text-muted text-uppercase text-filter-small">Séries</small>
+                    {/* Lado Direito: Informações (Séries, Reps, Descanso) */}
+                    {/* No mobile: flex-row com espaço entre eles. No PC: alinhado à direita com divisórias. */}
+                    <div className="d-flex flex-row justify-content-between justify-content-md-end text-center w-100 flex-md-shrink-0 pt-2 pt-md-0 border-top border-md-0 mt-2 mt-md-0">
+                      <div className="px-2 px-md-3 mt-2 mt-md-0">
+                        <div className="fw-black text-dark fs-5">
+                          {item.series}
+                        </div>
+                        <small
+                          className="text-muted text-uppercase fw-bold"
+                          style={{ fontSize: "0.65rem" }}
+                        >
+                          Séries
+                        </small>
                       </div>
-                      <div className="border-start mx-1"></div>
-                      <div className="px-2">
-                        <div className="fw-bold text-success fs-5">{item.repeticoes}</div>
-                        <small className="text-muted text-uppercase text-filter-small">Reps</small>
+
+                      <div className="d-none d-md-block border-start mx-1 my-2 opacity-50"></div>
+
+                      <div className="px-2 px-md-3 mt-2 mt-md-0">
+                        <div className="fw-black text-success fs-5">
+                          {item.repeticoes}
+                        </div>
+                        <small
+                          className="text-muted text-uppercase fw-bold"
+                          style={{ fontSize: "0.65rem" }}
+                        >
+                          Reps
+                        </small>
                       </div>
-                      <div className="border-start mx-1"></div>
-                      <div className="px-2">
-                        <div className="fw-bold text-warning fs-5">{formatarDescanso(item.descanso)}</div>
-                        <small className="text-muted text-uppercase text-filter-small">Descanso</small>
+
+                      <div className="d-none d-md-block border-start mx-1 my-2 opacity-50"></div>
+
+                      <div className="px-2 px-md-3 mt-2 mt-md-0">
+                        <div className="fw-black text-warning fs-5">
+                          {formatarDescanso(item.descanso)}
+                        </div>
+                        <small
+                          className="text-muted text-uppercase fw-bold"
+                          style={{ fontSize: "0.65rem" }}
+                        >
+                          Descanso
+                        </small>
                       </div>
                     </div>
                   </ListGroup.Item>
                 ))}
               </ListGroup>
             ) : (
-              <div className="alert alert-warning text-center p-4 rounded-4 border-0 shadow-sm">
+              <div className="alert alert-warning text-center p-4 rounded-4 border-0 shadow-sm mx-2 mx-md-0">
                 <i className="fas fa-exclamation-triangle fa-2x mb-3 text-warning"></i>
                 <p className="mb-0 fw-bold">Nenhum exercício cadastrado.</p>
               </div>
@@ -123,9 +154,23 @@ export function WorkoutModal({ show, handleClose, treino, readOnly = false }) {
           </div>
         )}
       </Modal.Body>
-      <Modal.Footer className="border-0">
-        <Button variant="outline-secondary" onClick={handleClose} className="rounded-pill px-4 fw-bold">
-          Fechar
+      <Modal.Footer className="border-0 bg-light rounded-bottom-4 p-3 p-md-4">
+        <Button
+          variant="outline-secondary"
+          className="fw-bold px-4 rounded-pill"
+          onClick={handleClose}
+        >
+          Voltar
+        </Button>
+        <Button
+          variant="success"
+          className="fw-bold px-4 px-md-5 rounded-pill shadow-sm"
+          onClick={() => {
+            handleClose();
+            onIniciarTreino(treino);
+          }}
+        >
+          <i className="fas fa-play me-2"></i> Iniciar Treino
         </Button>
       </Modal.Footer>
     </Modal>

@@ -1,0 +1,50 @@
+/* src/styles/Historico.css */
+
+.historico-container {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  padding-bottom: 4rem;
+}
+
+.historico-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #f0f0f0;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.historico-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+.historico-date-box {
+  background: #e8f5e9;
+  color: #198754;
+  border-radius: 12px;
+  text-align: center;
+  padding: 10px;
+  min-width: 70px;
+}
+
+.historico-day {
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.historico-month {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.historico-pontos {
+  font-weight: 900;
+  color: #ffc107;
+  background: #fff8e1;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 1.1rem;
+}
