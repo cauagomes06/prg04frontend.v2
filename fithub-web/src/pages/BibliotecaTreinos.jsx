@@ -3,13 +3,11 @@ import { apiFetch } from "../services/api";
 import { Container, Spinner, Button, Row, Col } from "react-bootstrap";
 import { AuthContext } from "../context/AuthContext";
 
-// Componentes do Domínio
 import { WorkoutModal } from "../components/treinos/WorkoutModal";
 import { LibraryCard } from "../components/treinos/LibraryCard";
 import { AvaliacaoModal } from "../components/treinos/AvaliacaoModal";
 import { WorkoutPlayer } from "../components/treinos/WorkoutPlayer";
 
-// Componentes Comuns
 import { ConfirmModal } from "../components/common/ConfirmModal";
 import { SuccessModal } from "../components/common/SuccessModal";
 import { ErrorModal } from "../components/common/ErrorModal";
@@ -21,20 +19,16 @@ import "../styles/treinos.css";
 export function Biblioteca() {
   const { user } = useContext(AuthContext);
 
-  // --- ESTADOS DE DADOS ---
   const [treinos, setTreinos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // --- ESTADOS DE FILTRO E PESQUISA ---
   const [filtroAtivo, setFiltroAtivo] = useState("RECENTES");
   const [termoBusca, setTermoBusca] = useState("");
 
-  // --- ESTADOS DE PAGINAÇÃO ---
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const pageSize = 6;
 
-  // --- ESTADOS DE UI/MODAIS ---
   const [selectedTreino, setSelectedTreino] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -50,7 +44,12 @@ export function Biblioteca() {
   const [treinoParaAvaliar, setTreinoParaAvaliar] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // --- 1. CARREGAR DADOS ---
+  // --- FUNÇÃO PARA MOSTRAR O ERRO VINDO DO FILHO ---
+  const handleMostrarErro = (mensagem) => {
+    setErrorMessage(mensagem);
+    setShowError(true);
+  };
+
   const carregarTreinos = async () => {
     setLoading(true);
     const url = `/api/treinos/buscar-per-filter?page=${currentPage}&size=${pageSize}&filtro=${filtroAtivo}&termo=${encodeURIComponent(termoBusca)}`;
@@ -68,8 +67,7 @@ export function Biblioteca() {
       }
     } catch (err) {
       console.error("Erro ao carregar biblioteca:", err);
-      setErrorMessage("Não foi possível carregar a biblioteca.");
-      setShowError(true);
+      handleMostrarErro("Não foi possível carregar a biblioteca.");
     } finally {
       setLoading(false);
     }
@@ -82,7 +80,6 @@ export function Biblioteca() {
     return () => clearTimeout(timer);
   }, [currentPage, filtroAtivo, termoBusca]);
 
-  // --- FUNÇÕES DE AÇÃO ---
   const handleTrocarFiltro = (novoFiltro) => {
     if (filtroAtivo !== novoFiltro) {
       setFiltroAtivo(novoFiltro);
@@ -96,8 +93,7 @@ export function Biblioteca() {
       setSelectedTreino(data);
       setShowDetailModal(true);
     } catch (error) {
-      setErrorMessage("Erro ao carregar detalhes do treino.");
-      setShowError(true);
+      handleMostrarErro("Erro ao carregar detalhes do treino.");
     }
   };
 
@@ -115,8 +111,7 @@ export function Biblioteca() {
       );
       setShowSuccess(true);
     } catch (error) {
-      setErrorMessage(error.message || "Erro ao atualizar seguidores.");
-      setShowError(true);
+      handleMostrarErro(error.message || "Erro ao atualizar seguidores.");
     } finally {
       setIsProcessing(false);
     }
@@ -124,8 +119,7 @@ export function Biblioteca() {
 
   const handleAbrirAvaliacao = (treino) => {
     if (treino.criadorId === user.id) {
-      setErrorMessage("Você não pode avaliar o seu próprio treino!");
-      setShowError(true);
+      handleMostrarErro("Você não pode avaliar o seu próprio treino!");
       return;
     }
     setTreinoParaAvaliar(treino);
@@ -145,8 +139,7 @@ export function Biblioteca() {
       );
       setShowSuccess(true);
     } catch (error) {
-      setErrorMessage("Erro ao copiar treino.");
-      setShowError(true);
+      handleMostrarErro("Erro ao copiar treino.");
     } finally {
       setIsProcessing(false);
       setTreinoParaCopiar(null);
@@ -156,7 +149,6 @@ export function Biblioteca() {
   return (
     <div className="treinos-container py-5 min-vh-100">
       <Container>
-        {/* Header */}
         <div className="mb-4">
           <Row className="align-items-center">
             <Col md={7}>
@@ -165,7 +157,7 @@ export function Biblioteca() {
                 Explore e siga os melhores treinos da comunidade.
               </p>
             </Col>
-            <Col md={5} className="mt-3mt-md-0">
+            <Col md={5} className="mt-3 mt-md-0">
               <SearchBar
                 placeholder="Pesquisar..."
                 value={termoBusca}
@@ -182,7 +174,6 @@ export function Biblioteca() {
           </Row>
         </div>
 
-        {/* Barra de Filtros - AQUI USAMOS A CLASSE CUSTOMIZADA */}
         <div className="d-flex flex-wrap gap-2 mb-4 pb-2 borda-inferior-customizada">
           <Button
             variant={filtroAtivo === "RECENTES" ? "success" : "outline-success"}
@@ -192,7 +183,6 @@ export function Biblioteca() {
           >
             <i className="fas fa-history"></i> Recentes
           </Button>
-
           <Button
             variant={
               filtroAtivo === "MAIS_SEGUIDOS" ? "success" : "outline-success"
@@ -203,7 +193,6 @@ export function Biblioteca() {
           >
             <i className="fas fa-fire"></i> Populares
           </Button>
-
           <Button
             variant={
               filtroAtivo === "MELHORES_AVALIADOS"
@@ -216,7 +205,6 @@ export function Biblioteca() {
           >
             <i className="fas fa-star"></i> Melhores Avaliados
           </Button>
-
           <Button
             variant={filtroAtivo === "SEGUINDO" ? "success" : "outline-success"}
             className="rounded-pill px-3 fw-bold d-flex align-items-center gap-2"
@@ -227,7 +215,6 @@ export function Biblioteca() {
           </Button>
         </div>
 
-        {/* LÓGICA DE EXIBIÇÃO */}
         {loading ? (
           <div className="text-center py-5 my-5">
             <Spinner
@@ -238,7 +225,6 @@ export function Biblioteca() {
             <h5 className="mt-3 text-success fw-bold">Buscando treinos...</h5>
           </div>
         ) : treinos?.length === 0 ? (
-          /* AQUI USAMOS A CLASSE CUSTOMIZADA EM VEZ DO BORDER DO BOOTSTRAP */
           <div
             className="text-center py-5 rounded-4 shadow-sm borda-customizada"
             style={{ backgroundColor: "var(--card-bg)" }}
@@ -258,29 +244,26 @@ export function Biblioteca() {
             )}
           </div>
         ) : (
-          <>
-            <div className="library-grid mb-5">
-              {/* O PONTO DE INTERROGAÇÃO AQUI EVITA O ERRO DO .MAP */}
-              {treinos?.map((treino) => (
-                <LibraryCard
-                  key={treino.id}
-                  treino={treino}
-                  onVerDetalhes={handleShowDetalhes}
-                  onCopiar={(t) => {
-                    setTreinoParaCopiar(t);
-                    setShowConfirm(true);
-                  }}
-                  onToggleFollow={handleToggleFollow}
-                  onAvaliar={handleAbrirAvaliacao}
-                  disabled={isProcessing}
-                  onIniciarTreino={(t) => setTreinoEmExecucao(t)}
-                />
-              ))}
-            </div>
-          </>
+          <div className="library-grid mb-5">
+            {treinos?.map((treino) => (
+              <LibraryCard
+                key={treino.id}
+                treino={treino}
+                onVerDetalhes={handleShowDetalhes}
+                onCopiar={(t) => {
+                  setTreinoParaCopiar(t);
+                  setShowConfirm(true);
+                }}
+                onToggleFollow={handleToggleFollow}
+                onAvaliar={handleAbrirAvaliacao}
+                disabled={isProcessing}
+                onIniciarTreino={(t) => setTreinoEmExecucao(t)}
+                onError={handleMostrarErro} // <--- PASSANDO PARA O FILHO AQUI
+              />
+            ))}
+          </div>
         )}
 
-        {/* Paginação Padronizada */}
         <PaginationComponent
           currentPage={currentPage}
           totalPages={totalPages}
@@ -288,21 +271,22 @@ export function Biblioteca() {
           loading={loading}
         />
 
-        {/* Modais */}
         {treinoEmExecucao && (
           <WorkoutPlayer
             treino={treinoEmExecucao}
             onFechar={() => setTreinoEmExecucao(null)}
-            onIniciarTreino={(t) => setTreinoEmExecucao(t)}
           />
         )}
+
         <WorkoutModal
           show={showDetailModal}
           handleClose={() => setShowDetailModal(false)}
           treino={selectedTreino}
           readOnly={true}
           onIniciarTreino={(t) => setTreinoEmExecucao(t)}
+          onError={handleMostrarErro} // <--- PASSANDO PARA O FILHO AQUI
         />
+
         <ConfirmModal
           show={showConfirm}
           handleClose={() => setShowConfirm(false)}
@@ -323,6 +307,8 @@ export function Biblioteca() {
           handleClose={() => setShowSuccess(false)}
           message={successMessage}
         />
+
+        {/* O MODAL DE ERRO ESTÁ PRONTO PARA RECEBER O AVISO DOS FILHOS */}
         <ErrorModal
           show={showError}
           handleClose={() => setShowError(false)}

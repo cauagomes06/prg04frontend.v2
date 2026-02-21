@@ -1,7 +1,7 @@
 import { Card, Button, Badge, Image } from "react-bootstrap";
+import { apiFetch } from "../../services/api";
 import "../../styles/treinos.css";
 
-// Função auxiliar para renderizar estrelas estáticas com base na média do DTO
 const renderStars = (media) => {
   const stars = [];
   for (let i = 1; i <= 5; i++) {
@@ -27,10 +27,25 @@ export function LibraryCard({
   disabled,
   isMostFollowed,
   onIniciarTreino,
+  onError, // Nova prop para erros
 }) {
+
+  const handleValidarInicioTreino = async (e) => {
+    e.stopPropagation();
+    try {
+      const podeTreinar = await apiFetch("/api/execucoes/pode-treinar");
+      if (podeTreinar) {
+        if (onIniciarTreino) onIniciarTreino(treino);
+      } else {
+        if (onError) onError("Você já realizou um treino hoje! O FitHub permite apenas um registro de atividade por dia.");
+      }
+    } catch (error) {
+      if (onError) onError("Não foi possível validar sua permissão de treino agora.");
+    }
+  };
+
   return (
     <Card className="h-100 shadow-sm border-0 rounded-4 overflow-hidden hover-effect custom-card position-relative">
-      {/* Badge "Mais Seguido" */}
       {isMostFollowed && (
         <div
           className="position-absolute top-0 start-0 m-2 px-3 py-1 bg-warning text-dark fw-bold rounded-pill shadow-sm d-flex align-items-center gap-2 border"
@@ -40,7 +55,6 @@ export function LibraryCard({
         </div>
       )}
 
-      {/* Badge de Seguidores */}
       <div
         className="position-absolute top-0 end-0 m-2 px-2 py-1 rounded-pill shadow-sm d-flex align-items-center gap-1"
         style={{ zIndex: 10, backgroundColor: "var(--card-bg)" }}
@@ -51,13 +65,11 @@ export function LibraryCard({
         </span>
       </div>
 
-      {/* Imagem/Ícone de Cabeçalho */}
       <div className="card-header-img card-header-library d-flex align-items-center justify-content-center">
         <i className="fas fa-book-reader fa-3x icon-opacity"></i>
       </div>
 
       <Card.Body className="d-flex flex-column p-3">
-        {/* Título e Nível do Treino */}
         <div className="d-flex justify-content-between align-items-start mb-1">
           <Card.Title
             className="fw-bold text-dark mb-0 h6 text-truncate pe-2"
@@ -80,7 +92,6 @@ export function LibraryCard({
           )}
         </div>
 
-        {/* Exibição de Estrelas */}
         <div
           className="d-flex align-items-center mb-2 gap-1"
           title={`Nota: ${treino.mediaNota || 0}`}
@@ -91,13 +102,11 @@ export function LibraryCard({
           </span>
         </div>
 
-        {/* INFO DO CRIADOR */}
         <div className="d-flex align-items-center mb-3">
           {treino.criadorFoto ? (
             <Image
               src={treino.criadorFoto}
               roundedCircle
-              /* ❌ AQUI: Removi o borderColor de dentro do style */
               style={{ width: "24px", height: "24px", objectFit: "cover" }}
               className="me-2 shadow-sm border"
               alt={treino.criadorNome}
@@ -110,7 +119,6 @@ export function LibraryCard({
           </span>
         </div>
 
-        {/* Rodapé com Botões de Ação */}
         <div className="mt-auto d-flex flex-column gap-2">
           <Button
             variant={treino.seguindo ? "outline-danger" : "outline-success"}
@@ -132,16 +140,12 @@ export function LibraryCard({
             variant="success"
             size="sm"
             className="w-100 fw-bold d-flex align-items-center justify-content-center gap-2 text-white shadow-sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (onIniciarTreino) onIniciarTreino(treino);
-            }}
+            onClick={handleValidarInicioTreino}
             disabled={disabled}
           >
             <i className="fas fa-play"></i> Iniciar Treino
           </Button>
 
-          {/* Ações Secundárias */}
           <div className="d-flex gap-2 mt-1">
             <Button
               variant="outline-success"

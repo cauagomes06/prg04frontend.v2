@@ -1,4 +1,5 @@
 import { Modal, Button, ListGroup, Badge } from "react-bootstrap";
+import { apiFetch } from "../../services/api";
 import "../../styles/treinos.css";
 
 export function WorkoutModal({
@@ -7,11 +8,26 @@ export function WorkoutModal({
   treino,
   readOnly = false,
   onIniciarTreino,
+  onError, // Nova prop para subir mensagens de erro
 }) {
   const formatarDescanso = (descanso) => {
     if (!descanso) return "N/A";
     if (!isNaN(descanso)) return `${descanso}s`;
     return descanso;
+  };
+
+  const handleValidarInicioTreino = async () => {
+    try {
+      const podeTreinar = await apiFetch("/api/execucoes/pode-treinar");
+      if (podeTreinar) {
+        handleClose();
+        onIniciarTreino(treino);
+      } else {
+        if (onError) onError("Limite diário atingido! Você já realizou um treino hoje. Volte amanhã para novos desafios.");
+      }
+    } catch (error) {
+      if (onError) onError("Erro ao verificar permissão de treino. Tente novamente mais tarde.");
+    }
   };
 
   return (
@@ -75,7 +91,6 @@ export function WorkoutModal({
                     key={index}
                     className="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3 px-3 px-md-4 border-0 rounded-4 shadow-sm bg-light hover-effect"
                   >
-                    {/* Lado Esquerdo: Número e Nome do Exercício */}
                     <div className="d-flex align-items-center gap-3 w-100 mb-3 mb-md-0">
                       <div
                         className="bg-success text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm flex-shrink-0"
@@ -93,8 +108,6 @@ export function WorkoutModal({
                       </div>
                     </div>
 
-                    {/* Lado Direito: Informações (Séries, Reps, Descanso) */}
-                    {/* No mobile: flex-row com espaço entre eles. No PC: alinhado à direita com divisórias. */}
                     <div className="d-flex flex-row justify-content-between justify-content-md-end text-center w-100 flex-md-shrink-0 pt-2 pt-md-0 border-top border-md-0 mt-2 mt-md-0">
                       <div className="px-2 px-md-3 mt-2 mt-md-0">
                         <div className="fw-black text-dark fs-5">
@@ -165,10 +178,7 @@ export function WorkoutModal({
         <Button
           variant="success"
           className="fw-bold px-4 px-md-5 rounded-pill shadow-sm"
-          onClick={() => {
-            handleClose();
-            onIniciarTreino(treino);
-          }}
+          onClick={handleValidarInicioTreino}
         >
           <i className="fas fa-play me-2"></i> Iniciar Treino
         </Button>
