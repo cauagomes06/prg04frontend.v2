@@ -16,6 +16,7 @@ import { Notificacoes } from "./pages/Notificacoes.jsx";
 import { Competicoes } from "./pages/Competicoes.jsx";
 import { Aulas } from "./pages/Aulas.jsx";
 import AdminUsers from "./pages/AdminUsers.jsx";
+import { PerfilPublico } from "./pages/PerfilPublico.jsx"; // <- Adicionado o .jsx
 
 // Imports de Pagamento (Adicionados)
 import { PaymentSuccess } from "./pages/payment/PaymentSuccess.jsx";
@@ -72,10 +73,10 @@ function App() {
               </PrivateRoute>
             }
           >
-            {/* Redireciona /portal para /portal/dashboard */}
-            <Route index element={<Navigate to="/portal/perfil" />} />
+            {/* Redireciona /portal para /portal/perfil */}
+            <Route index element={<Navigate to="perfil" />} />
 
-            {/* Rotas Internas do Portal */}
+            {/* Rotas Internas do Portal (TODAS RELATIVAS, SEM A BARRA INICIAL) */}
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="notificacoes" element={<Notificacoes />} />
             <Route path="perfil" element={<Perfil />} />
@@ -84,6 +85,9 @@ function App() {
             <Route path="exercicios" element={<Exercicios />} />
             <Route path="competicoes" element={<Competicoes />} />
             <Route path="aulas" element={<Aulas />} />
+            
+            {/* --- CORREÇÃO AQUI --- Tirei a barra / do início */}
+            <Route path="perfil/:id" element={<PerfilPublico />} />
 
             {/* Rota de Admin */}
             <Route

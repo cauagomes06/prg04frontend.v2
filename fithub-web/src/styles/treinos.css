@@ -124,3 +124,51 @@
   border: 1px solid #2d2d2d !important;
   color: #f8f9fa !important;
 }
+/* =========================================
+   ESTILOS DO PERFIL PÚBLICO
+   ========================================= */
+
+.perfil-publico-bg {
+  background-color: var(--bg-light, #f8f9fa);
+}
+
+.perfil-header-card {
+  border-top: 5px solid var(--primary-color);
+}
+
+.perfil-avatar {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+}
+
+.perfil-avatar-placeholder {
+  width: 120px;
+  height: 120px;
+}
+
+/* Card de Status Gamificado */
+.status-card-perfil {
+  min-width: 190px;
+}
+
+.status-label-perfil {
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+}
+
+.level-circle-perfil {
+  width: 50px;
+  height: 50px;
+  font-size: 1.4rem;
+  background-color: var(--primary-color);
+  border: 3px solid rgba(255, 255, 255, 0.9);
+}
+
+.level-subtitle-perfil {
+  font-size: 0.7rem;
+}
+
+.xp-badge-perfil {
+  font-size: 0.85rem;
+}

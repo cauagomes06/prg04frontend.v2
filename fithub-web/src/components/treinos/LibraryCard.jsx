@@ -1,5 +1,6 @@
 import { Card, Button, Badge, Image } from "react-bootstrap";
 import { apiFetch } from "../../services/api";
+import { useNavigate } from "react-router-dom"; // IMPORTAÇÃO CORRIGIDA AQUI NO TOPO
 import "../../styles/treinos.css";
 
 const renderStars = (media) => {
@@ -27,8 +28,10 @@ export function LibraryCard({
   disabled,
   isMostFollowed,
   onIniciarTreino,
-  onError, // Nova prop para erros
+  onError, 
 }) {
+
+  const navigate = useNavigate(); // HOOK INICIALIZADO AQUI
 
   const handleValidarInicioTreino = async (e) => {
     e.stopPropagation();
@@ -102,7 +105,18 @@ export function LibraryCard({
           </span>
         </div>
 
-        <div className="d-flex align-items-center mb-3">
+        {/* --- DIV DO CRIADOR COM NAVEGAÇÃO --- */}
+        <div 
+          className="d-flex align-items-center mb-3" 
+          style={{ cursor: treino.criadorId ? "pointer" : "default" }}
+          onClick={(e) => {
+            e.stopPropagation(); // Evita que clique na foto dispare outras ações do card
+            if (treino.criadorId) {
+              navigate(`/portal/perfil/${treino.criadorId}`);
+            }
+          }}
+          title={treino.criadorId ? "Ver perfil do criador" : ""}
+        >
           {treino.criadorFoto ? (
             <Image
               src={treino.criadorFoto}
@@ -114,7 +128,7 @@ export function LibraryCard({
           ) : (
             <i className="fas fa-user-circle text-muted me-2 fs-5"></i>
           )}
-          <span className="text-muted small fw-bold text-truncate">
+          <span className={`small fw-bold text-truncate ${treino.criadorId ? 'text-success hover-text-dark' : 'text-muted'}`} style={{ transition: "color 0.2s ease" }}>
             {treino.criadorNome || "Sistema"}
           </span>
         </div>
