@@ -29,7 +29,6 @@ export default function AdminPlans() {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [planToDelete, setPlanToDelete] = useState(null);
 
-  // Carrega os dados sempre que a página abrir ou o termo de busca mudar
   useEffect(() => {
     carregarPlanos();
   }, [searchTerm]);
@@ -71,12 +70,8 @@ export default function AdminPlans() {
     <div className="p-3 p-md-4 min-vh-100">
       <Container fluid className="px-0">
         
-        {/* CABEÇALHO RESPONSIVO E ADAPTADO AO MODO ESCURO */}
-        <div 
-          className="p-3 p-md-4 rounded-4 shadow-sm mb-4 borda-customizada d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4"
-          style={{ backgroundColor: "var(--card-bg)" }}
-        >
-          {/* Lado Esquerdo: Título e Descrição */}
+        {/* CABEÇALHO ADMINISTRATIVO */}
+        <div className="p-3 p-md-4 rounded-4 shadow-sm mb-4 borda-customizada d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4 admin-header-card">
           <div className="mb-2 mb-lg-0">
             <h2 className="fw-bold mb-1 text-dark">
               Gerenciamento de Planos
@@ -86,24 +81,19 @@ export default function AdminPlans() {
             </p>
           </div>
 
-          {/* Lado Direito: Ações (Barra de Pesquisa + Botão Novo) */}
-          <div className="d-flex flex-column flex-md-row align-items-md-start gap-3 w-100" style={{ maxWidth: "700px" }}>
-            
-            {/* SearchBar ocupa o espaço restante */}
-            <div className="flex-grow-1" style={{ marginBottom: "-1.5rem" }}>
+          <div className="d-flex flex-column flex-md-row align-items-md-start gap-3 w-100 admin-action-container">
+            <div className="flex-grow-1 search-wrapper-adjust">
               <SearchBar
                 placeholder="Pesquisar planos..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                onClear={() => setSearchTerm("")} /* Propriedade ativada com sucesso! */
+                onClear={() => setSearchTerm("")}
               />
             </div>
 
-            {/* Botão Novo Plano alinhado com a altura do SearchBar */}
             <Button
               variant="success"
-              className="shadow-sm border-0 d-flex align-items-center justify-content-center px-4 rounded-pill flex-shrink-0"
-              style={{ height: "54px" }} 
+              className="shadow-sm border-0 d-flex align-items-center justify-content-center px-4 rounded-pill flex-shrink-0 btn-new-plan"
               onClick={() => {
                 setPlanToEdit(null);
                 setShowPlanModal(true);
@@ -116,13 +106,10 @@ export default function AdminPlans() {
         </div>
 
         {/* ÁREA DA TABELA */}
-        <div 
-          className="rounded-4 shadow-sm overflow-hidden borda-customizada"
-          style={{ backgroundColor: "var(--card-bg)" }}
-        >
+        <div className="rounded-4 shadow-sm overflow-hidden borda-customizada admin-table-wrapper">
           {loading ? (
             <div className="text-center py-5">
-              <Spinner animation="border" variant="success" style={{ width: '3rem', height: '3rem' }} />
+              <Spinner animation="border" variant="success" className="loading-spinner-admin" />
               <p className="mt-3 fw-bold text-success">Carregando planos...</p>
             </div>
           ) : (

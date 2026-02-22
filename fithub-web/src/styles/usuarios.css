@@ -1,0 +1,77 @@
+/* =========================================
+   ESTILOS DE GESTÃO DE USUÁRIOS
+   ========================================= */
+
+.user-table-container {
+  background-color: var(--card-bg);
+}
+
+.user-table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--text-dark);
+  --bs-table-border-color: var(--border-color);
+  --bs-table-hover-bg: var(--bg-light);
+}
+
+.user-table-thead {
+  background-color: var(--bg-light);
+}
+
+/* Foto do Usuário na Tabela */
+.user-avatar-sm {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+}
+
+.user-icon-placeholder {
+  font-size: 32px;
+}
+
+/* Truncamento de nomes longos */
+.user-name-truncate {
+  display: inline-block;
+  max-width: 150px;
+}
+
+/* Badge de Plano */
+.user-plan-badge {
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+}
+
+/* Espaçamento de colunas vazias */
+.user-empty-icon {
+  opacity: 0.25;
+}
+
+/* Layout da Página de Gerenciamento de Usuários */
+
+.users-page-container {
+  background-color: var(--bg-light);
+}
+
+.users-header-search-wrapper {
+  max-width: 500px;
+  margin-bottom: -1.5rem;
+}
+
+/* Área de Conteúdo/Tabela */
+.users-content-wrapper {
+  background-color: var(--card-bg);
+  min-height: 400px;
+}
+
+.users-loading-container {
+  height: 400px;
+}
+
+.users-spinner {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Ajuste de Paginação */
+.users-pagination-wrapper {
+  padding-bottom: 1.5rem;
+}

@@ -34,7 +34,9 @@
   background-color: var(--card-bg);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   height: 100%;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   overflow: hidden;
 }
 
@@ -52,18 +54,22 @@
 }
 
 .card-header-library {
-  background-color: rgba(13, 110, 253, 0.1); 
+  background-color: rgba(13, 110, 253, 0.1);
   color: #0d6efd;
 }
 
 .card-header-my-workout {
-  background-color: var(--primary-light); 
-  color: var(--primary-color); 
+  background-color: var(--primary-light);
+  color: var(--primary-color);
 }
 
 /* --- UTILITÁRIOS --- */
-.text-small { font-size: 0.75rem; }
-.text-filter-small { font-size: 0.85rem !important; }
+.text-small {
+  font-size: 0.75rem;
+}
+.text-filter-small {
+  font-size: 0.85rem !important;
+}
 
 .library-grid {
   display: grid;
@@ -71,34 +77,41 @@
   gap: 1.5rem;
 }
 
-.search-container { max-width: 600px; }
-.icon-opacity { opacity: 0.5; }
-
-/* --- ITENS DE LISTA --- */
-.bg-light { background-color: var(--card-bg) !important; }
-
-.list-group-item.hover-effect:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+.search-container {
+  max-width: 600px;
+}
+.icon-opacity {
+  opacity: 0.5;
 }
 
-.bg-success { background-color: var(--primary-color) !important; }
+/* --- ITENS DE LISTA --- */
+.bg-light {
+  background-color: var(--card-bg) !important;
+}
+
+.list-group-item.hover-effect:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.bg-success {
+  background-color: var(--primary-color) !important;
+}
 
 .my-workout-card-hover {
-    transition: all 0.3s ease;
-    border-top: 4px solid transparent;
+  transition: all 0.3s ease;
+  border-top: 4px solid transparent;
 }
 
 .my-workout-card-hover:hover {
-    transform: translateY(-5px);
-    border-top-color: var(--primary-color); 
+  transform: translateY(-5px);
+  border-top-color: var(--primary-color);
 }
 
 /* =========================================================
    BLINDAGEM CONTRA BORDAS BRANCAS NA BIBLIOTECA
    ========================================================= */
 
-/* Classes estruturais sem cor de borda fixa */
 .biblioteca-filtros-container {
   border-bottom: 1px solid var(--border-color);
 }
@@ -108,7 +121,6 @@
   border: 1px solid var(--border-color);
 }
 
-/* Regras de Força Bruta para o Modo Escuro (Dark Mode) */
 [data-theme="dark"] .biblioteca-filtros-container {
   border-bottom: 1px solid #2d2d2d !important;
 }
@@ -118,57 +130,75 @@
   border: 1px solid #2d2d2d !important;
 }
 
-/* Garante que o input da Barra de Pesquisa também escureça */
 [data-theme="dark"] .treinos-container input.form-control {
   background-color: #121212 !important;
   border: 1px solid #2d2d2d !important;
   color: #f8f9fa !important;
 }
+
 /* =========================================
-   ESTILOS DO PERFIL PÚBLICO
+   MODAL DE CRIAÇÃO (MINT THEME) - CORRIGIDO PARA DARK MODE
    ========================================= */
 
-.perfil-publico-bg {
-  background-color: var(--bg-light, #f8f9fa);
+.mint-modal-header {
+  background-color: var(--primary-light) !important; /* Dinâmico */
+  border-bottom: 1px solid var(--border-color) !important;
 }
 
-.perfil-header-card {
-  border-top: 5px solid var(--primary-color);
+.mint-modal-title {
+  color: var(--primary-color) !important; /* Dinâmico */
 }
 
-.perfil-avatar {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
+.mint-modal-body {
+  background-color: var(--card-bg) !important; /* Dinâmico */
 }
 
-.perfil-avatar-placeholder {
-  width: 120px;
-  height: 120px;
+.mint-form-label {
+  color: var(--primary-color) !important; /* Dinâmico */
 }
 
-/* Card de Status Gamificado */
-.status-card-perfil {
-  min-width: 190px;
+.mint-input {
+  background-color: var(--bg-light) !important; /* Dinâmico */
+  color: var(--text-dark) !important;
+  border: 1px solid var(--border-color) !important;
 }
 
-.status-label-perfil {
-  font-size: 0.7rem;
+.mint-section-title {
+  color: var(--primary-color) !important;
+  font-size: 0.8rem;
   letter-spacing: 1px;
 }
 
-.level-circle-perfil {
-  width: 50px;
-  height: 50px;
-  font-size: 1.4rem;
-  background-color: var(--primary-color);
-  border: 3px solid rgba(255, 255, 255, 0.9);
+.add-exercise-card {
+  background-color: var(--bg-light) !important;
+  border: 1px solid var(--border-color) !important;
 }
 
-.level-subtitle-perfil {
-  font-size: 0.7rem;
+.mint-table-header {
+  background-color: var(--primary-light) !important;
+  color: var(--primary-color) !important;
+  font-size: 0.75rem;
 }
 
-.xp-badge-perfil {
-  font-size: 0.85rem;
+.btn-mint-action {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+  transition: transform 0.2s;
+}
+
+.btn-mint-action:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* Correção para as linhas da tabela no Dark Mode */
+[data-theme="dark"] .table {
+  color: var(--text-dark) !important;
+}
+
+[data-theme="dark"] .add-exercise-card input,
+[data-theme="dark"] .add-exercise-card select {
+  background-color: var(--card-bg) !important;
+  color: var(--text-dark) !important;
+  border: 1px solid var(--border-color) !important;
 }

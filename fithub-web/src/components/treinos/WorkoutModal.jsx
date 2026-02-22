@@ -8,7 +8,7 @@ export function WorkoutModal({
   treino,
   readOnly = false,
   onIniciarTreino,
-  onError, // Nova prop para subir mensagens de erro
+  onError,
 }) {
   const formatarDescanso = (descanso) => {
     if (!descanso) return "N/A";
@@ -36,7 +36,7 @@ export function WorkoutModal({
       onHide={handleClose}
       size="lg"
       centered
-      contentClassName="rounded-4 border-0 overflow-hidden shadow-lg custom-card"
+      contentClassName="workout-modal-content custom-card"
     >
       <Modal.Header
         closeButton
@@ -52,7 +52,6 @@ export function WorkoutModal({
       <Modal.Body className="p-3 p-md-4">
         {treino ? (
           <div>
-            {/* Cabeçalho com Detalhes Gerais */}
             <div className="mb-4 text-center text-md-start">
               <h5 className="text-muted mb-2 text-uppercase small fw-bold">
                 Sobre o Treino
@@ -64,14 +63,10 @@ export function WorkoutModal({
               <div className="d-flex gap-2 flex-wrap justify-content-center justify-content-md-start">
                 <Badge bg="success" className="p-2 px-3 rounded-pill shadow-sm">
                   <i className="fas fa-clock me-1"></i>{" "}
-                  {treino.duracaoMinutos
-                    ? `${treino.duracaoMinutos} min`
-                    : "Livre"}
+                  {treino.duracaoMinutos ? `${treino.duracaoMinutos} min` : "Livre"}
                 </Badge>
 
-                <Badge
-                  className={`p-2 px-3 rounded-pill shadow-sm ${treino.status === "PUBLICO" ? "bg-primary" : "bg-secondary"}`}
-                >
+                <Badge className={`p-2 px-3 rounded-pill shadow-sm ${treino.status === "PUBLICO" ? "bg-primary" : "bg-secondary"}`}>
                   {treino.status === "PUBLICO" ? "Público" : "Privado"}
                 </Badge>
               </div>
@@ -79,7 +74,6 @@ export function WorkoutModal({
 
             <hr className="text-muted opacity-25 mb-4" />
 
-            {/* Lista de Exercícios */}
             <h5 className="mb-3 text-success fw-bold px-2 px-md-0">
               <i className="fas fa-list-ol me-2"></i> Sequência de Exercícios
             </h5>
@@ -92,15 +86,7 @@ export function WorkoutModal({
                     className="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3 px-3 px-md-4 border-0 rounded-4 shadow-sm bg-light hover-effect"
                   >
                     <div className="d-flex align-items-center gap-3 w-100 mb-3 mb-md-0">
-                      <div
-                        className="bg-success text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm flex-shrink-0"
-                        style={{
-                          width: "42px",
-                          height: "42px",
-                          fontWeight: "900",
-                          fontSize: "1.1rem",
-                        }}
-                      >
+                      <div className="workout-item-badge rounded-circle d-flex align-items-center justify-content-center shadow-sm flex-shrink-0">
                         {index + 1}
                       </div>
                       <div className="fw-bold fs-5 text-dark lh-sm pe-2">
@@ -108,43 +94,34 @@ export function WorkoutModal({
                       </div>
                     </div>
 
-                    <div className="d-flex flex-row justify-content-between justify-content-md-end text-center w-100 flex-md-shrink-0 pt-2 pt-md-0 border-top border-md-0 mt-2 mt-md-0">
+                    <div className="d-flex flex-row justify-content-between justify-content-md-end text-center w-100 flex-md-shrink-0 pt-2 pt-md-0 workout-stats-container border-md-0 mt-2 mt-md-0">
                       <div className="px-2 px-md-3 mt-2 mt-md-0">
-                        <div className="fw-black text-dark fs-5">
+                        <div className="workout-stats-value text-dark fs-5">
                           {item.series}
                         </div>
-                        <small
-                          className="text-muted text-uppercase fw-bold"
-                          style={{ fontSize: "0.65rem" }}
-                        >
+                        <small className="text-muted text-uppercase fw-bold workout-stats-label">
                           Séries
                         </small>
                       </div>
 
-                      <div className="d-none d-md-block border-start mx-1 my-2 opacity-50"></div>
+                      <div className="d-none d-md-block divider-vertical"></div>
 
-                      <div className="px-2 px-md-3 mt-2 mt-md-0">
-                        <div className="fw-black text-success fs-5">
+                      <div className="px-2 px-md-5 mt-2 mt-md-0">
+                        <div className="workout-stats-value text-success fs-5">
                           {item.repeticoes}
                         </div>
-                        <small
-                          className="text-muted text-uppercase fw-bold"
-                          style={{ fontSize: "0.65rem" }}
-                        >
+                        <small className="text-muted text-uppercase fw-bold workout-stats-label">
                           Reps
                         </small>
                       </div>
 
-                      <div className="d-none d-md-block border-start mx-1 my-2 opacity-50"></div>
+                      <div className="d-none d-md-block divider-vertical"></div>
 
                       <div className="px-2 px-md-3 mt-2 mt-md-0">
-                        <div className="fw-black text-warning fs-5">
+                        <div className="workout-stats-value text-warning fs-5">
                           {formatarDescanso(item.descanso)}
                         </div>
-                        <small
-                          className="text-muted text-uppercase fw-bold"
-                          style={{ fontSize: "0.65rem" }}
-                        >
+                        <small className="text-muted text-uppercase fw-bold workout-stats-label">
                           Descanso
                         </small>
                       </div>
@@ -167,7 +144,8 @@ export function WorkoutModal({
           </div>
         )}
       </Modal.Body>
-      <Modal.Footer className="border-0 bg-light rounded-bottom-4 p-3 p-md-4">
+      
+      <Modal.Footer className="workout-modal-footer rounded-bottom-4 p-3 p-md-4">
         <Button
           variant="outline-secondary"
           className="fw-bold px-4 rounded-pill"

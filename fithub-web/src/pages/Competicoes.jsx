@@ -27,24 +27,20 @@ import "../styles/competicoes.css";
 
 export function Competicoes() {
   const { user } = useContext(AuthContext);
-
   const [loading, setLoading] = useState(true);
 
-  // --- ESTADOS DE DADOS PAGINADOS ---
+  // --- DADOS PAGINADOS ---
   const [ranking, setRanking] = useState([]);
   const [rankingPage, setRankingPage] = useState(0);
   const [rankingTotalPages, setRankingTotalPages] = useState(0);
-
   const [competicoes, setCompeticoes] = useState([]);
   const [compPage, setCompPage] = useState(0);
   const [compTotalPages, setCompTotalPages] = useState(0);
-
   const [inscricoes, setInscricoes] = useState([]);
 
-  // --- ESTADOS DE UI / MODAIS ---
+  // --- UI / MODAIS ---
   const [rankingCompeticao, setRankingCompeticao] = useState([]); 
   const [competicaoSelecionada, setCompeticaoSelecionada] = useState(null);
-
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -52,68 +48,45 @@ export function Competicoes() {
   const [showDetalhesModal, setShowDetalhesModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
 
-  // Mensagens e Ações
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [confirmTitle, setConfirmTitle] = useState("");
   const [confirmMessage, setConfirmMessage] = useState("");
   const [pendingAction, setPendingAction] = useState(null);
 
-  // Submit de Resultado
   const [selectedInscricaoId, setSelectedInscricaoId] = useState(null);
   const [resultadoValor, setResultadoValor] = useState("");
 
-  // Permissões
   const roleUsuario = user?.nomePerfil || user?.perfil?.nomePerfil;
   const canManage = roleUsuario && (roleUsuario === "ROLE_ADMIN" || roleUsuario === "ROLE_PERSONAL");
   const isAdmin = roleUsuario === "ROLE_ADMIN";
 
-  // =========================================================
-  // 1. BUSCA DE DADOS (CALLBACKS)
-  // =========================================================
-
   const carregarRanking = useCallback(async () => {
     try {
       const data = await apiFetch(`/api/usuarios/ranking?page=${rankingPage}&size=5`);
-      if (data && data.content) {
+      if (data?.content) {
         setRanking(data.content);
         setRankingTotalPages(data.totalPages);
-      } else {
-        setRanking([]);
-        setRankingTotalPages(0);
       }
-    } catch (error) {
-      console.error("Erro ao carregar ranking geral:", error);
-    }
+    } catch (error) { console.error(error); }
   }, [rankingPage]);
 
   const carregarCompeticoes = useCallback(async () => {
     try {
       const data = await apiFetch(`/api/competicoes/buscar?page=${compPage}&size=5&sort=dataInicio,desc`);
-      if (data && data.content) {
+      if (data?.content) {
         setCompeticoes(data.content);
         setCompTotalPages(data.totalPages);
-      } else {
-        setCompeticoes([]);
-        setCompTotalPages(0);
       }
-    } catch (error) {
-      console.error("Erro ao carregar competições:", error);
-    }
+    } catch (error) { console.error(error); }
   }, [compPage]);
 
   const carregarInscricoes = useCallback(async () => {
     try {
       const data = await apiFetch("/api/competicoes/inscricao/usuario");
       setInscricoes(data || []);
-    } catch (error) {
-      console.error("Erro ao carregar inscrições:", error);
-    }
+    } catch (error) { console.error(error); }
   }, []);
-
-  // =========================================================
-  // 2. EFEITOS (TRIGGERS)
-  // =========================================================
 
   useEffect(() => {
     const init = async () => {
@@ -124,11 +97,6 @@ export function Competicoes() {
     init();
   }, [carregarRanking, carregarCompeticoes, carregarInscricoes]);
 
-  // =========================================================
-  // 3. AÇÕES E HANDLERS
-  // =========================================================
-
-  // Função essencial reintroduzida para corrigir o Uncaught ReferenceError
   const handleOpenSubmit = (inscricaoId) => {
     setSelectedInscricaoId(inscricaoId);
     setResultadoValor("");
@@ -143,7 +111,7 @@ export function Competicoes() {
       setShowDetalhesModal(false);
       carregarCompeticoes();
     } catch (error) {
-      setErrorMessage("Erro ao atualizar status: " + error.message);
+      setErrorMessage("Erro: " + error.message);
       setShowErrorModal(true);
     }
   };
@@ -159,12 +127,12 @@ export function Competicoes() {
     setShowConfirmModal(false);
     try {
       await apiFetch(`/api/competicoes/delete/${id}`, { method: "DELETE" });
-      setSuccessMessage("Competição excluída com sucesso!");
+      setSuccessMessage("Excluída com sucesso!");
       setShowSuccessModal(true);
       setShowDetalhesModal(false);
       carregarCompeticoes();
     } catch (error) {
-      setErrorMessage("Erro ao excluir: " + error.message);
+      setErrorMessage("Erro: " + error.message);
       setShowErrorModal(true);
     }
   };
@@ -184,22 +152,19 @@ export function Competicoes() {
       setShowSuccessModal(true);
       carregarInscricoes();
     } catch (error) {
-      setErrorMessage("Não foi possível realizar a inscrição: " + error.message);
+      setErrorMessage("Erro: " + error.message);
       setShowErrorModal(true);
     }
   };
 
   const abrirDetalhes = async (competicao) => {
-    setRankingCompeticao([]); // Limpa ranking anterior
+    setRankingCompeticao([]);
     setCompeticaoSelecionada(competicao);
     setShowDetalhesModal(true);
     try {
       const data = await apiFetch(`/api/competicoes/${competicao.id}/ranking`);
       setRankingCompeticao(data || []);
-    } catch (error) {
-      console.error(error);
-      setRankingCompeticao([]);
-    }
+    } catch (error) { setRankingCompeticao([]); }
   };
 
   const handleSubmitResultado = async (e) => {
@@ -214,27 +179,27 @@ export function Competicoes() {
       setShowSuccessModal(true);
       carregarInscricoes();
     } catch (error) {
-      setErrorMessage("Erro ao enviar resultado: " + error.message);
+      setErrorMessage("Erro: " + error.message);
       setShowErrorModal(true);
     }
   };
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center vh-100" style={{ backgroundColor: 'var(--bg-light)' }}>
+      <div className="d-flex justify-content-center align-items-center loading-wrapper-comp">
         <Spinner animation="border" variant="success" />
       </div>
     );
   }
 
   return (
-    <div className="competicoes-container py-5 min-vh-100" style={{ backgroundColor: "var(--bg-light)" }}>
+    <div className="competicoes-container py-5 min-vh-100 comp-page-container">
       <Container>
         {/* CABEÇALHO */}
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-5 gap-3">
           <div>
             <h2 className="page-header-title text-dark">
-              <i className="fas fa-trophy me-2 text-warning"></i> Painel de Competições
+              <i className="fas fa-trophy me-2 comp-header-icon"></i> Painel de Competições
             </h2>
             <p className="text-muted mb-0">Acompanhe rankings, inscreva-se e supere seus limites.</p>
           </div>
@@ -281,30 +246,18 @@ export function Competicoes() {
         </Row>
       </Container>
 
-      {/* --- MODAIS --- */}
-      <CreateCompeticaoModal
-        show={showCreateModal}
-        handleClose={() => setShowCreateModal(false)}
-        onSuccess={() => {
-          carregarCompeticoes();
-          setSuccessMessage("Competição criada!");
-          setShowSuccessModal(true);
-        }}
-      />
-
-      {/* Modal de Resultado */}
-      <Modal show={showSubmitModal} onHide={() => setShowSubmitModal(false)} centered backdrop="static">
-        <Modal.Header closeButton className="borda-customizada" style={{ backgroundColor: 'var(--bg-light)' }}>
-          <Modal.Title className="fw-bold text-dark">Enviar Resultado</Modal.Title>
+      {/* MODAL DE RESULTADO */}
+      <Modal show={showSubmitModal} onHide={() => setShowSubmitModal(false)} centered backdrop="static" contentClassName="border-0 rounded-4 overflow-hidden shadow">
+        <Modal.Header closeButton className="submit-result-header">
+          <Modal.Title className="fw-bold text-dark fs-5">Enviar Resultado</Modal.Title>
         </Modal.Header>
-        <Modal.Body className="p-4" style={{ backgroundColor: 'var(--card-bg)' }}>
+        <Modal.Body className="p-4 submit-result-body">
           <Form onSubmit={handleSubmitResultado}>
             <Form.Group>
-              <Form.Label className="fw-bold text-success small">RESULTADO ALCANÇADO</Form.Label>
+              <Form.Label className="fw-bold text-success text-uppercase result-label-success">Resultado Alcançado</Form.Label>
               <Form.Control
                 type="text"
-                className="border-0 p-3 shadow-none"
-                style={{ backgroundColor: 'var(--bg-light)', color: 'var(--text-dark)' }}
+                className="border-0 p-3 shadow-none result-input-custom"
                 placeholder="Ex: 150kg, 50 reps…"
                 value={resultadoValor}
                 required
@@ -312,7 +265,7 @@ export function Competicoes() {
               />
             </Form.Group>
             <div className="d-flex justify-content-end mt-4 gap-2">
-              <Button variant="link" className="text-muted fw-bold text-decoration-none" onClick={() => setShowSubmitModal(false)}>
+              <Button variant="link" className="text-muted fw-bold text-decoration-none shadow-none" onClick={() => setShowSubmitModal(false)}>
                 Cancelar
               </Button>
               <Button type="submit" variant="success" className="rounded-pill px-4 fw-bold shadow-sm">
@@ -323,6 +276,17 @@ export function Competicoes() {
         </Modal.Body>
       </Modal>
 
+      {/* OUTROS MODAIS */}
+      <CreateCompeticaoModal
+        show={showCreateModal}
+        handleClose={() => setShowCreateModal(false)}
+        onSuccess={() => {
+          carregarCompeticoes();
+          setSuccessMessage("Competição criada!");
+          setShowSuccessModal(true);
+        }}
+      />
+
       <ConfirmModal
         show={showConfirmModal}
         handleClose={() => setShowConfirmModal(false)}
@@ -330,6 +294,7 @@ export function Competicoes() {
         title={confirmTitle}
         message={confirmMessage}
       />
+      
       <SuccessModal show={showSuccessModal} handleClose={() => setShowSuccessModal(false)} message={successMessage} />
       <ErrorModal show={showErrorModal} handleClose={() => setShowErrorModal(false)} message={errorMessage} />
 

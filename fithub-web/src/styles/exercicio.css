@@ -1,0 +1,117 @@
+/* =========================================================
+   ESTILOS DO CATÁLOGO DE EXERCÍCIOS - UNIFICADO
+   ========================================================= */
+
+.exercise-card-container {
+  background-color: var(--card-bg);
+}
+
+.exercise-table {
+  --bs-table-bg: transparent !important;
+  --bs-table-color: var(--text-dark) !important;
+  --bs-table-hover-color: var(--text-dark) !important;
+  --bs-table-border-color: var(--border-color) !important;
+  --bs-table-hover-bg: var(--bg-light) !important;
+}
+
+.exercise-table-thead {
+  background-color: var(--bg-light) !important;
+}
+
+.exercise-table-thead th {
+  color: var(--text-muted) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+/* Células e Textos */
+.exercise-name-cell {
+  color: var(--text-dark) !important;
+}
+
+.exercise-desc-col {
+  max-width: 350px;
+}
+
+.exercise-desc-text {
+  color: var(--text-muted) !important;
+  max-width: 300px;
+  display: inline-block;
+}
+
+.exercise-no-desc {
+  color: var(--text-muted) !important;
+  opacity: 0.5;
+}
+
+/* Badge de Grupo Muscular */
+.exercise-group-badge {
+  background-color: var(--bg-light) !important;
+  color: var(--primary-color) !important;
+  border: 1px solid var(--border-color) !important;
+  font-weight: 600;
+}
+
+/* Botão de Play (Mídia) */
+.btn-play-media {
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+  width: 32px;
+  height: 32px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-play-media:hover {
+  filter: brightness(0.9);
+  color: var(--primary-color);
+  transform: scale(1.05);
+}
+
+
+
+/* Estados (Loading e Vazio) */
+.exercise-status-text {
+  color: var(--text-muted) !important;
+}
+
+.table-empty-state {
+  color: var(--text-muted) !important;
+  opacity: 0.35;
+}
+
+.media-placeholder {
+  color: var(--text-muted);
+  opacity: 0.3;
+}
+
+/* --- CreateExerciseModal --- */
+.exercise-modal-header, .exercise-modal-footer {
+  background-color: var(--bg-light);
+  border-color: var(--border-color);
+}
+
+.exercise-modal-body {
+  background-color: var(--card-bg);
+}
+
+.exercise-form-label {
+  color: var(--primary-color);
+  font-size: 0.75rem;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.exercise-input-custom {
+  background-color: var(--bg-light) !important;
+  color: var(--text-dark) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 12px;
+  transition: box-shadow 0.2s ease;
+}
+
+.exercise-input-custom:focus {
+  box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.1) !important;
+  border-color: var(--primary-color) !important;
+}

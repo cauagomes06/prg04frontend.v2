@@ -1,85 +1,58 @@
 import { Card, ListGroup, Button } from "react-bootstrap";
+import "../../styles/competicoes.css";
 
 const getPosBadgeClass = (pos) => {
-  if (pos === 1) return "badge-pos badge-gold";
-  if (pos === 2) return "badge-pos badge-silver";
-  if (pos === 3) return "badge-pos badge-bronze";
-  return "badge-pos badge-default";
+  const base = "badge-pos ";
+  if (pos === 1) return base + "badge-gold shadow-sm";
+  if (pos === 2) return base + "badge-silver";
+  if (pos === 3) return base + "badge-bronze";
+  return base + "badge-default";
 };
 
-export function RankingCard({
-  ranking,
-  currentPage,
-  totalPages,
-  onPageChange,
-}) {
+export function RankingCard({ ranking, currentPage, totalPages, onPageChange }) {
   return (
     <Card className="custom-card h-100 shadow-sm border-0">
-      <div
-        className="custom-card-header borda-customizada"
-        style={{ borderBottom: "1px solid var(--border-color)" }}
-      >
-        <div className="d-flex justify-content-between align-items-center w-100">
-          <span className="fw-bold text-dark">
-            <i className="fas fa-trophy card-icon text-warning me-2"></i>{" "}
+      <div className="comp-card-header">
+        <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 w-100">
+          <h5 className="comp-card-title">
+            <i className="fas fa-trophy text-warning"></i>
             Ranking Geral
-          </span>
-          <span
-            className="badge borda-customizada"
-            style={{
-              fontSize: "0.7em",
-              backgroundColor: "var(--bg-light)",
-              color: "var(--text-dark)",
-            }}
-          >
-            Top {ranking.length > 0 ? ranking[0].posicao : 0} -{" "}
-            {ranking.length > 0 ? ranking[ranking.length - 1].posicao : 0}
+          </h5>
+          <span className="badge comp-list-badge-page py-2 px-3">
+            TOP {ranking.length > 0 ? ranking[0].posicao : 0} - {ranking.length > 0 ? ranking[ranking.length - 1].posicao : 0}
           </span>
         </div>
       </div>
 
-      <Card.Body
-        className="p-0 d-flex flex-column"
-        style={{ backgroundColor: "var(--card-bg)" }}
-      >
-        <ListGroup variant="flush" className="flex-grow-1 bg-transparent">
+      <Card.Body className="p-0 d-flex flex-column">
+        <ListGroup variant="flush" className="flex-grow-1">
           {ranking.length === 0 ? (
-            <div className="p-4 text-center text-muted">
+            <div className="p-5 text-center comp-empty-state">
               <i className="fas fa-chart-line fa-2x mb-3 opacity-25"></i>
-              <p className="mb-0 small">Ranking ainda não formado.</p>
+              <p className="fw-bold mb-0">Ranking ainda não formado.</p>
             </div>
           ) : (
             ranking.map((u) => (
-              <ListGroup.Item
-                key={u.usuarioId || u.username}
-                className="ranking-item d-flex justify-content-between align-items-center bg-transparent borda-customizada"
-              >
-                <div className="d-flex align-items-center">
+              <ListGroup.Item key={u.usuarioId || u.username} className="ranking-item border-0">
+                {/* Lado Esquerdo: Badge + Nome (Container com flex-grow para ocupar o espaço disponível) */}
+                <div className="d-flex align-items-center overflow-hidden flex-grow-1 me-2">
                   <div className={getPosBadgeClass(u.posicao)}>{u.posicao}</div>
-                  <div className="ms-2">
-                    <div
-                      className="fw-bold text-dark"
-                      style={{ fontSize: "0.95rem" }}
-                    >
+                  <div className="ms-3 text-truncate">
+                    <div className="ranking-user-name mb-0 text-truncate" title={u.nome || u.nomeCompleto}>
                       {u.nome || u.nomeCompleto || "Usuário"}
                     </div>
                     {u.posicao === 1 && (
-                      <span
-                        className="leader-crown text-warning"
-                        style={{ fontSize: "0.75rem", fontWeight: "bold" }}
-                      >
-                        <i className="fas fa-crown me-1"></i>Líder
+                      <span className="text-warning fw-bold text-uppercase d-block" style={{ fontSize: "0.6rem", letterSpacing: "0.5px" }}>
+                        <i className="fas fa-crown me-1"></i>Líder Atual
                       </span>
                     )}
                   </div>
                 </div>
-                <div className="text-end">
-                  <span className="score-text d-block fw-bold text-success">
-                    {u.scoreTotal}
-                  </span>
-                  <small className="text-muted" style={{ fontSize: "0.7rem" }}>
-                    PONTOS
-                  </small>
+
+                {/* Lado Direito: Score (Container com flex-shrink-0 para NUNCA quebrar ou sumir) */}
+                <div className="flex-shrink-0 text-end">
+                  <span className="score-text">{u.scoreTotal}</span>
+                  <span className="score-label ms-1">Pts</span>
                 </div>
               </ListGroup.Item>
             ))
@@ -87,33 +60,27 @@ export function RankingCard({
         </ListGroup>
 
         {totalPages > 1 && (
-          <div
-            className="p-2 border-top d-flex justify-content-between align-items-center mt-auto"
-            style={{
-              backgroundColor: "var(--bg-light)",
-              borderColor: "var(--border-color) !important",
-            }}
-          >
+          <div className="comp-card-footer mt-auto">
             <Button
               variant="link"
               size="sm"
-              className="text-decoration-none text-dark shadow-none"
+              className="comp-pagination-btn p-0 shadow-none"
               disabled={currentPage === 0}
               onClick={() => onPageChange(currentPage - 1)}
             >
-              <i className="fas fa-chevron-left"></i>
+              <i className="fas fa-chevron-left fa-lg"></i>
             </Button>
-            <span className="small text-muted fw-bold">
-              Página {currentPage + 1} de {totalPages}
+            <span className="comp-pagination-info fw-bold">
+              {currentPage + 1} / {totalPages}
             </span>
             <Button
               variant="link"
               size="sm"
-              className="text-decoration-none text-dark shadow-none"
+              className="comp-pagination-btn p-0 shadow-none"
               disabled={currentPage >= totalPages - 1}
               onClick={() => onPageChange(currentPage + 1)}
             >
-              <i className="fas fa-chevron-right"></i>
+              <i className="fas fa-chevron-right fa-lg"></i>
             </Button>
           </div>
         )}

@@ -3,7 +3,7 @@ import { ProgressBar, Button, Badge } from "react-bootstrap";
 import { execucaoApi } from "../../services/api";
 import { ErrorModal } from "../common/ErrorModal";
 import { LevelUpModal } from "../common/LevelUpModal";
-import "../../styles/WorkoutPlayer.css";
+import "../../styles/workoutPlayer.css";
 
 export function WorkoutPlayer({ treino, onFechar }) {
   const listaExercicios = treino?.items || treino?.itens || [];
@@ -16,9 +16,9 @@ export function WorkoutPlayer({ treino, onFechar }) {
   const [exercicioAtualIdx, setExercicioAtualIdx] = useState(0);
   const [logExecucao, setLogExecucao] = useState({});
   const [isFinalizando, setIsFinalizando] = useState(false);
-  
-  const [showSuccessScreen, setShowSuccessScreen] = useState(false); 
-  const [showLevelUpModal, setShowLevelUpModal] = useState(false);   
+
+  const [showSuccessScreen, setShowSuccessScreen] = useState(false);
+  const [showLevelUpModal, setShowLevelUpModal] = useState(false);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -77,21 +77,19 @@ export function WorkoutPlayer({ treino, onFechar }) {
 
     try {
       const response = await execucaoApi.finalizar(dadosSessao);
-      
       setPontosGanhos(response.pontosGanhos || 0);
       setNovoNivel(response.nivelAtual || 1);
-
-      // FLUXO ÚNICO: Ativa o Troféu como fundo
       setShowSuccessScreen(true);
 
-      // Se o backend diz que subiu de nível, abre o modal por cima do troféu
       if (response.subiuDeNivel) {
         setTimeout(() => {
           setShowLevelUpModal(true);
-        }, 300); // Pequeno delay para a animação do troféu respirar
+        }, 300);
       }
     } catch (err) {
-      setErrorMessage(err.response?.data?.message || "Erro ao salvar o treino.");
+      setErrorMessage(
+        err.response?.data?.message || "Erro ao salvar o treino.",
+      );
       setShowError(true);
     } finally {
       setIsFinalizando(false);
@@ -113,37 +111,64 @@ export function WorkoutPlayer({ treino, onFechar }) {
           <div className="text-center animate-up-1">
             <i className="fas fa-trophy fa-7x text-warning mb-4 trophy-pulse"></i>
           </div>
-          <h1 className="fw-black display-3 mb-2 text-center animate-up-2">TREINO CONCLUÍDO!</h1>
+          <h1 className="fw-black display-3 mb-2 text-center animate-up-2">
+            TREINO CONCLUÍDO!
+          </h1>
           <div className="animate-up-2 mb-4 mt-2">
-            <Badge bg="light" text="success" className="fs-2 px-4 py-2 rounded-pill shadow-sm fw-black">
+            <Badge
+              bg="light"
+              text="success"
+              className="xp-badge-concluded shadow-sm fw-black"
+            >
               +{pontosGanhos} PONTOS
             </Badge>
           </div>
           <p className="fs-5 mb-5 opacity-75 text-center px-4 animate-up-3">
-            Excelente trabalho! O seu esforço foi registado.
+            Excelente trabalho! O seu esforço foi registrado.
           </p>
-          <Button variant="light" size="lg" className="rounded-pill px-5 py-3 fw-bold text-success shadow-lg w-75 animate-up-3" onClick={onFechar}>
+          <Button
+            variant="light"
+            size="lg"
+            className="btn-continue-workout shadow-lg animate-up-3"
+            onClick={onFechar}
+          >
             CONTINUAR
           </Button>
         </div>
       ) : (
-        <div className="workout-player-overlay" style={{ backgroundColor: "var(--bg-light)" }}>
-          <div className="player-topbar border-bottom d-flex justify-content-between align-items-center px-3 py-3 shadow-sm" style={{ backgroundColor: "var(--card-bg)" }}>
+        <div className="workout-player-overlay">
+          <div className="player-topbar border-bottom d-flex justify-content-between align-items-center px-3 py-3 shadow-sm">
             <div className="d-flex align-items-center gap-3">
               <div className="session-timer bg-success text-white px-3 py-1 rounded-3 fw-bold">
                 {formatarTempo(segundosDecorridos)}
               </div>
-              <h5 className="mb-0 fw-bold text-dark text-truncate" style={{ maxWidth: "180px" }}>{treino.nome}</h5>
+              <h5 className="player-treino-nome mb-0 fw-bold text-dark text-truncate">
+                {treino.nome}
+              </h5>
             </div>
-            <Button variant="link" className="text-danger p-0 fs-3" onClick={onFechar}><i className="fas fa-times"></i></Button>
+            <Button
+              variant="link"
+              className="text-danger p-0 fs-3"
+              onClick={onFechar}
+            >
+              <i className="fas fa-times"></i>
+            </Button>
           </div>
 
-          <ProgressBar variant="success" now={((exercicioAtualIdx + 1) / listaExercicios.length) * 100} style={{ height: "6px", borderRadius: 0 }} />
+          <ProgressBar
+            variant="success"
+            now={((exercicioAtualIdx + 1) / listaExercicios.length) * 100}
+            className="player-progress-bar"
+          />
 
           <div className="player-content">
             <div className="text-center mb-4 mt-2">
-              <Badge bg="dark" className="mb-2 uppercase">Exercício {exercicioAtualIdx + 1} de {listaExercicios.length}</Badge>
-              <h2 className="fw-black text-dark display-6">{exercicioAtual.nomeExercicio}</h2>
+              <Badge bg="dark" className="mb-2 uppercase">
+                Exercício {exercicioAtualIdx + 1} de {listaExercicios.length}
+              </Badge>
+              <h2 className="fw-black text-dark display-6">
+                {exercicioAtual.nomeExercicio}
+              </h2>
             </div>
 
             <div className="sets-list px-2">
@@ -153,59 +178,87 @@ export function WorkoutPlayer({ treino, onFechar }) {
                 return (
                   <div
                     key={i}
-                    className={`set-row ${isDone ? "completed" : ""}`}
+                    className={`set-row ${isDone ? "completed" : ""} ${isNext ? "next-available" : "locked"}`}
                     onClick={() => isNext && handleToggleSerie(i)}
-                    style={{
-                      backgroundColor: isDone ? "var(--primary-light)" : "var(--card-bg)",
-                      borderColor: isDone ? "var(--primary-color)" : "var(--border-color)",
-                      opacity: isNext || isDone ? 1 : 0.4,
-                      cursor: isNext ? "pointer" : "default",
-                    }}
                   >
-                    <span className="set-number fs-4 fw-bold text-muted">#{i + 1}</span>
+                    <span className="set-number fs-4 fw-bold text-muted">
+                      #{i + 1}
+                    </span>
                     <div className="set-details text-center">
-                      <span className="fs-3 fw-bold text-dark">{exercicioAtual.repeticoes}</span>
-                      <small className="d-block text-muted text-uppercase fw-bold" style={{ fontSize: "0.6rem" }}>Repetições</small>
+                      <span className="fs-3 fw-bold text-dark">
+                        {exercicioAtual.repeticoes}
+                      </span>
+                      <small className="label-reps">Repetições</small>
                     </div>
-                    <i className={`fas fa-check-circle fs-1 ${isDone ? "text-success" : "text-light opacity-25"}`}></i>
+                    <i
+                      className={`fas fa-check-circle fs-1 check-icon ${isDone ? "active" : ""}`}
+                    ></i>
                   </div>
                 );
               })}
             </div>
 
             {isDescansando && (
-              <div className="inline-rest-container mx-2 mt-4" style={{ backgroundColor: "var(--card-bg)" }}>
-                <div className="inline-rest-circle" style={{ backgroundColor: "var(--bg-light)", border: "4px solid var(--primary-color)" }}>
-                  <span className="inline-rest-number" style={{ color: "var(--primary-color)" }}>{tempoDescanso}</span>
+              <div className="inline-rest-container mx-2 mt-4">
+                <div className="inline-rest-circle">
+                  <span className="inline-rest-number">{tempoDescanso}</span>
                 </div>
-                <Button variant="outline-success" className="rounded-pill mt-3 px-4 fw-bold" onClick={() => setIsDescansando(false)}>PULAR</Button>
+                <Button
+                  variant="outline-success"
+                  className="rounded-pill mt-3 px-4 fw-bold"
+                  onClick={() => setIsDescansando(false)}
+                >
+                  PULAR
+                </Button>
               </div>
             )}
           </div>
 
-          <div className="player-footer border-top p-3 position-absolute bottom-0 w-100" style={{ backgroundColor: "var(--card-bg)" }}>
+          <div className="player-footer border-top p-3 position-absolute bottom-0 w-100">
             <div className="d-flex gap-2">
-              <Button variant="light" className="flex-grow-1 py-3 fw-bold rounded-4" style={{ backgroundColor: "var(--bg-light)", color: "var(--text-dark)" }} onClick={() => setExercicioAtualIdx((p) => p - 1)} disabled={exercicioAtualIdx === 0}>ANTERIOR</Button>
+              <Button
+                variant="light"
+                className="btn-footer-secondary"
+                onClick={() => setExercicioAtualIdx((p) => p - 1)}
+                disabled={exercicioAtualIdx === 0}
+              >
+                ANTERIOR
+              </Button>
               {exercicioAtualIdx === listaExercicios.length - 1 ? (
-                <Button variant="dark" className="flex-grow-1 py-3 fw-bold rounded-4 shadow" onClick={handleFinalizarTreino} disabled={isFinalizando}>{isFinalizando ? "SALVANDO..." : "FINALIZAR"}</Button>
+                <Button
+                  variant="dark"
+                  className="btn-footer-primary shadow"
+                  onClick={handleFinalizarTreino}
+                  disabled={isFinalizando}
+                >
+                  {isFinalizando ? "SALVANDO..." : "FINALIZAR"}
+                </Button>
               ) : (
-                <Button variant="success" className="flex-grow-1 py-3 fw-bold rounded-4 shadow" onClick={() => {setExercicioAtualIdx((p) => p + 1); setIsDescansando(false);}}>PRÓXIMO</Button>
+                <Button
+                  variant="success"
+                  className="btn-footer-primary shadow"
+                  onClick={() => {
+                    setExercicioAtualIdx((p) => p + 1);
+                    setIsDescansando(false);
+                  }}
+                >
+                  PRÓXIMO
+                </Button>
               )}
             </div>
           </div>
         </div>
       )}
 
-      <LevelUpModal 
-        show={showLevelUpModal} 
-        level={novoNivel} 
-        onHide={() => setShowLevelUpModal(false)} 
+      <LevelUpModal
+        show={showLevelUpModal}
+        level={novoNivel}
+        onHide={() => setShowLevelUpModal(false)}
       />
-
-      <ErrorModal 
-        show={showError} 
-        handleClose={() => setShowError(false)} 
-        message={errorMessage} 
+      <ErrorModal
+        show={showError}
+        handleClose={() => setShowError(false)}
+        message={errorMessage}
       />
     </>
   );

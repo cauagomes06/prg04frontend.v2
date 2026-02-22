@@ -2,12 +2,12 @@ import { useState, useEffect, useContext } from "react";
 import { Modal, Button, Form, Row, Col, Alert } from "react-bootstrap";
 import { apiFetch } from "../../services/api";
 import { AuthContext } from "../../context/AuthContext";
+import "../../styles/aulas.css";
 
 export function CreateClassModal({ show, handleClose, onSuccess }) {
   const { user } = useContext(AuthContext);
   const [instrutores, setInstrutores] = useState([]);
   
-  // Estados do Formulário
   const [formData, setFormData] = useState({
     nome: "",
     descricao: "",
@@ -19,21 +19,18 @@ export function CreateClassModal({ show, handleClose, onSuccess }) {
 
   const [error, setError] = useState("");
 
-  // Carregar lista de instrutores ao abrir o modal
   useEffect(() => {
     if (show) {
-      // Limpa o form
       setFormData({
         nome: "",
         descricao: "",
         dataHoraInicio: "",
         duracaoMinutos: 60,
         vagasTotais: 20,
-        instrutorIdentificador: user?.id || "" // Se for personal, já sugere ele mesmo
+        instrutorIdentificador: user?.id || ""
       });
       setError("");
 
-      // Busca instrutores para o select
       apiFetch("/api/aulas/instrutores")
         .then(setInstrutores)
         .catch(console.error);
@@ -54,7 +51,6 @@ export function CreateClassModal({ show, handleClose, onSuccess }) {
         method: "POST",
         body: JSON.stringify({
             ...formData,
-            // Garante que números sejam enviados como números
             duracaoMinutos: parseInt(formData.duracaoMinutos),
             vagasTotais: parseInt(formData.vagasTotais),
             instrutorIdentificador: parseInt(formData.instrutorIdentificador)
@@ -69,22 +65,23 @@ export function CreateClassModal({ show, handleClose, onSuccess }) {
   };
 
   return (
-    <Modal show={show} onHide={handleClose} centered size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title className="fw-bold">Agendar Nova Aula</Modal.Title>
+    <Modal show={show} onHide={handleClose} centered size="lg" contentClassName="border-0 rounded-4 overflow-hidden shadow">
+      <Modal.Header closeButton className="aulas-modal-header">
+        <Modal.Title className="fw-bold text-dark">Agendar Nova Aula</Modal.Title>
       </Modal.Header>
       
-      <Modal.Body>
-        {error && <Alert variant="danger">{error}</Alert>}
+      <Modal.Body className="aulas-modal-body p-4">
+        {error && <Alert variant="danger" className="rounded-3 border-0 shadow-sm">{error}</Alert>}
         
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
             <Col md={6}>
               <Form.Group>
-                <Form.Label className="fw-bold">Nome da Aula</Form.Label>
+                <Form.Label className="fw-bold aulas-form-label">Nome da Aula</Form.Label>
                 <Form.Control 
                   type="text" 
                   name="nome" 
+                  className="aulas-input-custom shadow-none"
                   placeholder="Ex: Spinning Intenso"
                   value={formData.nome} 
                   onChange={handleChange} 
@@ -94,9 +91,10 @@ export function CreateClassModal({ show, handleClose, onSuccess }) {
             </Col>
             <Col md={6}>
               <Form.Group>
-                <Form.Label className="fw-bold">Instrutor Responsável</Form.Label>
+                <Form.Label className="fw-bold aulas-form-label">Instrutor Responsável</Form.Label>
                 <Form.Select 
                   name="instrutorIdentificador"
+                  className="aulas-input-custom shadow-none"
                   value={formData.instrutorIdentificador}
                   onChange={handleChange}
                   required
@@ -113,11 +111,13 @@ export function CreateClassModal({ show, handleClose, onSuccess }) {
           </Row>
 
           <Form.Group className="mb-3">
-            <Form.Label className="fw-bold">Descrição</Form.Label>
+            <Form.Label className="fw-bold aulas-form-label">Descrição</Form.Label>
             <Form.Control 
               as="textarea" 
               rows={2}
               name="descricao" 
+              className="aulas-input-custom shadow-none"
+              placeholder="Breve descrição dos objetivos da aula..."
               value={formData.descricao} 
               onChange={handleChange} 
             />
@@ -126,10 +126,11 @@ export function CreateClassModal({ show, handleClose, onSuccess }) {
           <Row className="mb-3">
             <Col md={4}>
               <Form.Group>
-                <Form.Label className="fw-bold">Data e Hora</Form.Label>
+                <Form.Label className="fw-bold aulas-form-label">Data e Hora</Form.Label>
                 <Form.Control 
                   type="datetime-local" 
                   name="dataHoraInicio" 
+                  className="aulas-input-custom shadow-none"
                   value={formData.dataHoraInicio} 
                   onChange={handleChange} 
                   required 
@@ -138,10 +139,11 @@ export function CreateClassModal({ show, handleClose, onSuccess }) {
             </Col>
             <Col md={4}>
               <Form.Group>
-                <Form.Label className="fw-bold">Duração (min)</Form.Label>
+                <Form.Label className="fw-bold aulas-form-label">Duração (min)</Form.Label>
                 <Form.Control 
                   type="number" 
                   name="duracaoMinutos" 
+                  className="aulas-input-custom shadow-none"
                   value={formData.duracaoMinutos} 
                   onChange={handleChange} 
                   min="10"
@@ -151,10 +153,11 @@ export function CreateClassModal({ show, handleClose, onSuccess }) {
             </Col>
             <Col md={4}>
               <Form.Group>
-                <Form.Label className="fw-bold">Vagas Totais</Form.Label>
+                <Form.Label className="fw-bold aulas-form-label">Vagas Totais</Form.Label>
                 <Form.Control 
                   type="number" 
                   name="vagasTotais" 
+                  className="aulas-input-custom shadow-none"
                   value={formData.vagasTotais} 
                   onChange={handleChange} 
                   min="1"
@@ -164,9 +167,13 @@ export function CreateClassModal({ show, handleClose, onSuccess }) {
             </Col>
           </Row>
 
-          <div className="d-flex justify-content-end gap-2 mt-4">
-            <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
-            <Button variant="success" type="submit">Confirmar Agendamento</Button>
+          <div className="d-flex justify-content-end gap-2 mt-4 pt-3 border-top border-color-custom">
+            <Button variant="link" className="text-muted fw-bold text-decoration-none shadow-none" onClick={handleClose}>
+              Cancelar
+            </Button>
+            <Button variant="success" type="submit" className="rounded-pill px-4 fw-bold shadow-sm">
+              Confirmar Agendamento
+            </Button>
           </div>
         </Form>
       </Modal.Body>

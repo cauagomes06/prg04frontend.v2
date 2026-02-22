@@ -1,5 +1,4 @@
-/* src/styles/WorkoutPlayer.css */
-
+/* --- CONTAINER PRINCIPAL (OVERLAY) --- */
 .workout-player-overlay {
   position: fixed;
   top: 0;
@@ -7,7 +6,6 @@
   width: 100vw;
   height: 100vh;
   z-index: 9999;
-  /* Fundo dinâmico que se adapta ao tema */
   background-color: var(--bg-light); 
   display: flex;
   flex-direction: column;
@@ -20,34 +18,77 @@
   to { transform: translateY(0); opacity: 1; }
 }
 
+/* --- TOPO E PROGRESSO --- */
+.player-topbar {
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.player-treino-nome {
+  max-width: 180px;
+}
+
+.player-progress-bar {
+  height: 6px;
+  border-radius: 0;
+}
+
+/* --- CONTEÚDO CENTRAL --- */
 .player-content {
   flex: 1;
   overflow-y: auto;
   padding: 1.5rem;
-  padding-bottom: 120px;
+  padding-bottom: 120px; /* Espaço para o footer fixo */
 }
 
-/* Linhas das Séries - Refatoradas para suportar Dark Mode */
+/* --- LISTA DE SÉRIES (SETS) --- */
 .set-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 1.2rem;
-  background: var(--card-bg); /* Dinâmico */
+  background: var(--card-bg);
   border-radius: 15px;
   margin-bottom: 0.8rem;
-  border: 1px solid var(--border-color); /* Dinâmico */
+  border: 2px solid var(--border-color);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
   transition: all 0.2s ease;
 }
 
-/* Estado de Concluído: Verde suave em ambos os temas */
 .set-row.completed {
-  background: rgba(10, 211, 84, 0.1) !important;
+  background: rgba(10, 211, 84, 0.1) !important; /* Verde suave transparente */
   border-color: var(--primary-color) !important;
 }
 
-/* --- Cronômetro Inline Destacado --- */
+.set-row.next-available {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.set-row.locked {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.label-reps {
+  display: block;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.6rem;
+}
+
+.check-icon {
+  color: var(--text-light);
+  opacity: 0.25;
+}
+
+.check-icon.active {
+  color: var(--primary-color);
+  opacity: 1;
+}
+
+/* --- CRONÔMETRO DE DESCANSO --- */
 .inline-rest-container {
   display: flex;
   flex-direction: column;
@@ -63,28 +104,49 @@
 }
 
 .inline-rest-circle {
-  width: 160px;
-  height: 160px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   background: var(--bg-light); 
-  border: 3px solid var(--primary-color);
+  border: 4px solid var(--primary-color);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   margin-bottom: 1.5rem;
 }
 
 .inline-rest-number {
-  font-size: 4rem;
+  font-size: 3.5rem;
   font-weight: 900;
   color: var(--primary-color);
-  line-height: 1;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -2px;
 }
 
-/* --- CSS DA TELA DE VITÓRIA (Sempre Vibrante) --- */
+/* --- FOOTER FIXO --- */
+.player-footer {
+  background-color: var(--card-bg);
+  border-top: 1px solid var(--border-color);
+  padding: 1.5rem;
+}
+
+.btn-footer-secondary {
+  flex-grow: 1;
+  padding: 1rem 0;
+  font-weight: bold;
+  border-radius: 1rem;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  border: none;
+}
+
+.btn-footer-primary {
+  flex-grow: 1;
+  padding: 1rem 0;
+  font-weight: bold;
+  border-radius: 1rem;
+}
+
+/* --- TELA DE SUCESSO (VITÓRIA) --- */
 .success-overlay {
   position: fixed;
   top: 0;
@@ -92,37 +154,45 @@
   width: 100vw;
   height: 100vh;
   z-index: 10000;
-  /* Gradiente premium do Fit Hub */
   background: linear-gradient(135deg, var(--primary-color) 0%, #08b346 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   color: white;
-  animation: victoryPopIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  text-align: center;
 }
 
-/* Brilho Dourado do Troféu */
 .trophy-pulse {
   animation: pulseGold 2.5s infinite ease-in-out;
-  filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.5));
 }
 
 @keyframes pulseGold {
-  0% { transform: scale(1); }
-  50% { 
-    transform: scale(1.08); 
-    filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.8));
-  }
-  100% { transform: scale(1); }
+  0% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.4)); }
+  50% { transform: scale(1.1); filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.8)); }
+  100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.4)); }
 }
 
-/* Ajustes de texto para Dark Mode dentro do Player */
-[data-theme="dark"] .set-row span,
-[data-theme="dark"] .set-row strong {
-  color: var(--text-dark) !important;
+.xp-badge-concluded {
+  font-size: 1.5rem;
+  padding: 0.75rem 2rem;
+  border-radius: 50px;
 }
 
-[data-theme="dark"] .inline-rest-container {
-  background-color: rgba(10, 211, 84, 0.05);
+.btn-continue-workout {
+  border-radius: 50px;
+  padding: 1rem;
+  font-weight: bold;
+  color: var(--primary-color) !important;
+  width: 75%;
+  background-color: white !important;
+  border: none;
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 576px) {
+  .player-treino-nome { max-width: 130px; font-size: 1rem; }
+  .display-3 { font-size: 2.2rem; }
+  .inline-rest-circle { width: 120px; height: 120px; }
+  .inline-rest-number { font-size: 2.5rem; }
 }

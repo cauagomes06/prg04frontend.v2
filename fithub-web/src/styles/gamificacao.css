@@ -1,0 +1,42 @@
+/* =========================================
+   ESTILOS DE GAMIFICAÇÃO (XP E NÍVEL)
+   ========================================= */
+
+.xp-container-card {
+  background-color: var(--card-bg, #ffffff);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-sm, 0 2px 4px rgba(0,0,0,0.05));
+  border: 1px solid var(--border-color, #e9ecef);
+}
+
+.xp-placeholder-loader {
+  height: 20px;
+}
+
+.xp-level-badge {
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.xp-level-title {
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+.xp-values-text {
+  font-size: 0.85rem;
+}
+
+/* Customização da Barra de Progresso do Bootstrap */
+.xp-bar-container {
+  height: 12px !important;
+  background-color: var(--border-color, #e9ecef) !important;
+}
+
+.xp-bar-fill {
+  background-color: var(--primary-color, #10b981) !important;
+}
+
+.xp-footer-text {
+  font-size: 0.7rem;
+}

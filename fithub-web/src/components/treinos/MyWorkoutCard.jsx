@@ -30,18 +30,16 @@ export function MyWorkoutCard({
 
   return (
     <Card className="h-100 shadow-sm border-0 rounded-4 overflow-hidden hover-effect custom-card position-relative">
+      {/* Badge de Status (Público/Privado) */}
       <div
-        className={`position-absolute top-0 start-0 m-2 px-3 py-1 fw-bold rounded-pill shadow-sm d-flex align-items-center gap-2 border border-white ${isPublic ? "bg-primary text-white" : "bg-secondary text-white"}`}
-        style={{ zIndex: 10, fontSize: "0.7rem", letterSpacing: "0.5px" }}
+        className={`position-absolute top-0 start-0 m-2 px-3 py-1 fw-bold rounded-pill shadow-sm d-flex align-items-center gap-2 border border-white badge-status-workout ${isPublic ? "bg-primary text-white" : "bg-secondary text-white"}`}
       >
         <i className={isPublic ? "fas fa-globe-americas" : "fas fa-lock"}></i>
         {isPublic ? "PÚBLICO" : "PRIVADO"}
       </div>
 
-      <div
-        className="position-absolute top-0 end-0 m-2 px-2 py-1 bg-white rounded-pill shadow-sm d-flex align-items-center gap-1"
-        style={{ zIndex: 10 }}
-      >
+      {/* Badge de Seguidores */}
+      <div className="position-absolute top-0 end-0 m-2 px-2 py-1 bg-white rounded-pill shadow-sm d-flex align-items-center gap-1 badge-users-count">
         <i className="fas fa-users text-muted small"></i>
         <span className="fw-bold small text-dark">
           {treino.numeroSeguidores || 0}
@@ -71,9 +69,10 @@ export function MyWorkoutCard({
           )}
         </div>
 
+        {/* Estrelas */}
         <div className="d-flex align-items-center mb-2 gap-1">
           <div className="d-flex">{renderStars(treino.mediaNota || 0)}</div>
-          <span className="text-muted ms-1" style={{ fontSize: "0.75rem" }}>
+          <span className="text-muted ms-1 rating-text-muted">
             ({treino.totalAvaliacoes || 0})
           </span>
         </div>
@@ -87,6 +86,7 @@ export function MyWorkoutCard({
         </Card.Subtitle>
 
         <div className="mt-auto pt-3 d-flex flex-column gap-2">
+          {/* Botão de Publicar (Apenas Admin/Personal e se for privado) */}
           {isPersonalOrAdmin && !isPublic && (
             <Button
               variant="success"
@@ -99,25 +99,19 @@ export function MyWorkoutCard({
             </Button>
           )}
 
-          {/* A SOLUÇÃO: Adicionado flex-wrap aqui para permitir a quebra de linha */}
-          <div className="d-flex flex-wrap gap-2">
-            {/* Detalhes recebe um min-width para forçar a quebra caso o card fique muito estreito */}
+          {/* Wrapper de Ações Responsivo */}
+          <div className="workout-actions-wrapper">
             <Button
               variant="outline-success"
               size="sm"
-              className="flex-grow-1 fw-bold d-flex align-items-center justify-content-center gap-2"
-              style={{ minWidth: "100px" }}
+              className="btn-detail-action fw-bold d-flex align-items-center justify-content-center gap-2"
               onClick={() => onVerDetalhes(treino.id)}
               disabled={disabled}
             >
               <i className="far fa-eye"></i> Detalhes
             </Button>
 
-            {/* Editar e Excluir agrupados. Se descerem, esticam para ocupar todo o espaço */}
-            <div
-              className="d-flex gap-2 flex-grow-1"
-              style={{ minWidth: "80px" }}
-            >
+            <div className="btn-group-edit-delete">
               <OverlayTrigger overlay={<Tooltip>Editar Treino</Tooltip>}>
                 <Button
                   variant="outline-primary"

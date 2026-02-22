@@ -1,4 +1,5 @@
 import { Card, Button, Badge } from "react-bootstrap";
+import "../../styles/aulas.css";
 
 export function ClassCard({ aula, isInstructor, onReservar, onVerParticipantes, onDelete }) {
   const dataAula = new Date(aula.dataHoraInicio);
@@ -31,31 +32,26 @@ export function ClassCard({ aula, isInstructor, onReservar, onVerParticipantes, 
   }
 
   return (
-    <Card className={`h-100 shadow-sm border-0 rounded-4 overflow-hidden hover-effect custom-card ${isPassada ? 'opacity-75' : ''}`}>
-      {/* Cabeçalho adaptável */}
-      <div 
-        className={`p-4 text-center border-bottom position-relative`}
-        style={{ backgroundColor: isPassada ? 'rgba(0,0,0,0.05)' : 'var(--bg-light)' }}
-      >
-          <i className={`fas fa-calendar-check fa-3x opacity-5 ${isPassada ? 'text-muted' : 'text-success'}`}></i>
+    <Card className={`h-100 shadow-sm border-0 rounded-4 overflow-hidden hover-effect custom-card ${isPassada ? 'class-card-past' : ''}`}>
+      
+      {/* Cabeçalho */}
+      <div className="p-4 text-center border-bottom position-relative class-card-header">
+          <i className={`fas fa-calendar-check fa-3x class-icon-bg ${isPassada ? 'text-muted' : 'text-success'}`}></i>
           
-{isPassada && (
-            <Badge bg="secondary" className="position-absolute top-0 end-0 m-3">
+          {isPassada && (
+            <Badge bg="secondary" className="class-badge-status">
               ENCERRADA
             </Badge>
           )}
 
           {!isPassada && isReservado && (
-            <Badge 
-              className="position-absolute top-0 end-0 m-3 shadow-sm border-0"
-              style={{ backgroundColor: "var(--primary-color)", color: "#fff" }}
-            >
+            <Badge className="class-badge-status badge-enrolled">
               INSCRITO
             </Badge>
           )}
 
           {!isPassada && !isReservado && isEsgotada && (
-            <Badge bg="danger" className="position-absolute top-0 end-0 m-3">
+            <Badge bg="danger" className="class-badge-status">
               ESGOTADO
             </Badge>
           )}
@@ -73,27 +69,32 @@ export function ClassCard({ aula, isInstructor, onReservar, onVerParticipantes, 
         
         <p className="text-muted small mb-3 flex-grow-1">{aula.descricao || "Sem descrição."}</p>
         
+        {/* Lista de Informações */}
         <div className="mb-4 small">
-          <div className="d-flex align-items-center mb-2">
-            <i className={`far fa-clock me-2 ${isPassada ? 'text-muted' : 'text-primary'}`} style={{width: '20px'}}></i>
-            <strong className={isPassada ? 'text-muted text-decoration-line-through' : 'text-dark'}>{dataFormatada}</strong>
+          <div className="class-info-row">
+            <i className={`far fa-clock class-info-icon ${isPassada ? 'text-muted' : 'text-primary'}`}></i>
+            <strong className={isPassada ? 'text-muted text-decoration-line-through' : 'text-dark'}>
+              {dataFormatada}
+            </strong>
           </div>
-          <div className="d-flex align-items-center mb-2 text-muted">
-            <i className="fas fa-stopwatch me-2" style={{width: '20px'}}></i>
+          
+          <div className="class-info-row text-muted">
+            <i className="fas fa-stopwatch class-info-icon"></i>
             <span>{aula.duracaoMinutos} min</span>
           </div>
-          <div className="d-flex align-items-center text-muted">
-            <i className="far fa-user me-2" style={{width: '20px'}}></i>
+          
+          <div className="class-info-row text-muted">
+            <i className="far fa-user class-info-icon"></i>
             <span>{aula.instrutor?.nomeCompleto || "Instrutor"}</span>
           </div>
         </div>
 
+        {/* Ações */}
         <div className="d-grid gap-2 mt-auto">
           <Button 
             variant="outline-secondary" 
-            className="fw-bold rounded-pill shadow-none" 
+            className="btn-class-action btn-participants shadow-none" 
             size="sm"
-            style={{ color: 'var(--text-dark)', borderColor: 'var(--border-color)' }}
             onClick={() => onVerParticipantes(aula.id)}
           >
             <i className="fas fa-users me-2"></i> Participantes
@@ -102,7 +103,7 @@ export function ClassCard({ aula, isInstructor, onReservar, onVerParticipantes, 
           {isInstructor && (
              <Button 
                variant="outline-danger" 
-               className="fw-bold rounded-pill" 
+               className="btn-class-action" 
                size="sm"
                onClick={() => onDelete(aula.id)}
              >
@@ -113,7 +114,7 @@ export function ClassCard({ aula, isInstructor, onReservar, onVerParticipantes, 
           {!isInstructor && (
               <Button 
                   variant={btnVariant}
-                  className="fw-bold rounded-pill shadow-sm"
+                  className="btn-class-action shadow-sm"
                   disabled={btnDisabled}
                   onClick={() => onReservar(aula.id)}
               >

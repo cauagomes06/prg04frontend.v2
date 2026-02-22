@@ -1,4 +1,5 @@
 import React from "react";
+import "../../styles/usuarios.css";
 
 export function UserTable({ users, onEdit, onDelete }) {
   const getBadgeClass = (perfil) => {
@@ -13,21 +14,10 @@ export function UserTable({ users, onEdit, onDelete }) {
     perfil ? perfil.replace("ROLE_", "") : "SEM PERFIL";
 
   return (
-    <div 
-      className="shadow-sm rounded-3 overflow-hidden borda-customizada" 
-      style={{ backgroundColor: "var(--card-bg)" }}
-    >
+    <div className="shadow-sm rounded-3 overflow-hidden borda-customizada user-table-container">
       <div className="table-responsive">
-        <table 
-          className="table table-hover mb-0 align-middle"
-          style={{ 
-            '--bs-table-bg': 'transparent', 
-            '--bs-table-color': 'var(--text-dark)', 
-            '--bs-table-border-color': 'var(--border-color)',
-            '--bs-table-hover-bg': 'var(--bg-light)'
-          }}
-        >
-          <thead style={{ backgroundColor: "var(--bg-light)" }}>
+        <table className="table table-hover mb-0 align-middle user-table">
+          <thead className="user-table-thead">
             <tr className="text-uppercase small fw-bold text-muted">
               <th className="ps-4 border-bottom-0">ID</th>
               <th className="border-bottom-0">Usuário</th>
@@ -45,50 +35,32 @@ export function UserTable({ users, onEdit, onDelete }) {
                     {user.fotoUrl ? (
                       <img
                         src={user.fotoUrl}
-                        className="rounded-circle me-2 shadow-sm border-0"
-                        style={{
-                          width: "32px",
-                          height: "32px",
-                          objectFit: "cover",
-                        }}
+                        className="rounded-circle me-2 shadow-sm border-0 user-avatar-sm"
                         alt={user.username}
                         onError={(e) => {
-                          // Se a URL der erro, coloca o placeholder padrão
                           e.target.src = "https://via.placeholder.com/32?text=U";
                         }}
                       />
                     ) : (
-                      <i
-                        className="fas fa-user-circle text-muted me-2"
-                        style={{ fontSize: "32px" }}
-                      ></i>
+                      <i className="fas fa-user-circle text-muted me-2 user-icon-placeholder"></i>
                     )}
 
-                    <span
-                      className="text-truncate"
-                      style={{ maxWidth: "150px" }}
-                    >
+                    <span className="text-truncate user-name-truncate">
                       {user.username}
                     </span>
                   </div>
                 </td>
                 <td>
-                  <span
-                    className={`badge rounded-pill ${getBadgeClass(user.nomePerfil)}`}
-                  >
+                  <span className={`badge rounded-pill ${getBadgeClass(user.nomePerfil)}`}>
                     {formatPerfil(user.nomePerfil)}
                   </span>
                 </td>
                 <td>
-                  <span 
-                    className="badge fw-normal borda-customizada"
-                    style={{ backgroundColor: "var(--bg-light)", color: "var(--text-dark)" }}
-                  >
+                  <span className="badge fw-normal borda-customizada user-plan-badge">
                     {user.nomePlano || "Nenhum Plano"}
                   </span>
                 </td>
                 <td className="text-end pe-4">
-                  {/* Botões ajustados para não terem o fundo branco forçado */}
                   <button
                     onClick={() => onEdit(user)}
                     className="btn btn-sm btn-link text-primary me-2 text-decoration-none shadow-none"
@@ -110,7 +82,7 @@ export function UserTable({ users, onEdit, onDelete }) {
             {users.length === 0 && (
               <tr>
                 <td colSpan="5" className="text-center py-5 text-muted">
-                  <i className="fas fa-user-slash fa-2x mb-3 d-block opacity-25"></i>
+                  <i className="fas fa-user-slash fa-2x mb-3 d-block user-empty-icon"></i>
                   Nenhum usuário corresponde aos critérios.
                 </td>
               </tr>

@@ -1,6 +1,7 @@
 import { Modal, Button, Form, Row, Col, Spinner } from "react-bootstrap";
 import { useState, useEffect } from "react";
 import { apiFetch } from "../../services/api";
+import "../../styles/exercicio.css";
 
 export function CreateExerciseModal({
   show,
@@ -17,16 +18,8 @@ export function CreateExerciseModal({
   });
 
   const gruposMusculares = [
-    "PEITO",
-    "COSTAS",
-    "PERNAS",
-    "OMBROS",
-    "BÍCEPS",
-    "TRÍCEPS",
-    "ABDÔMEN",
-    "GLÚTEOS",
-    "PANTURRILHA",
-    "FULL BODY",
+    "PEITO", "COSTAS", "PERNAS", "OMBROS", "BÍCEPS", 
+    "TRÍCEPS", "ABDÔMEN", "GLÚTEOS", "PANTURRILHA", "FULL BODY",
   ];
 
   useEffect(() => {
@@ -71,68 +64,45 @@ export function CreateExerciseModal({
       backdrop="static"
       contentClassName="border-0 rounded-4 overflow-hidden shadow"
     >
-      <Modal.Header
-        closeButton
-        className="borda-customizada"
-        style={{ backgroundColor: "var(--bg-light)" }}
-      >
+      <Modal.Header closeButton className="exercise-modal-header border-0">
         <Modal.Title className="fw-bold text-success">
-          <i
-            className={`fas ${exerciseToEdit ? "fa-edit" : "fa-plus-circle"} me-2`}
-          ></i>
+          <i className={`fas ${exerciseToEdit ? "fa-edit" : "fa-plus-circle"} me-2`}></i>
           {exerciseToEdit ? "Editar Exercício" : "Cadastrar Exercício"}
         </Modal.Title>
       </Modal.Header>
 
       <Form onSubmit={handleSubmit}>
-        <Modal.Body
-          className="p-4"
-          style={{ backgroundColor: "var(--card-bg)" }}
-        >
+        <Modal.Body className="p-4 exercise-modal-body">
           <Row>
             <Col md={7}>
               <Form.Group className="mb-3">
-                <Form.Label className="fw-bold small text-success">
-                  NOME DO EXERCÍCIO
+                <Form.Label className="fw-bold small text-success text-uppercase exercise-form-label">
+                  Nome do Exercício
                 </Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Ex: Supino Reto"
                   required
-                  className="border-0 p-3 shadow-none"
-                  style={{
-                    backgroundColor: "var(--bg-light)",
-                    color: "var(--text-dark)",
-                  }}
+                  className="border-0 p-3 shadow-none exercise-input-custom"
                   value={formData.nome}
-                  onChange={(e) =>
-                    setFormData({ ...formData, nome: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                 />
               </Form.Group>
             </Col>
             <Col md={5}>
               <Form.Group className="mb-3">
-                <Form.Label className="fw-bold small text-success">
-                  GRUPO MUSCULAR
+                <Form.Label className="fw-bold small text-success text-uppercase exercise-form-label">
+                  Grupo Muscular
                 </Form.Label>
                 <Form.Select
                   required
-                  className="border-0 p-3 shadow-none"
-                  style={{
-                    backgroundColor: "var(--bg-light)",
-                    color: "var(--text-dark)",
-                  }}
+                  className="border-0 p-3 shadow-none exercise-input-custom"
                   value={formData.grupoMuscular}
-                  onChange={(e) =>
-                    setFormData({ ...formData, grupoMuscular: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, grupoMuscular: e.target.value })}
                 >
                   <option value="">Selecione...</option>
                   {gruposMusculares.map((g) => (
-                    <option key={g} value={g}>
-                      {g}
-                    </option>
+                    <option key={g} value={g}>{g}</option>
                   ))}
                 </Form.Select>
               </Form.Group>
@@ -140,49 +110,34 @@ export function CreateExerciseModal({
           </Row>
 
           <Form.Group className="mb-3">
-            <Form.Label className="fw-bold small text-success">
-              URL DO VÍDEO (YOUTUBE/VIMEO)
+            <Form.Label className="fw-bold small text-success text-uppercase exercise-form-label">
+              URL do Vídeo (YouTube/Vimeo)
             </Form.Label>
             <Form.Control
               type="url"
               placeholder="https://..."
-              className="border-0 p-3 shadow-none"
-              style={{
-                backgroundColor: "var(--bg-light)",
-                color: "var(--text-dark)",
-              }}
+              className="border-0 p-3 shadow-none exercise-input-custom"
               value={formData.urlVideo}
-              onChange={(e) =>
-                setFormData({ ...formData, urlVideo: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, urlVideo: e.target.value })}
             />
           </Form.Group>
 
           <Form.Group className="mb-0">
-            <Form.Label className="fw-bold small text-success">
-              INSTRUÇÕES DE EXECUÇÃO
+            <Form.Label className="fw-bold small text-success text-uppercase exercise-form-label">
+              Instruções de Execução
             </Form.Label>
             <Form.Control
               as="textarea"
               rows={4}
               placeholder="Descreva o passo a passo..."
-              className="border-0 p-3 shadow-none"
-              style={{
-                backgroundColor: "var(--bg-light)",
-                color: "var(--text-dark)",
-              }}
+              className="border-0 p-3 shadow-none exercise-input-custom"
               value={formData.descricao}
-              onChange={(e) =>
-                setFormData({ ...formData, descricao: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
             />
           </Form.Group>
         </Modal.Body>
 
-        <Modal.Footer
-          className="borda-customizada border-0"
-          style={{ backgroundColor: "var(--bg-light)" }}
-        >
+        <Modal.Footer className="exercise-modal-footer border-0">
           <Button
             variant="link"
             onClick={handleClose}

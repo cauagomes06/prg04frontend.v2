@@ -1,0 +1,156 @@
+/* =========================================
+   ESTILOS DO MÓDULO DE AULAS COLETIVAS
+   ========================================= */
+
+.class-card-header {
+  background-color: var(--bg-light);
+  transition: background-color 0.3s ease;
+}
+
+/* Estado para aulas que já ocorreram */
+.class-card-past {
+  opacity: 0.75;
+}
+
+.class-card-past .class-card-header {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Badges e Posicionamento */
+.class-badge-status {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 1rem;
+}
+
+.badge-enrolled {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  box-shadow: var(--shadow-sm);
+  border: none;
+}
+
+/* Ícones e Tipografia */
+.class-icon-bg {
+  opacity: 0.05;
+}
+
+.class-info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.class-info-icon {
+  width: 20px;
+  margin-right: 0.5rem;
+}
+
+/* Botões Padronizados */
+.btn-class-action {
+  font-weight: bold;
+  border-radius: 50px;
+}
+
+.btn-participants {
+  color: var(--text-dark);
+  border-color: var(--border-color);
+}
+/* ParticipantsModal - Estilos de Lista */
+
+.participants-modal-body {
+  background-color: var(--card-bg);
+}
+
+.participant-item {
+  border-bottom: 1px solid var(--border-color);
+  background-color: transparent !important;
+}
+
+.participant-index {
+  width: 35px;
+  height: 35px;
+  background-color: var(--bg-light);
+  color: var(--primary-color);
+  border: 1px solid var(--border-color);
+  font-weight: bold;
+}
+
+.participant-name {
+  display: block;
+  font-weight: bold;
+  color: var(--text-dark);
+}
+
+.participant-id {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+/* Layout da Página de Agenda de Aulas */
+
+.aulas-page-container {
+  background-color: var(--bg-light);
+}
+
+.aulas-loading-wrapper {
+  background-color: var(--bg-light);
+  height: 100vh;
+}
+
+/* Botão de Sincronização (Refresh) */
+.btn-refresh-aulas {
+  background-color: var(--card-bg) !important;
+  color: var(--text-dark) !important;
+  border-color: var(--border-color) !important;
+  width: 45px;
+  height: 45px;
+}
+
+.btn-refresh-aulas:hover {
+  filter: brightness(0.95);
+}
+
+/* Área de Conteúdo (Grid Wrapper) */
+.aulas-grid-wrapper {
+  background-color: var(--card-bg);
+}
+/* CreateClassModal - Custom Classes */
+
+.aulas-modal-header {
+  background-color: var(--bg-light);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.aulas-modal-body {
+  background-color: var(--card-bg);
+}
+
+.aulas-form-label {
+  color: var(--text-dark);
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+}
+
+.aulas-input-custom {
+  background-color: var(--bg-light) !important;
+  color: var(--text-dark) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.aulas-input-custom:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 0.25rem rgba(10, 211, 84, 0.1) !important;
+}
+
+/* Ajuste para o ícone do calendário no input date/datetime */
+.aulas-input-custom::-webkit-calendar-picker-indicator {
+  filter: var(--calendar-icon-filter, invert(0));
+}
+
+[data-theme="dark"] .aulas-input-custom::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}

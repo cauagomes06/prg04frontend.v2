@@ -64,3 +64,163 @@
 .card-estats-title {
   color: var(--primary-color);
 }
+
+/* =========================================
+   ESTILOS DE PERFIL E ESTATÍSTICAS
+   ========================================= */
+
+.stats-card-custom {
+  background-color: var(--card-bg);
+}
+
+.stats-header-title {
+  border-bottom: 2px solid var(--border-color);
+}
+
+.stats-label {
+  font-size: 0.75rem; /* small + ajuste */
+  letter-spacing: 0.5px;
+}
+
+.stats-score-value {
+  color: var(--primary-color);
+}
+
+.stats-score-unit {
+  font-size: 0.6em;
+}
+
+/* Efeito de hover suave para os cards de estatísticas */
+.stats-card-custom:hover {
+  transform: translateY(-2px);
+  transition: transform 0.2s ease;
+}
+
+/* ProfileHeader - Estilos Customizados */
+
+.perfil-header-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Garante que os botões de ação do perfil sejam idênticos */
+.btn-profile-action {
+  min-width: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-profile-action:hover {
+  transform: translateY(-1px);
+}
+
+.badge-plano {
+  background-color: var(--primary-light);
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+}
+
+/* Ajuste para o container do avatar caso não esteja no index.css */
+.perfil-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: var(--bg-light);
+  border: 3px solid white;
+  box-shadow: var(--shadow-sm);
+}
+
+/* EditDataModal - Custom Classes */
+.edit-modal-header {
+  background-color: var(--primary-light);
+}
+
+.edit-modal-body {
+  background-color: var(--card-bg);
+}
+
+.edit-photo-container {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.edit-avatar-preview {
+  width: 120px;
+  height: 120px;
+  border: 4px solid var(--border-color);
+  object-fit: cover;
+}
+
+.edit-avatar-placeholder {
+  width: 120px;
+  height: 120px;
+  background-color: var(--bg-light);
+}
+
+.edit-photo-badge {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--card-bg);
+  background-color: var(--primary-color);
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.edit-data-section {
+  background-color: var(--bg-light);
+}
+
+.edit-input-custom {
+  background-color: var(--card-bg) !important;
+  color: var(--text-dark) !important;
+}
+
+.edit-footer-divider {
+  border-top: 1px solid var(--border-color);
+}
+
+/* ConfigModal - Custom Classes */
+.config-modal-header {
+  background-color: var(--bg-light);
+}
+
+.config-modal-body {
+  background-color: var(--card-bg);
+}
+
+/* Customização das Abas (Tabs) */
+.custom-tabs .nav-link {
+  color: var(--text-muted) !important;
+  font-weight: bold;
+  border: none !important;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.custom-tabs .nav-link.active {
+  color: var(--primary-color) !important;
+  background-color: transparent !important;
+  border-bottom: 3px solid var(--primary-color) !important;
+}
+
+/* Inputs e Selects dentro do Modal */
+.config-input-field {
+  background-color: var(--bg-light) !important;
+  color: var(--text-dark) !important;
+  border-radius: 12px;
+}
+
+/* Nota de rodapé (Plano) */
+.plan-note-box {
+  background-color: rgba(10, 211, 84, 0.05);
+  border: 1px dashed var(--primary-color);
+  opacity: 0.8;
+}
+
+.plan-note-box small {
+  display: block;
+}

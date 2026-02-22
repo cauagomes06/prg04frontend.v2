@@ -14,6 +14,9 @@ import { ConfirmModal } from "../components/common/ConfirmModal";
 import { SuccessModal } from "../components/common/SuccessModal";
 import { ErrorModal } from "../components/common/ErrorModal";
 
+// Estilos customizados
+import "../styles/usuarios.css";
+
 export default function AdminUsers() {
   const [usuarios, setUsuarios] = useState([]);
   const [perfis, setPerfis] = useState([]);
@@ -119,10 +122,7 @@ export default function AdminUsers() {
   };
 
   return (
-    <div
-      className="p-3 p-md-4 min-vh-100"
-      style={{ backgroundColor: "var(--bg-light)" }}
-    >
+    <div className="p-3 p-md-4 min-vh-100 users-page-container">
       <Container fluid className="px-0">
         {/* CABEÇALHO RESPONSIVO */}
         <div className="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3">
@@ -136,10 +136,7 @@ export default function AdminUsers() {
             </p>
           </div>
 
-          <div
-            className="flex-grow-1"
-            style={{ maxWidth: "500px", marginBottom: "-1.5rem" }}
-          >
+          <div className="flex-grow-1 users-header-search-wrapper">
             <SearchBar
               placeholder="Buscar por username..."
               value={searchTerm}
@@ -152,7 +149,7 @@ export default function AdminUsers() {
           </div>
         </div>
 
-        {/* GRUPO DE FILTROS */}
+        {/* FILTROS */}
         <div className="mb-4">
           <FilterGroup
             options={opcoesPerfis}
@@ -164,20 +161,14 @@ export default function AdminUsers() {
           />
         </div>
 
-        {/* ÁREA DA TABELA COM FEEDBACK DE CARREGAMENTO */}
-        <div
-          className="rounded-4 shadow-sm overflow-hidden borda-customizada"
-          style={{ backgroundColor: "var(--card-bg)", minHeight: "400px" }}
-        >
+        {/* ÁREA DA TABELA */}
+        <div className="rounded-4 shadow-sm overflow-hidden borda-customizada users-content-wrapper">
           {loading ? (
-            <div
-              className="d-flex flex-column justify-content-center align-items-center"
-              style={{ height: "400px" }}
-            >
+            <div className="d-flex flex-column justify-content-center align-items-center users-loading-container">
               <Spinner
                 animation="border"
                 variant="success"
-                style={{ width: "3rem", height: "3rem" }}
+                className="users-spinner"
               />
               <p className="mt-3 fw-bold text-success">
                 Sincronizando usuários...
@@ -194,8 +185,7 @@ export default function AdminUsers() {
                 }}
               />
 
-              {/* PAGINAÇÃO PADRONIZADA */}
-              <div className="pb-4">
+              <div className="users-pagination-wrapper">
                 <PaginationComponent
                   currentPage={currentPage}
                   totalPages={totalPages}

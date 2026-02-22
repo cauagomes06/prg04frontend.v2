@@ -1,22 +1,12 @@
 import React from 'react';
+import "../../styles/planos.css";
 
 export function PlanTable({ planos, onEdit, onDelete }) {
   return (
-    <div 
-      className="shadow-sm rounded-3 overflow-hidden borda-customizada" 
-      style={{ backgroundColor: "var(--card-bg)" }}
-    >
+    <div className="shadow-sm rounded-3 overflow-hidden borda-customizada plan-table-container">
       <div className="table-responsive">
-        <table 
-          className="table table-hover mb-0 align-middle"
-          style={{ 
-            '--bs-table-bg': 'transparent', 
-            '--bs-table-color': 'var(--text-dark)', 
-            '--bs-table-border-color': 'var(--border-color)',
-            '--bs-table-hover-bg': 'var(--bg-light)'
-          }}
-        >
-          <thead style={{ backgroundColor: "var(--bg-light)" }}>
+        <table className="table table-hover mb-0 align-middle plan-table">
+          <thead className="plan-table-thead">
             <tr className="text-uppercase small fw-bold text-muted">
               <th className="ps-4 border-bottom-0">ID</th>
               <th className="border-bottom-0">Nome do Plano</th>
@@ -34,18 +24,14 @@ export function PlanTable({ planos, onEdit, onDelete }) {
                   {plano.nomePlano || "Sem Nome"}
                 </td>
 
-                <td className="text-muted small" style={{ maxWidth: "300px" }}>
-                  <span className="text-truncate d-inline-block w-100">
+                <td className="text-muted small plan-desc-col">
+                  <span className="text-truncate plan-desc-text">
                     {plano.descricaoPlano || "Sem descrição"}
                   </span>
                 </td>
 
                 <td>
-                  {/* Badge de preço otimizada para os temas */}
-                  <span 
-                    className="badge px-3 borda-customizada"
-                    style={{ backgroundColor: "var(--primary-light)", color: "var(--primary-color)" }}
-                  >
+                  <span className="badge px-3 borda-customizada plan-price-badge">
                     R$ {plano.preco?.toFixed(2) || "0.00"}
                   </span>
                 </td>
@@ -67,7 +53,6 @@ export function PlanTable({ planos, onEdit, onDelete }) {
               </tr>
             ))}
             
-            {/* Mensagem caso a lista venha vazia */}
             {planos.length === 0 && (
               <tr>
                 <td colSpan="5" className="text-center py-5 text-muted">

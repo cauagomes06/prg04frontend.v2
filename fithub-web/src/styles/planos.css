@@ -1,6 +1,11 @@
+/* =========================================
+   ESTILOS DE PLANOS E ADMINISTRAÇÃO
+   ========================================= */
+
 .admin-plans-header {
   position: relative;
-  min-height: 150px; /* Espaço para o botão respirar embaixo */
+  min-height: 150px;
+  background-color: var(--card-bg) !important;
 }
 
 /* Barra de busca no topo direito */
@@ -9,16 +14,19 @@
   width: 100%;
 }
 
-/* UX: Texto sempre à esquerda para leitura rápida */
+/* UX: Ajustado para o tema escuro */
 .search-wrapper input {
   height: 42px !important;
   border-radius: 50px !important;
-  padding-left: 45px !important; /* Espaço para o ícone de lupa */
+  padding-left: 45px !important;
   text-align: left !important; 
-  border: 1px solid #eee !important;
+  /* Substituído #eee por variável do tema */
+  border: 1px solid var(--border-color) !important;
+  background-color: var(--bg-light) !important;
+  color: var(--text-dark) !important;
 }
 
-/* Botão posicionado no canto inferior direito */
+/* Botão Novo Plano */
 .btn-add-plano-fixed {
   position: absolute;
   bottom: 20px;
@@ -33,5 +41,87 @@
 
 .btn-add-plano-fixed:hover {
   transform: scale(1.05) translateY(-2px);
-  box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3) !important;
+  box-shadow: 0 8px 20px rgba(10, 211, 84, 0.3) !important;
+}
+
+/* --- TABELA DE PLANOS (CORE DARK MODE) --- */
+
+.plan-table-container {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color);
+}
+
+.plan-table {
+  /* Força as variáveis do Bootstrap a lerem as suas variáveis do FitHub */
+  --bs-table-bg: transparent !important;
+  --bs-table-color: var(--text-dark) !important;
+  --bs-table-border-color: var(--border-color) !important;
+  --bs-table-hover-bg: var(--bg-light) !important;
+  --bs-table-hover-color: var(--text-dark) !important;
+  --bs-table-striped-color: var(--text-dark) !important;
+  
+  color: var(--text-dark) !important;
+}
+
+.plan-table-thead {
+  background-color: var(--bg-light) !important;
+}
+
+.plan-table-thead th {
+  color: var(--text-muted) !important;
+  border-bottom: none !important;
+}
+
+/* Badge de Preço Customizada */
+.plan-price-badge {
+  background-color: var(--primary-light) !important;
+  color: var(--primary-color) !important;
+  font-weight: 600;
+  border: 1px solid rgba(10, 211, 84, 0.2);
+}
+
+/* Ajustes de colunas */
+.plan-desc-col {
+  max-width: 300px;
+}
+
+.plan-desc-text {
+  display: inline-block;
+  width: 100%;
+  color: var(--text-muted) !important;
+}
+
+/* --- ÁREA ADMINISTRATIVA --- */
+
+.admin-header-card {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color);
+}
+
+.admin-action-container {
+  max-width: 700px;
+}
+
+.search-wrapper-adjust {
+  margin-bottom: -1.5rem;
+}
+
+.btn-new-plan {
+  height: 54px;
+}
+
+.admin-table-wrapper {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color);
+}
+
+.loading-spinner-admin {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Força as células da tabela a serem legíveis no Dark Mode */
+.plan-table tbody td {
+  color: var(--text-dark) !important;
+  border-bottom-color: var(--border-color) !important;
 }

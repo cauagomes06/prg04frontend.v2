@@ -1,5 +1,6 @@
 import { Button } from "react-bootstrap";
 import { useState, useEffect } from "react";
+import "../../styles/perfil.css";
 
 export function ProfileHeader({ perfil, onEditData, onOpenConfig }) {
   const [imgError, setImgError] = useState(false);
@@ -7,14 +8,6 @@ export function ProfileHeader({ perfil, onEditData, onOpenConfig }) {
   useEffect(() => {
     setImgError(false);
   }, [perfil?.fotoUrl]);
-
-  // Estilo para garantir que os botões tenham exatamente o mesmo tamanho
-  const buttonStyle = {
-    minWidth: "160px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  };
 
   return (
     <div className="perfil-header d-flex align-items-center gap-4 mb-4 flex-wrap">
@@ -24,7 +17,7 @@ export function ProfileHeader({ perfil, onEditData, onOpenConfig }) {
           <img
             src={`${perfil?.fotoUrl}?t=${new Date().getTime()}`}
             alt="Avatar"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            className="perfil-header-img"
             onError={() => setImgError(true)}
           />
         ) : (
@@ -54,13 +47,12 @@ export function ProfileHeader({ perfil, onEditData, onOpenConfig }) {
         </div>
       </div>
 
-      {/* Container de Ações - Botões com tamanho fixo e responsivos */}
+      {/* Container de Ações */}
       <div className="d-flex gap-3 flex-wrap mt-2 mt-md-0">
         <Button
           variant="outline-success"
           onClick={onEditData}
-          className="rounded-pill px-4 fw-bold shadow-sm"
-          style={buttonStyle}
+          className="rounded-pill px-4 fw-bold shadow-sm btn-profile-action"
         >
           <i className="fas fa-pen me-2"></i> Editar
         </Button>
@@ -68,8 +60,7 @@ export function ProfileHeader({ perfil, onEditData, onOpenConfig }) {
         <Button
           variant="success"
           onClick={onOpenConfig}
-          className="rounded-pill px-4 fw-bold shadow-sm"
-          style={buttonStyle}
+          className="rounded-pill px-4 fw-bold shadow-sm btn-profile-action"
         >
           <i className="fas fa-cog me-2"></i> Configurações
         </Button>

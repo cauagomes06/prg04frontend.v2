@@ -1,6 +1,6 @@
 import { Card, Button, Badge, Image } from "react-bootstrap";
 import { apiFetch } from "../../services/api";
-import { useNavigate } from "react-router-dom"; // IMPORTAÇÃO CORRIGIDA AQUI NO TOPO
+import { useNavigate } from "react-router-dom";
 import "../../styles/treinos.css";
 
 const renderStars = (media) => {
@@ -28,10 +28,9 @@ export function LibraryCard({
   disabled,
   isMostFollowed,
   onIniciarTreino,
-  onError, 
+  onError,
 }) {
-
-  const navigate = useNavigate(); // HOOK INICIALIZADO AQUI
+  const navigate = useNavigate();
 
   const handleValidarInicioTreino = async (e) => {
     e.stopPropagation();
@@ -40,34 +39,42 @@ export function LibraryCard({
       if (podeTreinar) {
         if (onIniciarTreino) onIniciarTreino(treino);
       } else {
-        if (onError) onError("Você já realizou um treino hoje! O FitHub permite apenas um registro de atividade por dia.");
+        if (onError)
+          onError(
+            "Você já realizou um treino hoje! O FitHub permite apenas um registro de atividade por dia.",
+          );
       }
     } catch (error) {
-      if (onError) onError("Não foi possível validar sua permissão de treino agora.");
+      if (onError)
+        onError("Não foi possível validar sua permissão de treino agora.");
+    }
+  };
+
+  const handleNavegarParaPerfil = (e) => {
+    e.stopPropagation();
+    if (treino.criadorId) {
+      navigate(`/portal/perfil/${treino.criadorId}`);
     }
   };
 
   return (
     <Card className="h-100 shadow-sm border-0 rounded-4 overflow-hidden hover-effect custom-card position-relative">
+      {/* Badge "Mais Seguido" */}
       {isMostFollowed && (
-        <div
-          className="position-absolute top-0 start-0 m-2 px-3 py-1 bg-warning text-dark fw-bold rounded-pill shadow-sm d-flex align-items-center gap-2 border"
-          style={{ zIndex: 10, fontSize: "0.7rem", letterSpacing: "0.5px" }}
-        >
+        <div className="position-absolute m-2 px-3 py-1 bg-warning text-dark fw-bold rounded-pill shadow-sm d-flex align-items-center gap-2 border badge-most-followed">
           <i className="fas fa-crown text-dark"></i> MAIS SEGUIDO
         </div>
       )}
 
-      <div
-        className="position-absolute top-0 end-0 m-2 px-2 py-1 rounded-pill shadow-sm d-flex align-items-center gap-1"
-        style={{ zIndex: 10, backgroundColor: "var(--card-bg)" }}
-      >
+      {/* Badge de Seguidores */}
+      <div className="position-absolute m-2 px-2 py-1 rounded-pill shadow-sm d-flex align-items-center gap-1 badge-followers-count">
         <i className="fas fa-users text-muted small"></i>
         <span className="fw-bold small text-dark">
           {treino.numeroSeguidores || 0}
         </span>
       </div>
 
+      {/* Imagem/Ícone de Cabeçalho */}
       <div className="card-header-img card-header-library d-flex align-items-center justify-content-center">
         <i className="fas fa-book-reader fa-3x icon-opacity"></i>
       </div>
@@ -82,57 +89,47 @@ export function LibraryCard({
           </Card.Title>
 
           {treino.status === "PUBLICO" && (
-            <Badge
-              className="border border-success"
-              style={{
-                fontSize: "0.65rem",
-                backgroundColor: "var(--primary-light)",
-                color: "var(--primary-color)",
-              }}
-            >
+            <Badge className="border border-success badge-public-status">
               PÚBLICO
             </Badge>
           )}
         </div>
 
+        {/* Avaliação */}
         <div
           className="d-flex align-items-center mb-2 gap-1"
           title={`Nota: ${treino.mediaNota || 0}`}
         >
           <div className="d-flex">{renderStars(treino.mediaNota || 0)}</div>
-          <span className="text-muted ms-1" style={{ fontSize: "0.75rem" }}>
+          <span className="text-muted ms-1 rating-text-muted">
             ({treino.totalAvaliacoes || 0})
           </span>
         </div>
 
-        {/* --- DIV DO CRIADOR COM NAVEGAÇÃO --- */}
-        <div 
-          className="d-flex align-items-center mb-3" 
-          style={{ cursor: treino.criadorId ? "pointer" : "default" }}
-          onClick={(e) => {
-            e.stopPropagation(); // Evita que clique na foto dispare outras ações do card
-            if (treino.criadorId) {
-              navigate(`/portal/perfil/${treino.criadorId}`);
-            }
-          }}
+        {/* Info do Criador (Navegação) */}
+        <div
+          className={`d-flex align-items-center mb-3 ${treino.criadorId ? "creator-info-wrapper pointer" : "text-muted"}`}
+          onClick={handleNavegarParaPerfil}
           title={treino.criadorId ? "Ver perfil do criador" : ""}
         >
           {treino.criadorFoto ? (
             <Image
               src={treino.criadorFoto}
               roundedCircle
-              style={{ width: "24px", height: "24px", objectFit: "cover" }}
-              className="me-2 shadow-sm border"
+              className="me-2 shadow-sm border creator-avatar-sm"
               alt={treino.criadorNome}
             />
           ) : (
             <i className="fas fa-user-circle text-muted me-2 fs-5"></i>
           )}
-          <span className={`small fw-bold text-truncate ${treino.criadorId ? 'text-success hover-text-dark' : 'text-muted'}`} style={{ transition: "color 0.2s ease" }}>
+          <span
+            className={`small fw-bold text-truncate creator-name-text ${treino.criadorId ? "text-success" : ""}`}
+          >
             {treino.criadorNome || "Sistema"}
           </span>
         </div>
 
+        {/* Botões de Ação */}
         <div className="mt-auto d-flex flex-column gap-2">
           <Button
             variant={treino.seguindo ? "outline-danger" : "outline-success"}

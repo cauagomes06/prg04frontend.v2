@@ -8,7 +8,9 @@ import { ParticipantsModal } from "../components/aulas/ParticipantsModal";
 import { CreateClassModal } from "../components/aulas/CreateClassModal";
 import { SuccessModal } from "../components/common/SuccessModal";
 import { ConfirmModal } from "../components/common/ConfirmModal";
-import { ErrorModal } from "../components/common/ErrorModal"; 
+import { ErrorModal } from "../components/common/ErrorModal";
+
+import "../styles/aulas.css";
 
 export function Aulas() {
   const { user } = useContext(AuthContext);
@@ -96,7 +98,7 @@ export function Aulas() {
 
   if (loading)
     return (
-      <div className="d-flex justify-content-center align-items-center vh-100" style={{ backgroundColor: 'var(--bg-light)' }}>
+      <div className="d-flex justify-content-center align-items-center aulas-loading-wrapper">
         <Spinner animation="border" variant="success" />
       </div>
     );
@@ -107,9 +109,9 @@ export function Aulas() {
   }));
 
   return (
-    <div className="py-5 min-vh-100" style={{ backgroundColor: "var(--bg-light)" }}>
+    <div className="py-5 min-vh-100 aulas-page-container">
       <Container>
-        {/* Cabeçalho Refatorado para Responsividade e Tema */}
+        {/* CABEÇALHO DA PÁGINA */}
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
           <div>
             <h2 className="fw-bold text-dark mb-1">
@@ -120,7 +122,7 @@ export function Aulas() {
               Reserve o seu lugar e treine em grupo.
             </p>
           </div>
-          
+
           <div className="d-flex gap-2">
             {isInstructor && (
               <Button
@@ -133,30 +135,30 @@ export function Aulas() {
             )}
             <Button
               variant="outline-secondary"
-              className="shadow-sm rounded-pill d-flex align-items-center justify-content-center"
-              style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-dark)', borderColor: 'var(--border-color)', width: '45px' }}
+              className="shadow-sm rounded-pill d-flex align-items-center justify-content-center btn-refresh-aulas"
               onClick={carregarDados}
+              title="Atualizar Agenda"
             >
               <i className="fas fa-sync-alt"></i>
             </Button>
           </div>
         </div>
 
-        {/* Grid de Aulas */}
-        <div className="borda-customizada rounded-4 p-2 p-md-4" style={{ backgroundColor: 'var(--card-bg)' }}>
-             <ClassGrid
-              aulas={aulasComStatus}
-              isInstructor={isInstructor}
-              onReservar={handleReservar}
-              onVerParticipantes={(id) => {
-                setSelectedAulaId(id);
-                setShowParticipants(true);
-              }}
-              onDelete={handleDeleteRequest}
-            />
+        {/* CONTAINER DO GRID */}
+        <div className="borda-customizada rounded-4 p-2 p-md-4 aulas-grid-wrapper">
+          <ClassGrid
+            aulas={aulasComStatus}
+            isInstructor={isInstructor}
+            onReservar={handleReservar}
+            onVerParticipantes={(id) => {
+              setSelectedAulaId(id);
+              setShowParticipants(true);
+            }}
+            onDelete={handleDeleteRequest}
+          />
         </div>
 
-        {/* Modais de Fluxo */}
+        {/* MODAIS */}
         <ParticipantsModal
           show={showParticipants}
           handleClose={() => setShowParticipants(false)}
@@ -168,7 +170,6 @@ export function Aulas() {
           onSuccess={handleCreateSuccess}
         />
 
-        {/* Modais de Feedback */}
         <ConfirmModal
           show={showConfirm}
           handleClose={() => setShowConfirm(false)}
