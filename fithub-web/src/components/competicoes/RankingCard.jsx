@@ -9,7 +9,12 @@ const getPosBadgeClass = (pos) => {
   return base + "badge-default";
 };
 
-export function RankingCard({ ranking, currentPage, totalPages, onPageChange }) {
+export function RankingCard({
+  ranking,
+  currentPage,
+  totalPages,
+  onPageChange,
+}) {
   return (
     <Card className="custom-card h-100 shadow-sm border-0">
       <div className="comp-card-header">
@@ -19,7 +24,8 @@ export function RankingCard({ ranking, currentPage, totalPages, onPageChange }) 
             Ranking Geral
           </h5>
           <span className="badge comp-list-badge-page py-2 px-3">
-            TOP {ranking.length > 0 ? ranking[0].posicao : 0} - {ranking.length > 0 ? ranking[ranking.length - 1].posicao : 0}
+            TOP {ranking.length > 0 ? ranking[0].posicao : 0} -{" "}
+            {ranking.length > 0 ? ranking[ranking.length - 1].posicao : 0}
           </span>
         </div>
       </div>
@@ -33,26 +39,42 @@ export function RankingCard({ ranking, currentPage, totalPages, onPageChange }) 
             </div>
           ) : (
             ranking.map((u) => (
-              <ListGroup.Item key={u.usuarioId || u.username} className="ranking-item border-0">
+              <ListGroup.Item
+                key={u.usuarioId || u.username}
+                className="ranking-item border-0"
+              >
                 {/* Lado Esquerdo: Badge + Nome (Container com flex-grow para ocupar o espaço disponível) */}
-                <div className="d-flex align-items-center overflow-hidden flex-grow-1 me-2">
-                  <div className={getPosBadgeClass(u.posicao)}>{u.posicao}</div>
-                  <div className="ms-3 text-truncate">
-                    <div className="ranking-user-name mb-0 text-truncate" title={u.nome || u.nomeCompleto}>
-                      {u.nome || u.nomeCompleto || "Usuário"}
+                <div className="d-flex align-items-center justify-content-between overflow-hidden">
+                  {/* Lado esquerdo */}
+                  <div className="d-flex align-items-center flex-grow-1 me-3 overflow-hidden">
+                    <div className={getPosBadgeClass(u.posicao)}>
+                      {u.posicao}
                     </div>
-                    {u.posicao === 1 && (
-                      <span className="text-warning fw-bold text-uppercase d-block" style={{ fontSize: "0.6rem", letterSpacing: "0.5px" }}>
-                        <i className="fas fa-crown me-1"></i>Líder Atual
-                      </span>
-                    )}
-                  </div>
-                </div>
 
-                {/* Lado Direito: Score (Container com flex-shrink-0 para NUNCA quebrar ou sumir) */}
-                <div className="flex-shrink-0 text-end">
-                  <span className="score-text">{u.scoreTotal}</span>
-                  <span className="score-label ms-1">Pts</span>
+                    <div className="ms-3 text-truncate">
+                      <div
+                        className="ranking-user-name mb-0 text-truncate"
+                        title={u.nome || u.nomeCompleto}
+                      >
+                        {u.nome || u.nomeCompleto || "Usuário"}
+                      </div>
+
+                      {u.posicao === 1 && (
+                        <span
+                          className="text-warning fw-bold text-uppercase d-block"
+                          style={{ fontSize: "0.6rem", letterSpacing: "0.5px" }}
+                        >
+                          <i className="fas fa-crown me-1"></i>Líder Atual
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Lado direito */}
+                  <div className="flex-shrink-0 text-end ranking-score-wrapper ms-3">
+                    <span className="score-text">{u.scoreTotal}</span>
+                    <span className="score-label ms-1">Pts</span>
+                  </div>
                 </div>
               </ListGroup.Item>
             ))

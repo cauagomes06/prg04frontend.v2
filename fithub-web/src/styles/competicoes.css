@@ -224,3 +224,52 @@
 .comp-empty-state {
   color: var(--text-muted) !important;
 }
+/* =========================================
+   STATUS DE INSCRIÇÃO (CORES ADAPTÁVEIS)
+   ========================================= */
+
+/* Modo Claro (Padrão) */
+.status-concluido {
+  color: #198754; /* Verde padrão do Bootstrap (success) */
+}
+
+.status-pendente {
+  color: #ffc107; /* Amarelo padrão do Bootstrap (warning) */
+}
+
+/* Modo Escuro */
+[data-theme="dark"] .status-concluido {
+  color: var(--primary-color) !important; /* Ou um verde mais claro/brilhante, ex: #2ecc71 */
+}
+
+[data-theme="dark"] .status-pendente {
+  color: #ffdca8 !important; /* Um amarelo mais suave que o original, para não doer a vista no fundo escuro */
+}
+/* =========================================
+   RÓTULO E VALORES DE STATUS
+   ========================================= */
+
+/* O rótulo "Status:" agora segue a cor de texto padrão do tema */
+.inscription-status-label {
+  color: var(--text-dark) !important;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Cores dos valores (Concluido/Pendente) */
+.status-concluido {
+  color: #198754; /* Verde sucesso */
+}
+
+.status-pendente {
+  color: #ffc107; /* Amarelo alerta */
+}
+
+/* Ajustes específicos para o Modo Escuro */
+[data-theme="dark"] .status-concluido {
+  color: var(--primary-color) !important; /* Verde menta do Fit Hub */
+}
+
+[data-theme="dark"] .status-pendente {
+  color: #ffdca8 !important; /* Amarelo suave para melhor leitura */
+}

@@ -5,6 +5,7 @@ export function UserTable({ users, onEdit, onDelete }) {
   const getBadgeClass = (perfil) => {
     const p = perfil?.toUpperCase() || "";
     if (p.includes("ADMIN")) return "bg-danger text-white";
+    // Mantemos text-dark aqui apenas para contraste no fundo amarelo/verde
     if (p.includes("PERSONAL")) return "bg-warning text-dark";
     if (p.includes("CLIENTE")) return "bg-success text-dark";
     return "bg-secondary text-white";
@@ -14,11 +15,11 @@ export function UserTable({ users, onEdit, onDelete }) {
     perfil ? perfil.replace("ROLE_", "") : "SEM PERFIL";
 
   return (
-    <div className="shadow-sm rounded-3 overflow-hidden borda-customizada user-table-container">
+    <div className="shadow-sm rounded-3 overflow-hidden user-table-container">
       <div className="table-responsive">
         <table className="table table-hover mb-0 align-middle user-table">
           <thead className="user-table-thead">
-            <tr className="text-uppercase small fw-bold text-muted">
+            <tr className="text-uppercase small fw-bold">
               <th className="ps-4 border-bottom-0">ID</th>
               <th className="border-bottom-0">Usuário</th>
               <th className="border-bottom-0">Perfil</th>
@@ -29,8 +30,8 @@ export function UserTable({ users, onEdit, onDelete }) {
           <tbody>
             {users.map((user) => (
               <tr key={user.id}>
-                <td className="ps-4 text-muted">#{user.id}</td>
-                <td className="fw-bold text-dark">
+                <td className="ps-4 id-column">#{user.id}</td>
+                <td className="fw-bold">
                   <div className="d-flex align-items-center">
                     {user.fotoUrl ? (
                       <img
@@ -42,7 +43,7 @@ export function UserTable({ users, onEdit, onDelete }) {
                         }}
                       />
                     ) : (
-                      <i className="fas fa-user-circle text-muted me-2 user-icon-placeholder"></i>
+                      <i className="fas fa-user-circle me-2 user-icon-placeholder"></i>
                     )}
 
                     <span className="text-truncate user-name-truncate">
@@ -56,7 +57,7 @@ export function UserTable({ users, onEdit, onDelete }) {
                   </span>
                 </td>
                 <td>
-                  <span className="badge fw-normal borda-customizada user-plan-badge">
+                  <span className="badge fw-normal user-plan-badge">
                     {user.nomePlano || "Nenhum Plano"}
                   </span>
                 </td>
@@ -81,7 +82,7 @@ export function UserTable({ users, onEdit, onDelete }) {
 
             {users.length === 0 && (
               <tr>
-                <td colSpan="5" className="text-center py-5 text-muted">
+                <td colSpan="5" className="text-center py-5 empty-state-text">
                   <i className="fas fa-user-slash fa-2x mb-3 d-block user-empty-icon"></i>
                   Nenhum usuário corresponde aos critérios.
                 </td>

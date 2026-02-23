@@ -5,7 +5,7 @@ import { ErrorModal } from "../common/ErrorModal";
 import { LevelUpModal } from "../common/LevelUpModal";
 import "../../styles/workoutPlayer.css";
 
-export function WorkoutPlayer({ treino, onFechar }) {
+export function WorkoutPlayer({ treino, onFechar, onTreinoFinalizado }) {
   const listaExercicios = treino?.items || treino?.itens || [];
 
   const [timestampInicio] = useState(new Date().toISOString());
@@ -80,6 +80,13 @@ export function WorkoutPlayer({ treino, onFechar }) {
       setPontosGanhos(response.pontosGanhos || 0);
       setNovoNivel(response.nivelAtual || 1);
       setShowSuccessScreen(true);
+
+      // --- VERIFICAÇÃO DE CONQUISTAS ---
+      // Se o backend retornou uma conquista, avisamos o componente pai para mostrar o TrophyToast
+      if (response.conquistas && response.conquistas.length > 0) {
+        // Disparamos a função que veio por prop
+        onTreinoFinalizado(response.conquistas[0]);
+      }
 
       if (response.subiuDeNivel) {
         setTimeout(() => {

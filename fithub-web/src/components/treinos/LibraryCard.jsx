@@ -59,17 +59,17 @@ export function LibraryCard({
 
   return (
     <Card className="h-100 shadow-sm border-0 rounded-4 overflow-hidden hover-effect custom-card position-relative">
-      {/* Badge "Mais Seguido" */}
+      {/* Badge "Mais Seguido" (Mantém cores fixas pois é um selo de destaque) */}
       {isMostFollowed && (
         <div className="position-absolute m-2 px-3 py-1 bg-warning text-dark fw-bold rounded-pill shadow-sm d-flex align-items-center gap-2 border badge-most-followed">
           <i className="fas fa-crown text-dark"></i> MAIS SEGUIDO
         </div>
       )}
 
-      {/* Badge de Seguidores */}
-      <div className="position-absolute m-2 px-2 py-1 rounded-pill shadow-sm d-flex align-items-center gap-1 badge-followers-count">
+      {/* Badge de Seguidores (Cores dinâmicas via CSS) */}
+      <div className="position-absolute m-2 px-2 py-1 rounded-pill shadow-sm d-flex align-items-center gap-1 badge-users-count">
         <i className="fas fa-users text-muted small"></i>
-        <span className="fw-bold small text-dark">
+        <span className="fw-bold small count-text">
           {treino.numeroSeguidores || 0}
         </span>
       </div>
@@ -82,14 +82,14 @@ export function LibraryCard({
       <Card.Body className="d-flex flex-column p-3">
         <div className="d-flex justify-content-between align-items-start mb-1">
           <Card.Title
-            className="fw-bold text-dark mb-0 h6 text-truncate pe-2"
+            className="fw-bold mb-0 h6 text-truncate pe-2 card-title"
             title={treino.nome}
           >
             {treino.nome}
           </Card.Title>
 
           {treino.status === "PUBLICO" && (
-            <Badge className="border border-success badge-public-status">
+            <Badge className="border border-success badge-public-status bg-success">
               PÚBLICO
             </Badge>
           )}
@@ -106,11 +106,12 @@ export function LibraryCard({
           </span>
         </div>
 
-        {/* Info do Criador (Navegação) */}
+        {/* Info do Criador */}
         <div
           className={`d-flex align-items-center mb-3 ${treino.criadorId ? "creator-info-wrapper pointer" : "text-muted"}`}
           onClick={handleNavegarParaPerfil}
           title={treino.criadorId ? "Ver perfil do criador" : ""}
+          style={{ cursor: treino.criadorId ? "pointer" : "default" }}
         >
           {treino.criadorFoto ? (
             <Image
@@ -118,6 +119,7 @@ export function LibraryCard({
               roundedCircle
               className="me-2 shadow-sm border creator-avatar-sm"
               alt={treino.criadorNome}
+              style={{ width: "24px", height: "24px", objectFit: "cover" }}
             />
           ) : (
             <i className="fas fa-user-circle text-muted me-2 fs-5"></i>
@@ -141,9 +143,7 @@ export function LibraryCard({
             }}
             disabled={disabled}
           >
-            <i
-              className={treino.seguindo ? "fas fa-heart" : "far fa-heart"}
-            ></i>
+            <i className={treino.seguindo ? "fas fa-heart" : "far fa-heart"}></i>
             {treino.seguindo ? "Deixar de Seguir" : "Seguir"}
           </Button>
 
@@ -157,11 +157,12 @@ export function LibraryCard({
             <i className="fas fa-play"></i> Iniciar Treino
           </Button>
 
-          <div className="d-flex gap-2 mt-1">
+          {/* Wrapper dos 3 botões perfeitamente alinhados */}
+          <div className="library-actions-row mt-1">
             <Button
               variant="outline-success"
               size="sm"
-              className="flex-grow-1 fw-bold"
+              className="btn-library-action"
               onClick={(e) => {
                 e.stopPropagation();
                 onVerDetalhes(treino.id);
@@ -173,9 +174,9 @@ export function LibraryCard({
             </Button>
 
             <Button
-              variant="outline-success"
+              variant="outline-primary"
               size="sm"
-              className="flex-grow-1 fw-bold"
+              className="btn-library-action"
               onClick={(e) => {
                 e.stopPropagation();
                 onCopiar(treino);
@@ -189,7 +190,7 @@ export function LibraryCard({
             <Button
               variant="outline-warning"
               size="sm"
-              className="flex-grow-0 fw-bold"
+              className="btn-library-action"
               onClick={(e) => {
                 e.stopPropagation();
                 onAvaliar(treino);

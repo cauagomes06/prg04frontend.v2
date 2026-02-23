@@ -1,0 +1,74 @@
+/* =========================================================
+   ESTILOS DA GALERIA DE CONQUISTAS
+   ========================================================= */
+
+.galeria-container {
+    background-color: transparent;
+}
+
+.medal-card {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Efeito Hover apenas para as desbloqueadas */
+.medal-card.unlocked:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-color);
+    box-shadow: 0 8px 24px rgba(10, 211, 84, 0.15); /* Brilho suave */
+}
+
+/* Estilo para medalhas bloqueadas (Cinza e opaco) */
+.medal-card.locked {
+    filter: grayscale(100%);
+    opacity: 0.6;
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.medal-icon-wrapper {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    position: relative;
+}
+
+/* Cores por Raridade */
+.medal-ouro {
+    background: linear-gradient(135deg, rgba(241, 196, 15, 0.2), rgba(212, 175, 55, 0.05));
+    color: #f1c40f;
+    border: 2px solid #f1c40f;
+    box-shadow: 0 0 15px rgba(241, 196, 15, 0.2);
+}
+
+.medal-prata {
+    background: linear-gradient(135deg, rgba(189, 195, 199, 0.2), rgba(149, 165, 166, 0.05));
+    color: #bdc3c7;
+    border: 2px solid #bdc3c7;
+}
+
+.medal-bronze {
+    background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(160, 82, 45, 0.05));
+    color: #cd7f32;
+    border: 2px solid #cd7f32;
+}
+
+.medal-name {
+    color: var(--text-dark);
+    font-weight: 800;
+}
+
+.medal-date-badge {
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+    background-color: rgba(10, 211, 84, 0.1) !important;
+    color: var(--primary-color) !important;
+    border: 1px solid var(--primary-color);
+}

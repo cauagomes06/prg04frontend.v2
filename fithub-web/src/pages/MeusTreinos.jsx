@@ -9,6 +9,7 @@ import { SuccessModal } from "../components/common/SuccessModal";
 import { ConfirmModal } from "../components/common/ConfirmModal";
 import { ErrorModal } from "../components/common/ErrorModal";
 import { WorkoutPlayer } from "../components/treinos/WorkoutPlayer";
+import { TrophyToast } from "../components/common/TrophyToast"; // Componente importado com sucesso!
 
 import "../styles/treinos.css";
 
@@ -26,6 +27,10 @@ export function MeusTreinos() {
   const [treinoSelecionado, setTreinoSelecionado] = useState(null);
   const [treinoEmExecucao, setTreinoEmExecucao] = useState(null);
 
+  // --- ESTADOS DA CONQUISTA ---
+  const [showTrophy, setShowTrophy] = useState(false);
+  const [conquista, setConquista] = useState(null);
+
   const [errorData, setErrorData] = useState({ show: false, message: "" });
   const [successData, setSuccessData] = useState({ show: false, message: "" });
   const [confirmData, setConfirmData] = useState({
@@ -38,6 +43,20 @@ export function MeusTreinos() {
   // --- FUNÇÃO PARA MOSTRAR O ERRO VINDO DO FILHO ---
   const handleMostrarErro = (mensagem) => {
     setErrorData({ show: true, message: mensagem });
+  };
+
+  // --- FUNÇÃO PARA MOSTRAR O TROFÉU ---
+  const handleGanhouTrofeu = (novaConquista) => {
+    setConquista(novaConquista);
+    setShowTrophy(true);
+    try {
+        const audio = new Audio('fithub-web/src/sounds/trophy.mp3');
+        audio.volume = 0.5; 
+        audio.play();
+    } catch (error) {
+        console.error("Erro ao reproduzir som da conquista:", error);
+    }
+
   };
 
   const isPersonalOrAdmin =
@@ -192,6 +211,8 @@ export function MeusTreinos() {
                   onExcluir={onExcluir}
                   onPublicar={onPublicar}
                   disabled={isProcessing}
+                  // Mantido caso o card tenha um atalho para finalizar rápido
+                  onTreinoFinalizado={handleGanhouTrofeu} 
                 />
               </div>
             ))}
@@ -230,6 +251,7 @@ export function MeusTreinos() {
         <WorkoutPlayer
           treino={treinoEmExecucao}
           onFechar={() => setTreinoEmExecucao(null)}
+          onTreinoFinalizado={handleGanhouTrofeu} 
         />
       )}
 
@@ -239,7 +261,7 @@ export function MeusTreinos() {
         treino={treinoSelecionado}
         readOnly={true}
         onIniciarTreino={(t) => setTreinoEmExecucao(t)}
-        onError={handleMostrarErro} // <--- PASSANDO PARA O FILHO AQUI
+        onError={handleMostrarErro}
       />
 
       <CreateWorkoutModal
@@ -248,6 +270,7 @@ export function MeusTreinos() {
         onSuccess={carregarTreinos}
         treinoParaEditar={treinoSelecionado}
       />
+      
       <ConfirmModal
         show={confirmData.show}
         handleClose={() => setConfirmData({ ...confirmData, show: false })}
@@ -255,18 +278,25 @@ export function MeusTreinos() {
         title={confirmData.title}
         message={confirmData.message}
       />
+      
       <SuccessModal
         show={successData.show}
         handleClose={() => setSuccessData({ ...successData, show: false })}
         message={successData.message}
       />
 
-      {/* O MODAL DE ERRO ESTÁ PRONTO PARA RECEBER O AVISO DOS FILHOS */}
       <ErrorModal
         show={errorData.show}
         handleClose={() => setErrorData({ ...errorData, show: false })}
         message={errorData.message}
       />
+
+      <TrophyToast 
+        show={showTrophy} 
+        onClose={() => setShowTrophy(false)} 
+        conquista={conquista} 
+      />
+
     </div>
   );
 }

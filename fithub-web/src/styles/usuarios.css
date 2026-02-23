@@ -1,77 +1,116 @@
 /* =========================================
-   ESTILOS DE GESTÃO DE USUÁRIOS
+   ESTILOS DE GESTÃO DE USUÁRIOS (ADAPTÁVEL)
    ========================================= */
 
-.user-table-container {
-  background-color: var(--card-bg);
+/* Container da Página */
+.users-page-container {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
 }
 
+/* Títulos */
+.users-title { color: var(--text-dark); }
+.users-subtitle { color: var(--text-muted); }
+
+/* Card/Tabela Container */
+.user-table-container, .users-content-wrapper {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color);
+}
+
+/* Tabela */
 .user-table {
-  --bs-table-bg: transparent;
-  --bs-table-color: var(--text-dark);
-  --bs-table-border-color: var(--border-color);
-  --bs-table-hover-bg: var(--bg-light);
+    --bs-table-bg: transparent;
+    color: var(--text-dark) !important;
 }
 
 .user-table-thead {
-  background-color: var(--bg-light);
+    background-color: var(--bg-light);
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border-color);
 }
 
-/* Foto do Usuário na Tabela */
+.user-table tbody tr {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.user-table.table-hover tbody tr:hover {
+    background-color: var(--bg-light) !important;
+    color: var(--text-dark) !important;
+}
+
+/* Colunas Específicas */
+.id-column, .empty-state-text {
+    color: var(--text-muted) !important;
+}
+
+.user-name-truncate {
+    color: var(--text-dark);
+}
+
+/* Badges e Avatares */
 .user-avatar-sm {
-  width: 32px;
-  height: 32px;
-  object-fit: cover;
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
 }
 
 .user-icon-placeholder {
-  font-size: 32px;
+    font-size: 32px;
+    color: var(--text-muted);
 }
 
-/* Truncamento de nomes longos */
-.user-name-truncate {
-  display: inline-block;
-  max-width: 150px;
-}
-
-/* Badge de Plano */
 .user-plan-badge {
-  background-color: var(--bg-light);
-  color: var(--text-dark);
+    background-color: var(--bg-light) !important;
+    color: var(--text-dark) !important;
+    border: 1px solid var(--border-color) !important;
 }
 
-/* Espaçamento de colunas vazias */
 .user-empty-icon {
-  opacity: 0.25;
+    opacity: 0.4;
+    color: var(--text-muted);
 }
 
-/* Layout da Página de Gerenciamento de Usuários */
-
-.users-page-container {
-  background-color: var(--bg-light);
-}
-
+/* Layout Extras */
 .users-header-search-wrapper {
-  max-width: 500px;
-  margin-bottom: -1.5rem;
-}
-
-/* Área de Conteúdo/Tabela */
-.users-content-wrapper {
-  background-color: var(--card-bg);
-  min-height: 400px;
+    max-width: 500px;
 }
 
 .users-loading-container {
-  height: 400px;
+    height: 400px;
+    background-color: var(--card-bg);
+}
+/* Força o fundo do card da tabela a usar a variável do tema */
+.user-table-container {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
 }
 
-.users-spinner {
-  width: 3rem;
-  height: 3rem;
+/* Ajusta a tabela e garante que o texto herde a cor correta */
+.user-table {
+    background-color: var(--card-bg) !important;
+    color: var(--text-dark) !important;
 }
 
-/* Ajuste de Paginação */
-.users-pagination-wrapper {
-  padding-bottom: 1.5rem;
+/* Remove o fundo branco das linhas e células */
+.user-table tr, .user-table td, .user-table th {
+    background-color: transparent !important;
+    color: inherit !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Cabeçalho com fundo levemente diferente para destaque */
+.user-table-thead {
+    background-color: var(--bg-light) !important;
+}
+
+/* Ajuste de opacidade para o ID e textos secundários */
+.id-column {
+    opacity: 0.7;
+}
+
+/* Efeito de hover ajustado para o modo escuro */
+.user-table.table-hover tbody tr:hover {
+    background-color: var(--bg-light) !important;
+    cursor: pointer;
 }

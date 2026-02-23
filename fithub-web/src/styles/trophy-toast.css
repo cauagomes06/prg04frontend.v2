@@ -1,0 +1,82 @@
+/* trophy-toast.css */
+
+.trophy-toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.trophy-toast {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+    border: 1px solid rgba(241, 196, 15, 0.4) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(241, 196, 15, 0.2) !important;
+    color: white !important;
+    width: 350px;
+    
+    /* Animação de entrada estilo PS */
+    animation: slideInRight 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.trophy-toast-header {
+    background-color: transparent !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #f1c40f !important;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.trophy-toast-icon {
+    font-size: 1.8rem;
+    color: #f1c40f;
+    margin-right: 15px;
+    filter: drop-shadow(0 0 5px rgba(241, 196, 15, 0.5));
+}
+
+.trophy-toast-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.trophy-toast-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.trophy-toast-desc {
+    font-size: 0.85rem;
+    color: #b0b0b0;
+}
+
+/* Keyframes para o deslize perfeito */
+@keyframes slideInRight {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+/* Efeito de brilho pulsante no ícone do troféu */
+.trophy-toast-icon i {
+    animation: goldGlow 2s infinite alternate;
+}
+
+@keyframes goldGlow {
+    from {
+        filter: drop-shadow(0 0 2px #f1c40f);
+    }
+    to {
+        filter: drop-shadow(0 0 10px #f1c40f);
+    }
+}
+
+/* Garante que o Toast apareça sobre qualquer modal (como o de Treino Concluído) */
+.trophy-toast-container {
+    z-index: 10000 !important; 
+}

@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { apiFetch } from "../services/api";
-import { execucaoApi } from "../services/api"; 
+import { execucaoApi } from "../services/api";
 import { paymentService } from "../services/PaymentService";
-import { Spinner, Badge } from "react-bootstrap";
+import { Spinner, Badge, Tabs, Tab } from "react-bootstrap";
 
 import { SuccessModal } from "../components/common/SuccessModal";
 import { ConfirmModal } from "../components/common/ConfirmModal";
@@ -19,6 +19,7 @@ import { ProfileHeader } from "../components/perfil/ProfileHeader";
 import { ProfileStats } from "../components/perfil/ProfileStats";
 import { EditDataModal } from "../components/perfil/EditDataModal";
 import { ConfigModal } from "../components/perfil/ConfigModal";
+import { GaleriaConquistas } from "../components/perfil/GaleriaConquistas"; // <-- Importado o novo componente
 
 export function Perfil() {
   const [perfil, setPerfil] = useState(null);
@@ -169,79 +170,109 @@ export function Perfil() {
         dataCriacao={perfil?.dataCriacao}
       />
 
-      {/* --- INÍCIO DA SEÇÃO DO FEED DE HISTÓRICO --- */}
+      {/* --- INÍCIO DA ESTRUTURA DE ABAS (TABS) --- */}
       <div className="mt-5">
-        <h3 className="fw-bold text-dark mb-4">
-          <i className="fas fa-chart-line text-success me-2"></i> Atividades
-          Recentes
-        </h3>
+        <Tabs
+          defaultActiveKey="historico"
+          id="perfil-tabs"
+          className="mb-4 custom-tabs"
+        >
+          {/* ABA 1: HISTÓRICO (O código do seu Feed entrou aqui) */}
+          <Tab
+            eventKey="historico"
+            title={
+              <span>
+                <i className="fas fa-chart-line text-success me-2"></i>{" "}
+                Atividades Recentes
+              </span>
+            }
+          >
+            {loadingHistorico ? (
+              <div className="text-center py-5">
+                <Spinner animation="grow" variant="success" />
+              </div>
+            ) : historico.length === 0 ? (
+              <div className="text-center py-5 bg-white rounded-4 shadow-sm border p-4 mt-3">
+                <i className="fas fa-clipboard-list fa-3x text-muted mb-3 opacity-25"></i>
+                <h5 className="fw-bold text-dark">
+                  Nenhum treino concluído ainda
+                </h5>
+                <p className="text-muted mb-0">
+                  Seus treinos finalizados aparecerão aqui.
+                </p>
+              </div>
+            ) : (
+              <div className="mt-3">
+                <div className="historico-list d-flex flex-column gap-3 mb-4">
+                  {historico.map((exec) => (
+                    <div
+                      key={exec.id}
+                      className="historico-card p-3 shadow-sm d-flex flex-column flex-md-row align-items-md-center gap-3 gap-md-4 bg-white"
+                    >
+                      {/* Bloco de Data (Verde) */}
+                      <div className="historico-date-box d-flex flex-row flex-md-column justify-content-center align-items-center flex-shrink-0">
+                        <span className="historico-day me-2 me-md-0">
+                          {getDia(exec.dataInicio)}
+                        </span>
+                        <span className="historico-month">
+                          {getMes(exec.dataInicio)}
+                        </span>
+                      </div>
 
-        {loadingHistorico ? (
-          <div className="text-center py-5">
-            <Spinner animation="grow" variant="success" />
-          </div>
-        ) : historico.length === 0 ? (
-          <div className="text-center py-5 bg-white rounded-4 shadow-sm border p-4">
-            <i className="fas fa-clipboard-list fa-3x text-muted mb-3 opacity-25"></i>
-            <h5 className="fw-bold text-dark">Nenhum treino concluído ainda</h5>
-            <p className="text-muted mb-0">
-              Seus treinos finalizados aparecerão aqui.
-            </p>
-          </div>
-        ) : (
-          <>
-            <div className="historico-list d-flex flex-column gap-3 mb-4">
-              {historico.map((exec) => (
-                <div
-                  key={exec.id}
-                  className="historico-card p-3 shadow-sm d-flex flex-column flex-md-row align-items-md-center gap-3 gap-md-4 bg-white"
-                >
-                  {/* Bloco de Data (Verde) */}
-                  <div className="historico-date-box d-flex flex-row flex-md-column justify-content-center align-items-center flex-shrink-0">
-                    <span className="historico-day me-2 me-md-0">
-                      {getDia(exec.dataInicio)}
-                    </span>
-                    <span className="historico-month">
-                      {getMes(exec.dataInicio)}
-                    </span>
-                  </div>
+                      {/* Informações Principais do Treino */}
+                      <div className="flex-grow-1">
+                        <h5 className="fw-bolder text-dark mb-1">
+                          {exec.nomeTreino || "Treino Realizado"}
+                        </h5>
+                        <div className="d-flex flex-wrap gap-3 text-muted small fw-bold">
+                          <span>
+                            <i className="far fa-clock me-1"></i>{" "}
+                            {calcularDuracao(exec.dataInicio, exec.dataFim)} min
+                          </span>
+                          <span>
+                            <i className="fas fa-dumbbell me-1"></i>{" "}
+                            {exec.itens?.length || 0} exercícios
+                          </span>
+                        </div>
+                      </div>
 
-                  {/* Informações Principais do Treino */}
-                  <div className="flex-grow-1">
-                    <h5 className="fw-bolder text-dark mb-1">
-                      {exec.nomeTreino || "Treino Realizado"}
-                    </h5>
-                    <div className="d-flex flex-wrap gap-3 text-muted small fw-bold">
-                      <span>
-                        <i className="far fa-clock me-1"></i>{" "}
-                        {calcularDuracao(exec.dataInicio, exec.dataFim)} min
-                      </span>
-                      <span>
-                        <i className="fas fa-dumbbell me-1"></i>{" "}
-                        {exec.itens?.length || 0} exercícios
-                      </span>
+                      {/* Pontos da Sessão */}
+                      <div className="historico-pontos d-flex align-items-center gap-2 mt-2 mt-md-0 align-self-start align-self-md-center flex-shrink-0 shadow-sm">
+                        <i className="fas fa-star text-warning"></i>+
+                        {exec.pontosGanhos || 0} PTS
+                      </div>
                     </div>
-                  </div>
-
-                  {/* Pontos da Sessão */}
-                  <div className="historico-pontos d-flex align-items-center gap-2 mt-2 mt-md-0 align-self-start align-self-md-center flex-shrink-0 shadow-sm">
-                    <i className="fas fa-star text-warning"></i>+
-                    {exec.pontosGanhos || 0} PTS
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            <PaginationComponent
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={(page) => setCurrentPage(page)}
-              loading={loadingHistorico}
-            />
-          </>
-        )}
+                <PaginationComponent
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(page) => setCurrentPage(page)}
+                  loading={loadingHistorico}
+                />
+              </div>
+            )}
+          </Tab>
+
+          {/* ABA 2: GALERIA DE TROFÉUS */}
+          <Tab
+            eventKey="conquistas"
+            title={
+              <span>
+                <i className="fas fa-medal me-2 text-warning"></i> Galeria de
+                Troféus
+              </span>
+            }
+          >
+            {/* Renderiza a galeria passando o ID do usuário que já foi carregado no topo */}
+            <div className="mt-3">
+              {perfil && <GaleriaConquistas usuarioId={perfil.id} />}
+            </div>
+          </Tab>
+        </Tabs>
       </div>
-      {/* --- FIM DA SEÇÃO DO FEED DE HISTÓRICO --- */}
+      {/* --- FIM DA ESTRUTURA DE ABAS --- */}
 
       {/* --- MODAIS MANTIDOS INTACTOS --- */}
       <EditDataModal

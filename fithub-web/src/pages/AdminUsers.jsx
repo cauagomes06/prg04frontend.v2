@@ -127,11 +127,11 @@ export default function AdminUsers() {
         {/* CABEÇALHO RESPONSIVO */}
         <div className="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3">
           <div>
-            <h2 className="fw-bold text-dark mb-1">
+            <h2 className="fw-bold mb-1 users-title">
               <i className="fas fa-users-cog me-2 text-success"></i>
               Gerenciar Usuários
             </h2>
-            <p className="text-muted small mb-0">
+            <p className="users-subtitle small mb-0">
               Controle de acessos e permissões da plataforma.
             </p>
           </div>

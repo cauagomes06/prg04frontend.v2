@@ -32,9 +32,9 @@ export function MyWorkoutCard({
     <Card className="h-100 shadow-sm border-0 rounded-4 overflow-hidden hover-effect custom-card position-relative">
       {/* Badge de Status (Público/Privado) */}
       <div
-        className={`position-absolute top-0 start-0 m-2 px-3 py-1 fw-bold rounded-pill shadow-sm d-flex align-items-center gap-2 border border-white badge-status-workout ${isPublic ? "bg-primary text-white" : "bg-secondary text-white"}`}
+        className={`position-absolute   top-0 start-0 m-1  px-1 py-1 fw-bold rounded-pill shadow-sm d-flex align-items-center gap-2 border border-white badge-status-workout ${isPublic ? "bg-primary text-white small" : "bg-secondary text-white small"}`}
       >
-        <i className={isPublic ? "fas fa-globe-americas" : "fas fa-lock"}></i>
+        <i className={isPublic ? "fas fa-globe-americas small " : "fas fa-lock small"}></i>
         {isPublic ? "PÚBLICO" : "PRIVADO"}
       </div>
 

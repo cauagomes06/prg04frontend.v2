@@ -11,7 +11,7 @@ export function InscriptionsCard({ inscricoes, competicoes, onSubmeter }) {
           Minhas Inscrições
         </h5>
       </div>
-      
+
       <Card.Body className="p-0 d-flex flex-column">
         <div className="d-flex flex-column p-3 flex-grow-1">
           {inscricoes.length === 0 ? (
@@ -22,22 +22,31 @@ export function InscriptionsCard({ inscricoes, competicoes, onSubmeter }) {
           ) : (
             inscricoes.map((insc) => {
               const comp = competicoes.find(
-                (c) => c.id === insc.competicaoId || c.nome === insc.competicaoNome
+                (c) =>
+                  c.id === insc.competicaoId || c.nome === insc.competicaoNome,
               );
               const statusAtual = comp ? comp.status : "DESCONHECIDO";
               const isEmAndamento = statusAtual === "EM_ANDAMENTO";
 
               return (
                 /* Usando a classe comp-item para ter a mesma separação individual */
-                <div key={insc.idInscricao} className="comp-item p-3 borda-customizada rounded-3">
+                <div
+                  key={insc.idInscricao}
+                  className="comp-item p-3 borda-customizada rounded-3"
+                >
                   <div className="d-flex justify-content-between align-items-center gap-3">
                     <div className="flex-grow-1 text-truncate">
-                      <div className="comp-item-title mb-1 text-truncate" title={insc.competicaoNome}>
+                      <div
+                        className="comp-item-title mb-1 text-truncate"
+                        title={insc.competicaoNome}
+                      >
                         {insc.competicaoNome}
                       </div>
                       <div className="inscription-status-label">
                         Status:{" "}
-                        <span className={insc.resultado ? "text-success fw-bold" : "text-warning fw-bold"}>
+                        <span
+                          className={`fw-bold ${insc.resultado ? "status-concluido" : "status-pendente"}`}
+                        >
                           {insc.resultado ? "Concluído" : "Pendente"}
                         </span>
                       </div>
