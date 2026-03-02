@@ -18,9 +18,10 @@ export function GaleriaConquistas({ usuarioId }) {
       setLoading(true);
       // <-- CORRIGIDO AQUI
       const data = await apiFetch(`/api/conquistas/usuario/${usuarioId}`);
-      setConquistas(data);
+      setConquistas(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Erro ao carregar conquistas:", error);
+      setConquistas([]);
     } finally {
       setLoading(false);
     }
@@ -36,9 +37,9 @@ export function GaleriaConquistas({ usuarioId }) {
   }
 
   return (
-    <div className="galeria-container py-4">
-      <Row className="g-4">
-        {conquistas.map((c) => (
+    <div className="galeria-container py-4 fle">
+      <Row className="g-4 ">
+        {conquistas?.map((c) => (
           <Col key={c.id} xs={6} md={4} lg={3}>
             <div
               className={`medal-card h-100 p-3 text-center ${c.desbloqueada ? "unlocked" : "locked"}`}
@@ -79,4 +80,3 @@ export function GaleriaConquistas({ usuarioId }) {
     </div>
   );
 }
-  

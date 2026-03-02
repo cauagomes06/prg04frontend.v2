@@ -1,23 +1,30 @@
-import { Button } from "react-bootstrap";
+import React from "react";
 
 export function NotificationItem({ notificacao, onMarcarComoLida }) {
-  
-  // Função auxiliar de data (encapsulada aqui ou num utils)
+
   const formatarData = (dataIso) => {
     if (!dataIso) return "";
-    return new Date(dataIso).toLocaleString("pt-BR", { 
-      day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' 
+    return new Date(dataIso).toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
-  // Lógica do Ícone
-  const isVitoria = notificacao.mensagem && 
-    (notificacao.mensagem.includes("Venceu") || notificacao.mensagem.includes("ganhou"));
+  const isVitoria =
+    notificacao.mensagem &&
+    (notificacao.mensagem.includes("Venceu") ||
+      notificacao.mensagem.includes("ganhou"));
 
   return (
-    <div className={`notificacao-card p-3 d-flex align-items-start ${!notificacao.lida ? 'nao-lida' : ''}`}>
+    <div
+      className={`notificacao-card d-flex align-items-start ${
+        !notificacao.lida ? "nao-lida" : ""
+      }`}
+    >
       {/* Ícone */}
-      <div className="notificacao-icon me-3">
+      <div className="notificacao-icon me-4">
         {isVitoria ? (
           <i className="fas fa-trophy text-warning"></i>
         ) : (
@@ -25,30 +32,39 @@ export function NotificationItem({ notificacao, onMarcarComoLida }) {
         )}
       </div>
 
+      {/* Conteúdo */}
       <div className="flex-grow-1">
-        <div className="d-flex justify-content-between align-items-start">
-          <h6 className="fw-bold mb-1 text-dark">
+
+        {/* Cabeçalho */}
+        <div className="d-flex justify-content-between align-items-start mb-2">
+          <h5 className="notificacao-titulo mb-0">
             Notificação
-            {!notificacao.lida && <span className="notificacao-badge-new">Nova</span>}
-          </h6>
+            {!notificacao.lida && (
+              <span className="badge bg-success ms-2 rounded-pill px-3 py-1">
+                Nova
+              </span>
+            )}
+          </h5>
+
           <span className="notificacao-time">
             {formatarData(notificacao.dataCriacao)}
           </span>
         </div>
-        
-        <p className="text-muted mb-2 small" style={{ lineHeight: "1.5" }}>
+
+        {/* Mensagem */}
+        <p className="notificacao-mensagem">
           {notificacao.mensagem}
         </p>
 
-
-        {/* Botão de Ação */}
+        {/* Botão */}
         {!notificacao.lida && (
-          <div className="d-flex gap-2 mt-1">
-            <button 
-              className="btn-mark-read" 
+          <div className="mt-2">
+            <button
+              className="btn-mark-read"
               onClick={() => onMarcarComoLida(notificacao.id)}
             >
-              <i className="fas fa-check me-1"></i> Marcar como lida
+              <i className="fas fa-check me-2"></i>
+              Marcar como lida
             </button>
           </div>
         )}

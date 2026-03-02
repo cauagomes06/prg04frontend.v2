@@ -9,7 +9,7 @@ import { SuccessModal } from "../components/common/SuccessModal";
 import { ConfirmModal } from "../components/common/ConfirmModal";
 import { ErrorModal } from "../components/common/ErrorModal";
 import { WorkoutPlayer } from "../components/treinos/WorkoutPlayer";
-import { TrophyToast } from "../components/common/TrophyToast"; // Componente importado com sucesso!
+
 
 import "../styles/treinos.css";
 
@@ -45,19 +45,7 @@ export function MeusTreinos() {
     setErrorData({ show: true, message: mensagem });
   };
 
-  // --- FUNÇÃO PARA MOSTRAR O TROFÉU ---
-  const handleGanhouTrofeu = (novaConquista) => {
-    setConquista(novaConquista);
-    setShowTrophy(true);
-    try {
-        const audio = new Audio('fithub-web/src/sounds/trophy.mp3');
-        audio.volume = 0.5; 
-        audio.play();
-    } catch (error) {
-        console.error("Erro ao reproduzir som da conquista:", error);
-    }
 
-  };
 
   const isPersonalOrAdmin =
     user?.nomePerfil &&

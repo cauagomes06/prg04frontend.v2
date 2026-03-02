@@ -5,6 +5,10 @@ import { apiFetch } from "../../services/api";
 import { ThemeToggle } from "./ThemeToggle";
 import "../../styles/portal.css";
 
+// 1. IMPORTAR O TOAST E O SOM (Ajuste o caminho se necessário)
+import { TrophyToast } from "./TrophyToast";
+import trophySound from "../../sounds/trophy.mp3";
+
 export function Layout() {
   const { user, logout } = useContext(AuthContext);
   const location = useLocation();
@@ -21,6 +25,25 @@ export function Layout() {
   const [imgError, setImgError] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // ==========================================
+  // ESTADOS E FUNÇÃO GLOBAL PARA O TROFÉU
+  // ==========================================
+  const [showTrophy, setShowTrophy] = useState(false);
+  const [conquista, setConquista] = useState(null);
+
+  const handleGanhouTrofeu = useCallback((novaConquista) => {
+    setConquista(novaConquista);
+    setShowTrophy(true);
+    try {
+      const audio = new Audio(trophySound);
+      audio.volume = 0.5;
+      audio.play();
+    } catch (error) {
+      console.error("Erro ao reproduzir som da conquista:", error);
+    }
+  }, []);
+  // ==========================================
+
   // Fecha a sidebar ao mudar de rota
   useEffect(() => {
     setIsSidebarOpen(false);
@@ -29,7 +52,6 @@ export function Layout() {
   // Função centralizada para carregar dados iniciais
   const loadInitialData = useCallback(async () => {
     try {
-      // 1. Dados do Usuário
       const data = await apiFetch("/api/usuarios/me");
       const primeiroNome = data.pessoa?.nomeCompleto?.split(" ")[0] || "Utilizador";
 
@@ -40,8 +62,6 @@ export function Layout() {
         foto: data.fotoUrl,
       });
 
-      // 2. Ranking (Executa em paralelo com notificações após ter o ID do usuário)
-      // Usamos Promise.allSettled para que o erro de uma não trave a outra
       Promise.allSettled([
         apiFetch("/api/usuarios/ranking?page=0&size=50").then((dataRanking) => {
           const listaRanking = dataRanking.content || [];
@@ -94,7 +114,7 @@ export function Layout() {
         onClick={() => setIsSidebarOpen(false)}
       ></div>
 
-      {/* SIDEBAR */}
+      {/* SIDEBAR (Mantida igual ao seu original) */}
       <aside className={`portal-sidebar ${isSidebarOpen ? "open" : ""}`}>
         <div className="d-flex align-items-center justify-content-between">
           <ThemeToggle />
@@ -180,13 +200,20 @@ export function Layout() {
       </aside>
 
       <main className="portal-conteudo">
-        <Outlet />
+        {/* 2. PASSAR A FUNÇÃO COMO CONTEXTO PARA TODAS AS PÁGINAS FILHAS */}
+        <Outlet context={{ handleGanhouTrofeu }} />
       </main>
+
+      {/* 3. O COMPONENTE RENDERIZADO GLOBALMENTE */}
+      <TrophyToast 
+        show={showTrophy} 
+        onClose={() => setShowTrophy(false)} 
+        conquista={conquista} 
+      />
     </div>
   );
 }
 
-// Sub-componente para limpar o código do menu
 function MenuLink({ to, icon, label }) {
   return (
     <li>

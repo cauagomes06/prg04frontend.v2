@@ -204,7 +204,7 @@ export function Perfil() {
             ) : (
               <div className="mt-3">
                 <div className="historico-list d-flex flex-column gap-3 mb-4">
-                  {historico.map((exec) => (
+                  {historico?.map((exec) => (
                     <div
                       key={exec.id}
                       className="historico-card p-3 shadow-sm d-flex flex-column flex-md-row align-items-md-center gap-3 gap-md-4 bg-white"
