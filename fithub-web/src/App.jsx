@@ -10,7 +10,7 @@ import { Register } from "./pages/Register.jsx";
 import { Layout } from "./components/common/Layout.jsx";
 import { Dashboard } from "./pages/Dashboard.jsx";
 import { MeusTreinos } from "./pages/MeusTreinos.jsx";
-import { Biblioteca } from "./pages/BibliotecaTreinos.jsx";
+import { Biblioteca } from "./pages/Biblioteca.jsx";
 import { Exercicios } from "./pages/Exercicios.jsx";
 import { Perfil } from "./pages/Perfil.jsx";
 import { Notificacoes } from "./pages/Notificacoes.jsx";
