@@ -5,10 +5,6 @@ import { apiFetch } from "../../services/api";
 import { ThemeToggle } from "./ThemeToggle";
 import "../../styles/portal.css";
 
-// 1. IMPORTAR O TOAST E O SOM (Ajuste o caminho se necessário)
-import { TrophyToast } from "./TrophyToast";
-import trophySound from "../../sounds/trophy.mp3";
-
 export function Layout() {
   const { user, logout } = useContext(AuthContext);
   const location = useLocation();
@@ -24,25 +20,6 @@ export function Layout() {
   const [notifCount, setNotifCount] = useState(0);
   const [imgError, setImgError] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  // ==========================================
-  // ESTADOS E FUNÇÃO GLOBAL PARA O TROFÉU
-  // ==========================================
-  const [showTrophy, setShowTrophy] = useState(false);
-  const [conquista, setConquista] = useState(null);
-
-  const handleGanhouTrofeu = useCallback((novaConquista) => {
-    setConquista(novaConquista);
-    setShowTrophy(true);
-    try {
-      const audio = new Audio(trophySound);
-      audio.volume = 0.5;
-      audio.play();
-    } catch (error) {
-      console.error("Erro ao reproduzir som da conquista:", error);
-    }
-  }, []);
-  // ==========================================
 
   // Fecha a sidebar ao mudar de rota
   useEffect(() => {
@@ -114,7 +91,7 @@ export function Layout() {
         onClick={() => setIsSidebarOpen(false)}
       ></div>
 
-      {/* SIDEBAR (Mantida igual ao seu original) */}
+      {/* SIDEBAR */}
       <aside className={`portal-sidebar ${isSidebarOpen ? "open" : ""}`}>
         <div className="d-flex align-items-center justify-content-between">
           <ThemeToggle />
@@ -200,16 +177,8 @@ export function Layout() {
       </aside>
 
       <main className="portal-conteudo">
-        {/* 2. PASSAR A FUNÇÃO COMO CONTEXTO PARA TODAS AS PÁGINAS FILHAS */}
-        <Outlet context={{ handleGanhouTrofeu }} />
+        <Outlet />
       </main>
-
-      {/* 3. O COMPONENTE RENDERIZADO GLOBALMENTE */}
-      <TrophyToast 
-        show={showTrophy} 
-        onClose={() => setShowTrophy(false)} 
-        conquista={conquista} 
-      />
     </div>
   );
 }

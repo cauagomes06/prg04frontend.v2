@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { apiFetch } from "../services/api";
 import { Container, Spinner, Button, Row, Col } from "react-bootstrap";
 import { AuthContext } from "../context/AuthContext";
+import { GamificationContext } from "../context/GamificationContext"; 
 
 import { WorkoutModal } from "../components/treinos/WorkoutModal";
 import { LibraryCard } from "../components/treinos/LibraryCard";
@@ -18,6 +19,7 @@ import "../styles/treinos.css";
 
 export function Biblioteca() {
   const { user } = useContext(AuthContext);
+  const { ganharConquista } = useContext(GamificationContext);
 
   const [treinos, setTreinos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -258,7 +260,7 @@ export function Biblioteca() {
                 onAvaliar={handleAbrirAvaliacao}
                 disabled={isProcessing}
                 onIniciarTreino={(t) => setTreinoEmExecucao(t)}
-                onError={handleMostrarErro} // <--- PASSANDO PARA O FILHO AQUI
+                onError={handleMostrarErro} 
               />
             ))}
           </div>
@@ -275,6 +277,7 @@ export function Biblioteca() {
           <WorkoutPlayer
             treino={treinoEmExecucao}
             onFechar={() => setTreinoEmExecucao(null)}
+            onTreinoFinalizado={ganharConquista}
           />
         )}
 
@@ -284,7 +287,7 @@ export function Biblioteca() {
           treino={selectedTreino}
           readOnly={true}
           onIniciarTreino={(t) => setTreinoEmExecucao(t)}
-          onError={handleMostrarErro} // <--- PASSANDO PARA O FILHO AQUI
+          onError={handleMostrarErro} 
         />
 
         <ConfirmModal

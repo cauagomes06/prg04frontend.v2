@@ -1,5 +1,4 @@
 import { useState, useEffect, useContext } from "react";
-import { paymentService } from "../services/PaymentService.js";
 import { useNavigate, Link } from "react-router-dom";
 import { apiFetch } from "../services/api.js";
 import { SuccessModal } from "../components/common/SuccessModal.jsx";
@@ -48,9 +47,29 @@ export function Register() {
   }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    let { name, value } = e.target;
 
+    if (name === "cpf") {
+      // 1. Remove qualquer coisa que não seja número para reprocessar a máscara
+      const numbers = value.replace(/\D/g, "");
+
+      // 2. Aplica a formatação 000.000.000-00 dinamicamente
+      value = numbers
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    }
+    if (name === "telefone") {
+      const numbers = value.replace(/\D/g, ""); // Remove tudo que não é número
+
+      value = numbers
+        .replace(/^(\d{2})(\d)/g, "($1) $2") // Adiciona os parênteses no DDD
+        .replace(/(\d{5})(\d)/, "$1-$2") // Adiciona o hífen após o 5º dígito
+        .replace(/(-\d{4})\d+?$/, "$1"); // Limita a 11 números (9 dígitos + DDD)
+    }
+
+    setFormData({ ...formData, [name]: value });
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -62,7 +81,7 @@ export function Register() {
       return;
     }
 
-    // Payload de registro (Mantive igual ao seu)
+    // Payload de registro com a limpeza do CPF/Telefone
     const payload = {
       username: formData.email,
       password: formData.password,
@@ -70,13 +89,13 @@ export function Register() {
       plano: parseInt(formData.planoId),
       pessoa: {
         nomeCompleto: formData.nomeCompleto,
-        cpf: formData.cpf,
-        telefone: formData.telefone,
+        cpf: formData.cpf.replace(/\D/g, ""), // Limpa pontos e traços
+        telefone: formData.telefone.replace(/\D/g, ""), // Limpa caracteres especiais
       },
     };
 
     try {
-      // 1. Cria a conta
+      // 1. Cria a conta no banco de dados
       await apiFetch("/api/usuarios/register", {
         method: "POST",
         body: JSON.stringify(payload),
@@ -91,32 +110,23 @@ export function Register() {
         }),
       });
 
-      // Salva token e carrega usuário
+      // 3. Salva token e carrega usuário logado
       localStorage.setItem("fithub_token", loginData.token);
       const userProfile = await apiFetch("/api/usuarios/me");
       login(loginData.token, userProfile);
 
-      // 3. INICIA O PAGAMENTO DO PLANO ESCOLHIDO
-      // Usa o ID do usuário recém-criado (userProfile.id) e o plano do form
-      const checkoutResponse = await paymentService.criarCheckout(
-        userProfile.id,
-        parseInt(formData.planoId)
+      // 4. Fluxo de Sucesso Direto (Sem Mercado Pago)
+      setSuccessMessage(
+        "Conta criada com sucesso! Redirecionando para o portal...",
       );
-
-      // 4. Redireciona para o Mercado Pago
-      if (checkoutResponse && checkoutResponse.initPoint) {
-        window.location.href = checkoutResponse.initPoint;
-      } else {
-        throw new Error("Link de pagamento não gerado.");
-      }
+      setShowSuccessModal(true);
     } catch (err) {
       console.error(err);
       setErrorMessage(err.message || "Erro ao criar conta.");
       setShowErrorModal(true);
-      setLoading(false); // Só tira o loading se der erro, pois se der certo ele sai da página
+      setLoading(false);
     }
   };
-
   const handleCloseSuccess = () => {
     setShowSuccessModal(false);
     navigate("/portal");
@@ -163,8 +173,10 @@ export function Register() {
                   type="text"
                   name="cpf"
                   className="form-control"
-                  placeholder="apenas números"
+                  placeholder="000.000.000-00"
                   required
+                  maxLength="14" // 11 números + 2 pontos + 1 traço
+                  value={formData.cpf} // Vincula ao estado para refletir a máscara
                   onChange={handleChange}
                 />
               </div>
@@ -174,7 +186,10 @@ export function Register() {
                   type="text"
                   name="telefone"
                   className="form-control"
+                  placeholder="(00) 00000-0000"
                   required
+                  maxLength="15"
+                  value={formData.telefone}
                   onChange={handleChange}
                 />
               </div>
@@ -243,7 +258,7 @@ export function Register() {
               className="btn btn-success btn-lg w-100 rounded-pill fw-bold mt-4"
               disabled={loading}
             >
-              {loading ? "A processar..." : "Registar e Pagar"}
+              {loading ? "A processar..." : "Cadastre-se"}
             </button>
 
             <p className="mt-4 text-center">

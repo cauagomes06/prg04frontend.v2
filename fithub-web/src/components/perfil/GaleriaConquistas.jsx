@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Row, Col, Spinner, Badge } from "react-bootstrap";
 import "../../styles/conquistas.css";
-import { apiFetch } from "../../services/api"; // <-- CORRIGIDO AQUI
+import { apiFetch } from "../../services/api";
 
-export function GaleriaConquistas({ usuarioId }) {
+// Adicionamos a prop 'apenasObtidas' com valor padrão 'false'
+export function GaleriaConquistas({ usuarioId, apenasObtidas = false }) {
   const [conquistas, setConquistas] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -16,12 +17,10 @@ export function GaleriaConquistas({ usuarioId }) {
   const carregarConquistas = async () => {
     try {
       setLoading(true);
-      // <-- CORRIGIDO AQUI
       const data = await apiFetch(`/api/conquistas/usuario/${usuarioId}`);
-      setConquistas(Array.isArray(data) ? data : []);
+      setConquistas(data);
     } catch (error) {
       console.error("Erro ao carregar conquistas:", error);
-      setConquistas([]);
     } finally {
       setLoading(false);
     }
@@ -36,10 +35,16 @@ export function GaleriaConquistas({ usuarioId }) {
     );
   }
 
+  // LÓGICA DE FILTRO AQUI: Se for para mostrar só as obtidas, filtramos a lista.
+  const conquistasFiltradas = apenasObtidas 
+    ? conquistas.filter(c => c.desbloqueada) 
+    : conquistas;
+
   return (
-    <div className="galeria-container py-4 fle">
-      <Row className="g-4 ">
-        {conquistas?.map((c) => (
+    <div className="galeria-container py-4">
+      <Row className="g-4">
+        {/* Usamos o array filtrado para desenhar os cards */}
+        {conquistasFiltradas.map((c) => (
           <Col key={c.id} xs={6} md={4} lg={3}>
             <div
               className={`medal-card h-100 p-3 text-center ${c.desbloqueada ? "unlocked" : "locked"}`}
@@ -71,10 +76,15 @@ export function GaleriaConquistas({ usuarioId }) {
         ))}
       </Row>
 
-      {conquistas.length === 0 && (
-        <div className="text-center p-5 text-muted">
-          <i className="fas fa-trophy fa-3x mb-3 opacity-25"></i>
-          <p>Nenhuma conquista configurada no sistema ainda.</p>
+      {/* Mensagem de estado vazio dinâmica */}
+      {conquistasFiltradas.length === 0 && (
+        <div className="text-center p-5 text-muted border border-dashed rounded-4 mt-3" style={{ backgroundColor: "var(--bg-light)" }}>
+          <i className="fas fa-trophy fa-3x mb-3 opacity-25 text-warning"></i>
+          <p className="mb-0 fw-semibold">
+            {apenasObtidas 
+              ? "Este usuário ainda não obteve nenhuma conquista." 
+              : "Nenhuma conquista configurada no sistema ainda."}
+          </p>
         </div>
       )}
     </div>

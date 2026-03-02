@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, AuthContext } from "./context/AuthContext.jsx";
+import { GamificationProvider } from "./context/GamificationContext";
 import { useContext } from "react";
 
 // Imports das Páginas
@@ -16,11 +17,7 @@ import { Notificacoes } from "./pages/Notificacoes.jsx";
 import { Competicoes } from "./pages/Competicoes.jsx";
 import { Aulas } from "./pages/Aulas.jsx";
 import AdminUsers from "./pages/AdminUsers.jsx";
-import { PerfilPublico } from "./pages/PerfilPublico.jsx"; // <- Adicionado o .jsx
-
-// Imports de Pagamento (Adicionados)
-import { PaymentSuccess } from "./pages/payment/PaymentSuccess.jsx";
-import { PaymentFailure } from "./pages/payment/PaymentFailure.jsx";
+import { PerfilPublico } from "./pages/PerfilPublico.jsx";
 
 // 1. Protetor de Rotas Geral (Logado)
 const PrivateRoute = ({ children }) => {
@@ -53,58 +50,52 @@ const AdminRoute = ({ children }) => {
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* --- Rotas Públicas --- */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+      <GamificationProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* --- Rotas Públicas --- */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-          {/* --- Rotas de Retorno do Pagamento --- */}
-          <Route path="/sucesso" element={<PaymentSuccess />} />
-          <Route path="/falha" element={<PaymentFailure />} />
-          <Route path="/pendente" element={<PaymentSuccess />} />
-
-          {/* --- Área do Portal (Protegida) --- */}
-          <Route
-            path="/portal"
-            element={
-              <PrivateRoute>
-                <Layout />
-              </PrivateRoute>
-            }
-          >
-            {/* Redireciona /portal para /portal/perfil */}
-            <Route index element={<Navigate to="perfil" />} />
-
-            {/* Rotas Internas do Portal (TODAS RELATIVAS, SEM A BARRA INICIAL) */}
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="notificacoes" element={<Notificacoes />} />
-            <Route path="perfil" element={<Perfil />} />
-            <Route path="treinos" element={<MeusTreinos />} />
-            <Route path="biblioteca" element={<Biblioteca />} />
-            <Route path="exercicios" element={<Exercicios />} />
-            <Route path="competicoes" element={<Competicoes />} />
-            <Route path="aulas" element={<Aulas />} />
-            
-            {/* --- CORREÇÃO AQUI --- Tirei a barra / do início */}
-            <Route path="perfil/:id" element={<PerfilPublico />} />
-
-            {/* Rota de Admin */}
+            {/* --- Área do Portal (Protegida) --- */}
             <Route
-              path="admin/planos"
+              path="/portal"
               element={
-                <AdminRoute>
-                  <AdminPlans />
-                </AdminRoute>
+                <PrivateRoute>
+                  <Layout />
+                </PrivateRoute>
               }
-            />
-            <Route path="admin" element={<AdminUsers />} />
-          </Route>
+            >
+              {/* Redireciona /portal para /portal/perfil */}
+              <Route index element={<Navigate to="perfil" />} />
 
-          {/* Qualquer rota desconhecida vai para login */}
-          <Route path="*" element={<Navigate to="/login" />} />
-        </Routes>
-      </BrowserRouter>
+              {/* Rotas Internas do Portal (TODAS RELATIVAS, SEM A BARRA INICIAL) */}
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="notificacoes" element={<Notificacoes />} />
+              <Route path="perfil" element={<Perfil />} />
+              <Route path="treinos" element={<MeusTreinos />} />
+              <Route path="biblioteca" element={<Biblioteca />} />
+              <Route path="exercicios" element={<Exercicios />} />
+              <Route path="competicoes" element={<Competicoes />} />
+              <Route path="aulas" element={<Aulas />} />
+              <Route path="perfil-publico/:id" element={<PerfilPublico />} />
+              {/* Rota de Admin */}
+              <Route
+                path="admin/planos"
+                element={
+                  <AdminRoute>
+                    <AdminPlans />
+                  </AdminRoute>
+                }
+              />
+              <Route path="admin" element={<AdminUsers />} />
+            </Route>
+
+            {/* Qualquer rota desconhecida vai para login */}
+            <Route path="*" element={<Navigate to="/login" />} />
+          </Routes>
+        </BrowserRouter>
+      </GamificationProvider>
     </AuthProvider>
   );
 }

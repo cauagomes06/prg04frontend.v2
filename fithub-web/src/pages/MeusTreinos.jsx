@@ -1,8 +1,9 @@
 import { useState, useEffect, useContext } from "react";
 import { apiFetch } from "../services/api";
 import { AuthContext } from "../context/AuthContext";
-import { MyWorkoutCard } from "../components/treinos/MyWorkoutCard";
+import { GamificationContext } from "../context/GamificationContext";
 
+import { MyWorkoutCard } from "../components/treinos/MyWorkoutCard";
 import { WorkoutModal } from "../components/treinos/WorkoutModal";
 import { CreateWorkoutModal } from "../components/treinos/CreateWorkoutModal";
 import { SuccessModal } from "../components/common/SuccessModal";
@@ -11,10 +12,12 @@ import { ErrorModal } from "../components/common/ErrorModal";
 import { WorkoutPlayer } from "../components/treinos/WorkoutPlayer";
 
 
+
 import "../styles/treinos.css";
 
 export function MeusTreinos() {
   const { user } = useContext(AuthContext);
+  const { ganharConquista } = useContext(GamificationContext);
   const [treinos, setTreinos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -27,9 +30,6 @@ export function MeusTreinos() {
   const [treinoSelecionado, setTreinoSelecionado] = useState(null);
   const [treinoEmExecucao, setTreinoEmExecucao] = useState(null);
 
-  // --- ESTADOS DA CONQUISTA ---
-  const [showTrophy, setShowTrophy] = useState(false);
-  const [conquista, setConquista] = useState(null);
 
   const [errorData, setErrorData] = useState({ show: false, message: "" });
   const [successData, setSuccessData] = useState({ show: false, message: "" });
@@ -199,8 +199,7 @@ export function MeusTreinos() {
                   onExcluir={onExcluir}
                   onPublicar={onPublicar}
                   disabled={isProcessing}
-                  // Mantido caso o card tenha um atalho para finalizar rápido
-                  onTreinoFinalizado={handleGanhouTrofeu} 
+                  onTreinoFinalizado={ganharConquista} 
                 />
               </div>
             ))}
@@ -239,7 +238,7 @@ export function MeusTreinos() {
         <WorkoutPlayer
           treino={treinoEmExecucao}
           onFechar={() => setTreinoEmExecucao(null)}
-          onTreinoFinalizado={handleGanhouTrofeu} 
+          onTreinoFinalizado={ganharConquista} 
         />
       )}
 
@@ -279,11 +278,6 @@ export function MeusTreinos() {
         message={errorData.message}
       />
 
-      <TrophyToast 
-        show={showTrophy} 
-        onClose={() => setShowTrophy(false)} 
-        conquista={conquista} 
-      />
 
     </div>
   );

@@ -63,7 +63,7 @@ export function Competicoes() {
 
   const carregarRanking = useCallback(async () => {
     try {
-      const data = await apiFetch(`/api/usuarios/ranking?page=${rankingPage}&size=5`);
+      const data = await apiFetch(`/api/usuarios/ranking?page=${rankingPage}&size=10`);
       if (data?.content) {
         setRanking(data.content);
         setRankingTotalPages(data.totalPages);
@@ -222,6 +222,7 @@ export function Competicoes() {
               currentPage={rankingPage}
               totalPages={rankingTotalPages}
               onPageChange={setRankingPage}
+              usuarioLogadoId={user?.id}
             />
           </Col>
 
