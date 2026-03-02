@@ -70,6 +70,7 @@ export function Register() {
 
     setFormData({ ...formData, [name]: value });
   };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -127,6 +128,7 @@ export function Register() {
       setLoading(false);
     }
   };
+  
   const handleCloseSuccess = () => {
     setShowSuccessModal(false);
     navigate("/portal");
@@ -158,7 +160,7 @@ export function Register() {
 
             <div className="row g-3">
               <div className="col-md-12">
-                <label className="form-label fw-bold">Nome Completo</label>
+                <label className="form-label fw-bold">Nome Completo <span className="text-danger">*</span></label>
                 <input
                   type="text"
                   name="nomeCompleto"
@@ -168,7 +170,7 @@ export function Register() {
                 />
               </div>
               <div className="col-md-6">
-                <label className="form-label fw-bold">CPF</label>
+                <label className="form-label fw-bold">CPF <span className="text-danger">*</span></label>
                 <input
                   type="text"
                   name="cpf"
@@ -181,7 +183,7 @@ export function Register() {
                 />
               </div>
               <div className="col-md-6">
-                <label className="form-label fw-bold">Telefone</label>
+                <label className="form-label fw-bold">Telefone <span className="text-danger">*</span></label>
                 <input
                   type="text"
                   name="telefone"
@@ -195,7 +197,7 @@ export function Register() {
               </div>
 
               <div className="col-md-6">
-                <label className="form-label fw-bold">Email</label>
+                <label className="form-label fw-bold">Email <span className="text-danger">*</span></label>
                 <input
                   type="email"
                   name="email"
@@ -205,7 +207,7 @@ export function Register() {
                 />
               </div>
               <div className="col-md-6">
-                <label className="form-label fw-bold">Senha</label>
+                <label className="form-label fw-bold">Senha <span className="text-danger">*</span></label>
                 <input
                   type="password"
                   name="password"
@@ -217,9 +219,8 @@ export function Register() {
 
               <div className="col-12 mt-4">
                 <label className="form-label fw-bold mb-2">
-                  Escolha o seu Plano:
+                  Escolha o seu Plano: <span className="text-danger">*</span>
                 </label>
-                {/* 2. CORREÇÃO DE SEGURANÇA NO RENDER (?.map) */}
                 <div className="row g-2">
                   {planos?.length > 0 ? (
                     planos.map((plano) => (

@@ -90,7 +90,7 @@ export function LibraryCard({
           </Card.Title>
 
           {treino.status === "PUBLICO" && (
-            <Badge className="border border-success badge-public-status bg-success">
+            <Badge className="badge-public-status bg-success">
               PÚBLICO
             </Badge>
           )}
