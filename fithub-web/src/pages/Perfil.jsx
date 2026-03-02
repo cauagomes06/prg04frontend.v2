@@ -8,7 +8,7 @@ import { Spinner, Badge, Tabs, Tab } from "react-bootstrap";
 import { SuccessModal } from "../components/common/SuccessModal";
 import { ConfirmModal } from "../components/common/ConfirmModal";
 import { ErrorModal } from "../components/common/ErrorModal";
-import { XPProgressBar } from "../components/perfil/XpProgressBar";
+import { XPProgressBar } from "../components/perfil/XPProgressBar";
 import { PaginationComponent } from "../components/common/PaginationComponent";
 
 import "../styles/perfil.css";
