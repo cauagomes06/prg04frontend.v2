@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Spinner, Button } from "react-bootstrap";
 import { AuthContext } from "../context/AuthContext";
-import { apiFetch } from "../services/api"; // <-- Importe o apiFetch (Remova o paymentService)
+import { apiFetch } from "../services/api"; 
 
 import "../styles/dashboard.css"; 
 

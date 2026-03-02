@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
-import { apiFetch } from "../services/api";
-import { execucaoApi } from "../services/api";
-import { paymentService } from "../services/PaymentService";
-import { Spinner, Badge, Tabs, Tab } from "react-bootstrap";
+import { apiFetch, execucaoApi } from "../services/api"; // <-- Importamos apenas da api local
+import { Spinner, Tabs, Tab } from "react-bootstrap";
 
 import { SuccessModal } from "../components/common/SuccessModal";
 import { ConfirmModal } from "../components/common/ConfirmModal";
@@ -19,12 +16,11 @@ import { ProfileHeader } from "../components/perfil/ProfileHeader";
 import { ProfileStats } from "../components/perfil/ProfileStats";
 import { EditDataModal } from "../components/perfil/EditDataModal";
 import { ConfigModal } from "../components/perfil/ConfigModal";
-import { GaleriaConquistas } from "../components/perfil/GaleriaConquistas"; // <-- Importado o novo componente
+import { GaleriaConquistas } from "../components/perfil/GaleriaConquistas"; 
 
 export function Perfil() {
   const [perfil, setPerfil] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [searchParams, setSearchParams] = useSearchParams();
 
   // --- ESTADOS DO HISTÓRICO (FEED) ---
   const [historico, setHistorico] = useState([]);
@@ -77,20 +73,10 @@ export function Perfil() {
     }
   };
 
-  // Verificar retorno do Mercado Pago e carregar perfil
+  // Carregar perfil inicial (removido a checagem do Mercado Pago daqui)
   useEffect(() => {
-    const status = searchParams.get("status");
-    if (status === "sucesso") {
-      setSuccessMsg("Pagamento confirmado! O seu plano foi ativado.");
-      setShowSuccess(true);
-      setSearchParams({});
-    } else if (status === "falha") {
-      setErrorMsg("O pagamento falhou ou foi cancelado.");
-      setShowError(true);
-      setSearchParams({});
-    }
     carregarPerfil();
-  }, [searchParams]);
+  }, []);
 
   // Disparar a busca do histórico sempre que a página mudar
   useEffect(() => {
@@ -113,23 +99,28 @@ export function Perfil() {
     setShowConfirm(true);
   };
 
+  // --- TROCA DIRETA DE PLANO SEM PAGAMENTO ---
   const executarMudancaPlano = async () => {
     try {
       setShowConfirm(false);
       setShowConfig(false);
-      const checkoutResponse = await paymentService.criarCheckout(
-        perfil.id,
-        pendingPlanId,
-      );
+      
+      // Chamada direta para o endpoint do backend
+      await apiFetch("/api/usuarios/alterar-plano", {
+        method: "PATCH",
+        body: JSON.stringify({ planoId: pendingPlanId })
+      });
 
-      if (checkoutResponse && checkoutResponse.initPoint) {
-        window.location.href = checkoutResponse.initPoint;
-      } else {
-        alert("Erro: O servidor não retornou o link de pagamento.");
-      }
+      setSuccessMsg("Plano atualizado com sucesso!");
+      setShowSuccess(true);
+      
+      // Atualiza os dados da tela para mostrar o novo plano
+      carregarPerfil(); 
+      
     } catch (error) {
-      console.error("Erro no checkout:", error);
-      alert("Não foi possível iniciar o pagamento: " + error.message);
+      console.error("Erro ao alterar plano:", error);
+      setErrorMsg("Não foi possível alterar o plano. Tente novamente.");
+      setShowError(true);
     }
   };
 
@@ -177,7 +168,7 @@ export function Perfil() {
           id="perfil-tabs"
           className="mb-4 custom-tabs"
         >
-          {/* ABA 1: HISTÓRICO (O código do seu Feed entrou aqui) */}
+          {/* ABA 1: HISTÓRICO */}
           <Tab
             eventKey="historico"
             title={
@@ -265,16 +256,14 @@ export function Perfil() {
               </span>
             }
           >
-            {/* Renderiza a galeria passando o ID do usuário que já foi carregado no topo */}
             <div className="mt-3">
               {perfil && <GaleriaConquistas usuarioId={perfil.id} />}
             </div>
           </Tab>
         </Tabs>
       </div>
-      {/* --- FIM DA ESTRUTURA DE ABAS --- */}
 
-      {/* --- MODAIS MANTIDOS INTACTOS --- */}
+      {/* --- MODAIS --- */}
       <EditDataModal
         show={showEditData}
         handleClose={() => setShowEditData(false)}
@@ -290,12 +279,13 @@ export function Perfil() {
         onPlanChangeRequest={handlePlanChangeRequest}
       />
 
+      {/* ConfirmModal ajustado para não mencionar Mercado Pago */}
       <ConfirmModal
         show={showConfirm}
         handleClose={() => setShowConfirm(false)}
         handleConfirm={executarMudancaPlano}
-        title="Ir para Pagamento"
-        message="Você será redirecionado para o Mercado Pago para concluir a assinatura. Deseja continuar?"
+        title="Confirmar Troca de Plano"
+        message="Deseja realmente alterar o seu plano atual para o novo plano selecionado? A mudança será aplicada imediatamente."
       />
 
       <SuccessModal
