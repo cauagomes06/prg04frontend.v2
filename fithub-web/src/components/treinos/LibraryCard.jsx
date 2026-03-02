@@ -29,6 +29,7 @@ export function LibraryCard({
   isMostFollowed,
   onIniciarTreino,
   onError,
+  hideCreatorLink = false
 }) {
   const navigate = useNavigate();
 
@@ -52,8 +53,8 @@ export function LibraryCard({
 
   const handleNavegarParaPerfil = (e) => {
     e.stopPropagation();
-    if (treino.criadorId) {
-      navigate(`/portal/perfil/${treino.criadorId}`);
+    if (treino.criadorId && !hideCreatorLink) {
+      navigate(`/portal/perfil-publico/${treino.criadorId}`);
     }
   };
 

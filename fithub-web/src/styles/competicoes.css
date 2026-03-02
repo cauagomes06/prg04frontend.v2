@@ -3,12 +3,14 @@
    Foco: Simetria, Contraste e Espaçamento Otimizado
    ========================================================= */
 
-/* --- VARIÁVEIS DE CORES --- */
+/* --- VARIÁVEIS GLOBAIS --- */
 :root {
   --gold: #f1c40f;
 }
 
-/* --- PAGE LAYOUT --- */
+/* =========================================================
+   1. LAYOUT GERAL DA PÁGINA
+   ========================================================= */
 .comp-page-container {
   background-color: var(--bg-light);
   min-height: 100vh;
@@ -23,7 +25,9 @@
   font-weight: 800;
 }
 
-/* --- CABEÇALHO UNIFICADO PARA CARDS (SIMETRIA) --- */
+/* =========================================================
+   2. ESTILOS BASE PARA CARDS (SIMETRIA)
+   ========================================================= */
 .comp-card-header {
   padding: 1.25rem 1.5rem !important;
   display: flex;
@@ -49,7 +53,35 @@
   white-space: nowrap;
 }
 
-/* --- COMPETITIONS LIST CARD (ESTILO INDIVIDUAL) --- */
+.comp-card-footer {
+  padding: 1rem 1.5rem;
+  background-color: var(--bg-light);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.comp-empty-state {
+  color: var(--text-muted) !important;
+}
+
+/* Paginação */
+.comp-pagination-btn {
+  color: var(--primary-color) !important;
+}
+
+.comp-pagination-info {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dark) !important;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+/* =========================================================
+   3. LISTA DE COMPETIÇÕES (CompetitionsListCard)
+   ========================================================= */
 .comp-list-badge-page {
   font-size: 0.65rem !important;
   letter-spacing: 1px;
@@ -106,16 +138,191 @@
   font-weight: 600;
 }
 
-/* --- RANKING CARD - VISUAL REFINADO & COMPACTO --- */
+/* =========================================================
+   4. STATUS E BADGES GERAIS (Inscrições e Competições)
+   ========================================================= */
+
+/* Inscrições */
+.inscription-status-label {
+  color: var(--text-dark) !important;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-concluido {
+  color: #198754;
+}
+.status-pendente {
+  color: #ffc107;
+}
+
+[data-theme="dark"] .status-concluido {
+  color: var(--primary-color) !important;
+}
+[data-theme="dark"] .status-pendente {
+  color: #ffdca8 !important;
+}
+
+/* Competições (Pills Modal) */
+.status-pill {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  border-radius: 50rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.status-aberta {
+  background-color: rgba(10, 211, 84, 0.15);
+  color: #09a03f;
+}
+.status-em-andamento {
+  background-color: rgba(253, 126, 20, 0.15);
+  color: #fd7e14;
+}
+.status-encerrada {
+  background-color: rgba(108, 117, 125, 0.15);
+  color: #6c757d;
+}
+.status-cancelada {
+  background-color: rgba(220, 53, 69, 0.15);
+  color: #dc3545;
+}
+
+[data-theme="dark"] .status-aberta {
+  color: #2ecc71;
+  background-color: rgba(46, 204, 113, 0.2);
+}
+[data-theme="dark"] .status-em-andamento {
+  color: #f39c12;
+  background-color: rgba(243, 156, 18, 0.2);
+}
+[data-theme="dark"] .status-encerrada {
+  color: #adb5bd;
+  background-color: rgba(173, 181, 189, 0.2);
+}
+[data-theme="dark"] .status-cancelada {
+  color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.2);
+}
+
+/* =========================================================
+   5. MODAL DE DETALHES DA COMPETIÇÃO
+   ========================================================= */
+.comp-modal-content {
+  background-color: var(--card-bg) !important;
+  color: var(--text-dark) !important;
+}
+
+.comp-modal-header,
+.comp-modal-footer {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+.comp-modal-body {
+  background-color: var(--bg-light) !important;
+}
+
+.comp-description-box {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+.comp-info-stat {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  transition: transform 0.2s ease;
+}
+
+.comp-info-stat:hover {
+  transform: translateY(-2px);
+}
+
+.comp-management-box {
+  background-color: rgba(10, 211, 84, 0.05);
+  border: 1px dashed var(--primary-color) !important;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+[data-theme="dark"] .comp-management-box {
+  background-color: rgba(10, 211, 84, 0.08);
+}
+
+.comp-select-custom {
+  background-color: var(--bg-light) !important;
+  color: var(--text-dark) !important;
+  border-color: var(--border-color) !important;
+}
+
+.comp-select-custom:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 0.2rem rgba(10, 211, 84, 0.25) !important;
+}
+
+.comp-leaderboard-list {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+.leaderboard-list-item {
+  background-color: transparent !important;
+  border-color: var(--border-color) !important;
+  transition: background-color 0.2s ease;
+}
+
+.leaderboard-list-item:hover {
+  background-color: var(--bg-light) !important;
+}
+
+.border-dashed {
+  border-style: dashed !important;
+  border-color: var(--border-color) !important;
+}
+
+.btn-close-modal {
+  background-color: var(--bg-light) !important;
+  color: var(--text-dark) !important;
+  border-color: var(--border-color) !important;
+}
+
+.btn-close-modal:hover {
+  background-color: var(--border-color) !important;
+}
+
+.result-input-custom {
+  background-color: var(--bg-light) !important;
+  color: var(--text-dark) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 12px;
+}
+
+/* =========================================================
+   6. RANKING CARD
+   ========================================================= */
 .ranking-item {
   background-color: transparent !important;
   border-bottom: 1px solid var(--border-color) !important;
-  /* Ajustado para 0.75rem para aproximar as pessoas */
   padding: 0.75rem 1.5rem !important;
   transition: background-color 0.2s;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  animation: fadeInRow 0.3s ease-out forwards;
+}
+
+@keyframes fadeInRow {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .ranking-item:hover {
@@ -129,8 +336,9 @@
   line-height: 1.2;
 }
 
-/* --- BADGES DE POSIÇÃO NO RANKING --- */
+/* Badges de Posição */
 .badge-pos {
+  flex-shrink: 0;
   width: 32px;
   height: 32px;
   display: flex;
@@ -146,24 +354,21 @@
   background: linear-gradient(135deg, #f1c40f, #d4af37) !important;
   color: #000 !important;
 }
-
 .badge-silver {
   background: linear-gradient(135deg, #bdc3c7, #95a5a6) !important;
   color: #000 !important;
 }
-
 .badge-bronze {
   background: linear-gradient(135deg, #cd7f32, #a0522d) !important;
   color: #fff !important;
 }
-
 .badge-default {
   background-color: var(--bg-light) !important;
   color: var(--text-dark) !important;
   border: 1px solid var(--border-color) !important;
 }
 
-/* --- PONTUAÇÃO --- */
+/* Pontuação */
 .score-text {
   color: var(--primary-color) !important;
   font-weight: 800;
@@ -179,97 +384,38 @@
   text-transform: uppercase;
 }
 
-/* --- MODAIS & GESTÃO --- */
-.comp-details-body,
-.submit-result-body {
-  background-color: var(--card-bg) !important;
+/* Avatar e Destaques */
+.leader-badge-text {
+  font-size: 0.6rem;
+  letter-spacing: 0.5px;
 }
 
-.comp-management-box {
-  border: 1px dashed var(--primary-color) !important;
-  background-color: rgba(10, 211, 84, 0.02);
-  border-radius: 12px;
-  padding: 1rem;
+.ranking-avatar-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
 
-.result-input-custom {
-  background-color: var(--bg-light) !important;
-  color: var(--text-dark) !important;
-  border: 1px solid var(--border-color) !important;
-  border-radius: 12px;
-}
-
-/* --- NAVEGAÇÃO & RODAPÉ --- */
-.comp-card-footer {
-  padding: 1rem 1.5rem;
+.ranking-avatar-fallback {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   background-color: var(--bg-light);
-  border-top: 1px solid var(--border-color);
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
 
-.comp-pagination-btn {
-  color: var(--primary-color) !important;
+.ranking-item-highlight {
+  background-color: rgba(10, 211, 84, 0.05) !important;
+  border-left: 4px solid var(--primary-color) !important;
 }
 
-.comp-pagination-info {
-  font-variant-numeric: tabular-nums;
-  color: var(--text-dark) !important;
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: 0.8rem;
-}
-
-.comp-empty-state {
-  color: var(--text-muted) !important;
-}
-/* =========================================
-   STATUS DE INSCRIÇÃO (CORES ADAPTÁVEIS)
-   ========================================= */
-
-/* Modo Claro (Padrão) */
-.status-concluido {
-  color: #198754; /* Verde padrão do Bootstrap (success) */
-}
-
-.status-pendente {
-  color: #ffc107; /* Amarelo padrão do Bootstrap (warning) */
-}
-
-/* Modo Escuro */
-[data-theme="dark"] .status-concluido {
-  color: var(--primary-color) !important; /* Ou um verde mais claro/brilhante, ex: #2ecc71 */
-}
-
-[data-theme="dark"] .status-pendente {
-  color: #ffdca8 !important; /* Um amarelo mais suave que o original, para não doer a vista no fundo escuro */
-}
-/* =========================================
-   RÓTULO E VALORES DE STATUS
-   ========================================= */
-
-/* O rótulo "Status:" agora segue a cor de texto padrão do tema */
-.inscription-status-label {
-  color: var(--text-dark) !important;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-/* Cores dos valores (Concluido/Pendente) */
-.status-concluido {
-  color: #198754; /* Verde sucesso */
-}
-
-.status-pendente {
-  color: #ffc107; /* Amarelo alerta */
-}
-
-/* Ajustes específicos para o Modo Escuro */
-[data-theme="dark"] .status-concluido {
-  color: var(--primary-color) !important; /* Verde menta do Fit Hub */
-}
-
-[data-theme="dark"] .status-pendente {
-  color: #ffdca8 !important; /* Amarelo suave para melhor leitura */
+[data-theme="dark"] .ranking-item-highlight {
+  background-color: rgba(10, 211, 84, 0.1) !important;
 }
