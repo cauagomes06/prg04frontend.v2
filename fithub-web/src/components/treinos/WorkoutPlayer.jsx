@@ -3,7 +3,7 @@ import { ProgressBar, Button, Badge } from "react-bootstrap";
 import { execucaoApi } from "../../services/api";
 import { ErrorModal } from "../common/ErrorModal";
 import { LevelUpModal } from "../common/LevelUpModal";
-import "../../styles/workoutPlayer.css";
+import "../../styles/WorkoutPlayer.css";
 
 export function WorkoutPlayer({ treino, onFechar, onTreinoFinalizado }) {
   const listaExercicios = treino?.items || treino?.itens || [];
