@@ -13,16 +13,17 @@ import {
 export function RevenueChart({ dados }) {
   if (!dados) return null;
 
-  // Cores alinhadas com o dashboard.css para consistência
+  // Substituímos os dados de vendas pelos dados reais da plataforma
   const data = [
-    { name: 'Faturamento (R$)', valor: dados.total_faturado || 0, cor: '#2ecc71' },
-    { name: 'Qtd. Vendas', valor: dados.quantidade_vendas || 0, cor: '#3498db' }
+    { name: 'Alunos', valor: dados.totalAlunos || 0, cor: '#3498db' }, // Azul
+    { name: 'Personais', valor: dados.totalPersonais || 0, cor: '#0dcaf0' }, // Ciano
+    { name: 'Aulas Agendadas', valor: dados.aulasAgendadas || 0, cor: '#f1c40f' }, // Amarelo
+    { name: 'Competições', valor: dados.competicoesAtivas || 0, cor: '#e74c3c' } // Vermelho
   ];
 
   return (
     <ResponsiveContainer width="100%" height={350}>
       <BarChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-        {/* Ajustada a cor da grade para ser visível mas discreta em ambos os temas */}
         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
         
         <XAxis 
@@ -35,6 +36,7 @@ export function RevenueChart({ dados }) {
           axisLine={false} 
           tickLine={false} 
           tick={{ fill: 'var(--text-muted)', fontSize: 12 }}
+          allowDecimals={false} // Não permite números quebrados no eixo Y (ex: 1.5 alunos)
         />
         
         <Tooltip  

@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8080";
+const API_URL = "https://fithub-api-kx7l.onrender.com";
 
 /**
  * Função base para chamadas à API com tratamento de Token e Erros

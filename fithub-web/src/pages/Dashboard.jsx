@@ -1,30 +1,28 @@
 import { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Spinner, Button } from "react-bootstrap";
 import { AuthContext } from "../context/AuthContext";
-import { paymentService } from "../services/PaymentService";
+import { apiFetch } from "../services/api"; // <-- Importe o apiFetch (Remova o paymentService)
 
-// Importação do CSS Externo
 import "../styles/dashboard.css"; 
 
-// Componentes de Analytics
 import { AdminStatsCards } from "../components/dashboard/AdminStatsCards";
 import { RevenueChart } from "../components/dashboard/RevenueChart";
 
 export function Dashboard() {
   const { user } = useContext(AuthContext);
   
-  // Estados para dados financeiros
-  const [stats, setStats] = useState({ total_faturado: 0, quantidade_vendas: 0 });
+  // Estado inicializado vazio
+  const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Verificação de permissão
   const isAdmin = user?.nomePerfil && user.nomePerfil.includes("ROLE_ADMIN");
 
-  // --- CARREGAR DADOS FINANCEIROS ---
+  // --- CARREGAR DADOS DO DASHBOARD DA API REAL ---
   const carregarDadosDashboard = async () => {
     setLoading(true);
     try {
-      const data = await paymentService.obterRelatorioFaturamento();
+      const data = await apiFetch("/api/dashboard/stats");
       setStats(data);
     } catch (error) {
       console.error("Erro ao carregar dados do dashboard:", error);
@@ -34,8 +32,12 @@ export function Dashboard() {
   };
 
   useEffect(() => {
-    carregarDadosDashboard();
-  }, []);
+    if (isAdmin) {
+      carregarDadosDashboard();
+    } else {
+      setLoading(false);
+    }
+  }, [isAdmin]);
 
   if (loading) return (
     <div className="d-flex justify-content-center align-items-center vh-100" style={{ backgroundColor: 'var(--bg-light)' }}>
@@ -56,13 +58,12 @@ export function Dashboard() {
             </h4>
             <p className="text-muted mb-0 small">
                 {isAdmin 
-                  ? "Acompanhe métricas e faturamento da plataforma." 
+                  ? "Acompanhe as métricas da plataforma." 
                   : "Visualize suas estatísticas de uso."}
             </p>
           </div>
 
           <div className="d-flex gap-2">
-            {/* Botão de atualizar refatorado para respeitar os temas */}
             <Button 
               variant="outline-secondary" 
               onClick={carregarDadosDashboard} 
@@ -75,11 +76,11 @@ export function Dashboard() {
         </div>
 
         {/* 1. SEÇÃO DE CARDS */}
-        {isAdmin && (
+        {isAdmin && stats && (
           <Row className="mb-4">
             <Col lg={12}>
-                {/* O CSS que fizemos no passo anterior vai brilhar dentro deste componente */}
-                <AdminStatsCards dados={stats} />
+                {/* Repassamos os dados centralizados para os cards */}
+                <AdminStatsCards stats={stats} />
             </Col>
           </Row>
         )}
@@ -88,9 +89,9 @@ export function Dashboard() {
         <Row>
           <Col lg={12}>
             <div className="dashboard-chart-section">
-               <h5 className="fw-bold mb-4 text-dark">Desempenho de Vendas e Faturamento</h5>
+               <h5 className="fw-bold mb-4 text-dark">Visão Geral da Plataforma</h5>
                
-               {isAdmin ? (
+               {isAdmin && stats ? (
                  <RevenueChart dados={stats} />
                ) : (
                  <div className="text-center py-5">
